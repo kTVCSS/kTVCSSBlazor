@@ -14,6 +14,7 @@
     <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
     <PackageReference Include="Radzen.Blazor" Version="*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*-*" />
+    <ProjectReference Include="..\..\kTVCSS.Models\kTVCSS.Models.csproj" />
     <ProjectReference Include="..\Client\kTVCSSBlazor.Client.csproj" />
   </ItemGroup>
 

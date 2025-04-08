@@ -17,6 +17,9 @@
     <Compile Include="../Server/Models/**/*.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\kTVCSS.Models\kTVCSS.Models.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <ServiceWorker Include="../Server/wwwroot/service-worker.js" PublishedContent="../Server/wwwroot/service-worker.published.js" />
   </ItemGroup>
 </Project>
