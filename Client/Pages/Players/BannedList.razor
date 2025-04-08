@@ -1,0 +1,61 @@
+﻿@page "/banslist"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject StateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@inject HttpClient http
+
+@if (ready)
+{
+    <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@_filtered">
+        <HeaderTemplate>
+            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список заблокированных игроков проекта"></RadzenText>
+                <div class="rz-pr-2">
+                    <RadzenTextBox Style="width: 300px" Placeholder="Например, ник или стим" @bind-Value="@SearchString" />
+                </div>
+            </RadzenStack>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                <Template>
+                    <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
+                <Template>
+                    <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" Context="ctx" Title="STEAMID" Property="SteamID" />
+            <RadzenDataGridColumn Context="ctx" Title="Истекает" Property="BanExpires" />
+            <RadzenDataGridColumn CssClass="rz-text-wrap" Width="300px" Context="ctx" Title="Причина" Property="Reason" />
+            <RadzenDataGridColumn Context="ctx" Title="Выдан" Property="BannedBy" />
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка списка заблокированных игроков проекта" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+<style>
+    .rz-custom-header {
+        width: 100% !important;
+    }
+
+    a {
+        color: var(--rz-text-color) !important;
+        text-decoration: initial !important;
+    }
+</style>

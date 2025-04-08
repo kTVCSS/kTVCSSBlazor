@@ -1,0 +1,54 @@
+﻿@using kTVCSSBlazor.Db.Models.Players
+
+<RadzenCard>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="open_in_browser" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Энтри" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.Highlights.OpenFrags.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="3k" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Триплы" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.Highlights.Tripples.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="4k" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Квадро" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.Highlights.Quadros.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="5k" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Эйсы" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.Highlights.Aces.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+}

@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Radzen.Blazor
+@using kTVCSSBlazor.Client.Authorization
+@inject NavigationManager NavigationManager
+@inject StateProvider AuthProvider
+@inject NotificationService notify
+
+<PageTitle>kTVCSS @@ Авторизация в системе</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView Context="auth">
+        <Authorized>
+            <RadzenAlert AlertStyle="AlertStyle.Danger">Вы уже авторизованы!</RadzenAlert>
+        </Authorized>
+        <NotAuthorized>
+            <RadzenRow JustifyContent="JustifyContent.Center">
+                <RadzenColumn SizeSM="12" SizeMD="6">
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenImage class="rz-m-auto" Path="/images/logo_ktv.png" Style="width: 256px;" AlternateText="community" />
+                        <RadzenTemplateForm class="rz-py-4 rz-px-4" Data=@("LoginWithDefaultValues")>
+                            <RadzenLogin FormFieldVariant="Variant.Flat" LoginText="Авторизоваться" UserText="Логин" PasswordText="Пароль" AllowRegister="true"
+                                         AllowResetPassword="true" Username=@userName Password=@password RegisterMessageText="Нет учетной записи?"
+                                         ResetPasswordText="Забыли пароль?" RegisterText="Зарегистрироваться"
+                                         Login=@(args => OnLogin(args, "Login with default values"))
+                                         ResetPassword=@(args => OnResetPassword(args, "Login with default values"))
+                                         Register=@(args => OnRegister("Login with default values")) />
+                        </RadzenTemplateForm>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    string userName = "";
+    string password = "";
+    bool rememberMe = true;
+
+    private async Task OnLogin(LoginArgs args, string name)
+    {
+        string result = await AuthProvider.LoginAsync(args.Username, args.Password);
+
+        if (!string.IsNullOrEmpty(result))
+        {
+            notify.Notify(new NotificationMessage()
+                {
+                    CloseOnClick = true,
+                    Detail = result,
+                    Summary = "Ошибка авторизации",
+                    Severity = NotificationSeverity.Error,
+                    Duration = 5000,
+                    Payload = DateTime.Now
+                });
+            return;
+        }
+
+        notify.Notify(NotificationSeverity.Success, "Успех", $"Добро пожаловать, {args.Username}. Сейчас вы будете перенаправлены на главную страницу!", TimeSpan.FromSeconds(5));
+
+        await Task.Delay(1500);
+
+        NavigationManager.NavigateTo("/", true);
+
+        StateHasChanged();
+    }
+
+    void OnRegister(string name)
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+    void OnResetPassword(string value, string name)
+    {
+        notify.Notify(NotificationSeverity.Info, "Долбаеб", $"Нехуй забывать пароль", TimeSpan.FromSeconds(5));
+    }
+}

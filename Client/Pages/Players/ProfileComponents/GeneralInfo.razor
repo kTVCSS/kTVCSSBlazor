@@ -1,0 +1,54 @@
+﻿@using kTVCSSBlazor.Db.Models.Players
+
+<RadzenCard>
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <img src="@player.RankUrl" alt="User Profile" style="width: 56px; height: 100%; border-radius: 50%;">
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Рейтинг" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.MMR.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="clean_hands" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Порядочость" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.BanMultiplier.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="gamepad" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="Роль" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.Role" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeMD="3">
+            <RadzenCard Variant="Radzen.Variant.Outlined">
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAACXBIWXMAAAsTAAALEwEAmpwYAAAE8klEQVR4nO1aW6xcUxjeIojiRVyKB7cED5xGiAcSaatoFe2jN40ivYQHD+rBJeLy4EnKW10S156mQVpOz8y/tiERqWRUtbP/f8/RtJS4PkiooD2dT/5tOGNm7fvac45mvmQlk5l1+9b/r/+2xvNGGGGEYxofCU6jAFdSgCUmwEoKsSL6HGKs0cKp3v8NZg/ONoI1RrCZGF8bAVLaQRK8SYJ7Gy3M9+YiABxHjOUkqBnGdAZS1kaCIyR4T+fSOb25AAqxlAStoqQS2mc69+yqIuOdCoj9tzG2Dl11fcZNhvFj5eRmVPf7eoAbhkLOMNbrXRkWuR5JTqshqprchqETGyS6oRJyJLhv1snNqKxbSVKIpWXMfxXq6odY7IScWjBi/FTRZj8gxgO+4NpaiAu16Wf9jgQfpkjxOyfWlRjbKlCxT5VI2tq1ENcZwa4ESW4tRc6EWFaBeo1/fBAnZ92D9tWwL/awwoLBgIZKRrDXMblGs4kT8u5Fx+jYmHl3FQrriHGrY7X8Ne7ONEKcEWlLiGX62dZnB+McIzhknZuxPD9BQd0pQcaT/WtMTOEkEjzfGzhEnxkb9TfLoT8VM/+7ucjpSbt2C8S4xHKIb+UxIL7g0hjtOFLbh7MyE+zmcy7v3v6BNRg3po2zxZ/EOGDtH2B1HoKbHRNsWAhuzCD1Zy3jrMaGBG9kJpgxE8+jni9bNvpahnGv5vDLX2Uip3USYnQckvvFD3C+heBjGcY+MkBQsDOmb6e2G6ekEtTNGMFvDiW4xrYOtXGREfyZoNZ/NAQX9PtDEvwcN8ZvY0EmKZo2ziPGS4ZxtKT0/CQnbBh3W9f4O/e7a+DwQyxOWXNRJoL/TtjGgqL+UB27Bs9pa5BgoRartL82w5j0A1xfJC72Bbd7RaARRu7CEmO95xBRLTVlTb8oQcUW4Pg64x5NUzKQa7gs+0V2IVsNaFHpxSIrK3h8IC5k7NFwjBh36h12wszzvPcFV2lxOJPWhBhLnXBbE/NI8EJdcG5SP/3dMF6MJBpgpecYky2cbhjPEOP3jAatk8lNKDS0UgmppJLeD9SIGAFp2FWWUI1xuRGsIsHDamjUTeQ0al8WCtVUQnr39A4O5Gi92TZjh24yL7EtLZxoGE+Q4HAZl2QYr2cnGGC1ZZK9ak3/6RPdNbv/2qS5W5Z16oKrXSXVZPGbsdANxhV31S+qf1SJJSx4KCm611zPCJ52VUAmweGJKZzp5QExJhLU4SgJ7ifGNwl9pjUc65/XtHENCQIXxMxM256LXLQRwW1Jk6oU1GoZxqNRBGI72QBLLPfNfX01nLk6ed/8dsdN2pshdFV6U+/m9cGk3wJr8OyaHAmaucllKRuqkenvT4IrujWW5/wpXDwwn2CVc+lxSRdFgrdjTm5nnnCsqxGfOCY37pVFtwD1Q55czwYKsdax9L7VR1jPBeqCm23GIXLOjDvSxmuf0o588C1/oecSxFgXcxc7JHhlMsRl/WP0O62rOC6BdHJV0PKAGA+lnOwX6j+7bZ9rg9Il96B3LD5hk65ZleT6oQ68wjdDq0FxfufSoBYssfTuqjHGnVnLohaWGJ9XoJJNF3mmE6gT9wPc0k1Uy/yVS13J9kKx5bCgrzz6LwhNQLWcnmYVNRPXvprP5U555gKijCPEWGSYQqzQ0p4WcDVu1frPbO9vhBFG8CrFXzMqtHFumQDrAAAAAElFTkSuQmCC" alt="steam-circled">
+                    <RadzenStack Gap="0">
+                        <RadzenText Text="SteamID" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.SteamID" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+}

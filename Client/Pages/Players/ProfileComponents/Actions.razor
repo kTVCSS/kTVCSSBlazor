@@ -1,0 +1,119 @@
+﻿@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Players
+@inject StateProvider AuthProvider
+@inject NavigationManager nm
+@inject HttpClient http
+@inject TooltipService tooltipService
+
+@if (AuthProvider.CurrentUser.Id == player.MainInfo.Id || AuthProvider.CurrentUser.IsAdmin)
+{
+    <RadzenButton Click=OpenEditProfile Icon="edit" Text="Редактировать профиль"></RadzenButton>
+
+    @if (player.Vip || AuthProvider.CurrentUser.IsAdmin)
+    {
+        <RadzenButton @ref=clrBtn MouseEnter="@(args => ShowTooltip(args, "Обнулить стастистику, не затрагивая рейтинг"))" Click=ClearProfile Icon="clear" Text="Обнулить профиль"></RadzenButton>
+    }
+    else
+    {
+        <RadzenButton Disabled MouseEnter="@(args => ShowTooltip(args, "Обнуление доступно VIP игрокам"))" Icon="clear" Text="Обнулить профиль"></RadzenButton>
+    }
+
+    @if (player.MainInfo.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+    {
+        <RadzenButton @ref=fullClrBtn MouseEnter="@(args => ShowTooltip(args, "Обнулить стастистику, в т.ч. и рейтинг"))" Click=FullClearProfile Icon="clear" Text="Полное обнуление"></RadzenButton>
+    }
+}
+@if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
+{
+    <RadzenButton Click=SendMessage Icon="message" Text="Написать"></RadzenButton>
+
+    <RadzenButton Click=Report Icon="warning" Text="Репорт"></RadzenButton>
+
+    if (!string.IsNullOrEmpty(player.TeamInfo.ID))
+    {
+        <RadzenButton @ref=itBtn Click="SendInviteToTeam" Icon="add_business">Пригласить в команду</RadzenButton>
+    }
+
+    @if (isMeAFriend)
+    {
+        <RadzenButton Click=AddFriend Text="Удалить из друзей" Icon="remove_circle" />
+    }
+    else
+    {
+        <RadzenButton Click=RemoveFriend Text="Добавить в друзья" Icon="add_circle" />
+    }
+}
+
+@if (!AuthProvider.CurrentUser.IsAdmin)
+{
+    @if (player.Vip)
+    {
+        <RadzenButton Text="Лучшие моменты" Click="@(() => { nm.NavigateTo($"/player/highlights/{player.MainInfo.Id}"); })" Icon="movie"></RadzenButton>
+    }
+    else
+    {
+        <RadzenButton Disabled MouseEnter="@(args => ShowTooltip(args, "Чтобы с легкостью искать и скачивать лучшие моменты (сразу с тиками и описанием момента), необходимо приобрести VIP привилегию"))" Icon="movie" Text="Лучшие моменты"></RadzenButton>
+    }
+}
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+    [Parameter] public bool isOnline { get; set; }
+    [Parameter] public bool isMeAFriend { get; set; }
+
+    RadzenButton? clrBtn;
+    RadzenButton? fullClrBtn;
+    RadzenButton? itBtn;
+
+    private void OpenEditProfile()
+    {
+        if (player.MainInfo.Block == 1)
+        {
+            return;
+        }
+        nm.NavigateTo($"/editprofile/{player.MainInfo.Id}");
+    }
+
+    void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) => tooltipService.Open(elementReference, text, options);
+
+    private async Task ClearProfile()
+    {
+        clrBtn.Disabled = true;
+    }
+
+    private void FullClearProfile()
+    {
+        clrBtn.Disabled = true;
+        fullClrBtn.Disabled = true;
+    }
+
+    private void SendMessage()
+    {
+
+    }
+
+    private void SendInviteToTeam()
+    {
+        itBtn.Disabled = true;
+    }
+
+    private void AddFriend()
+    {
+
+    }
+
+    private void RemoveFriend()
+    {
+
+    }
+
+    private void Report()
+    {
+
+    }
+
+    private void UnbanRequest()
+    {
+
+    }
+}

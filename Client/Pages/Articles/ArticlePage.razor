@@ -1,0 +1,83 @@
+﻿@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Arcticles
+@inject StateProvider AuthProvider
+@page "/article/{Id:int}"
+@inject NotificationService notifyService
+@inject NavigationManager nm
+@inject HttpClient http
+
+@if (ready)
+{
+    @if (article is not null)
+    {
+        <PageTitle>kTVCSS @@ @article.Title</PageTitle>
+
+        <RadzenContent>
+            <div class="news-article-container">
+                <div class="rz-mb-4 rz-p-10">
+                    <RadzenText TextStyle="TextStyle.DisplayH3" TextAlign="TextAlign.Center" Text="@article.Title" />
+                    <RadzenText TextAlign="TextAlign.Center">Дата публикации: @article.DateTime.ToString("dd.MM.yyyy") / @article.Views просмотров</RadzenText>
+                    <CascadingAuthenticationState>
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                                        <RadzenButton Click="OpenEdit" Size="ButtonSize.Small" Variant="Variant.Text" Text="Редактировать" />
+                                        <RadzenButton Click="Remove" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                    </RadzenStack>
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </div>
+
+                @((MarkupString)article.Html)
+
+                <hr />
+
+                <RadzenText TextStyle="TextStyle.DisplayH6" Text="Комментарии" />
+
+                @if (article.ArticleComments is not null)
+                {
+                    @if (article.ArticleComments.Count == 0)
+                    {
+                        <RadzenText>Комментарии не найдены. Будьте первым, кто оставит комментарий!</RadzenText>
+                    }
+                    else
+                    {
+                        @foreach (var item in article.ArticleComments)
+                        {
+                            <RadzenCard class="rz-pa-3 rz-my-2">
+                                <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+
+                                <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+                                    <RadzenText>@item.Text</RadzenText>
+                                </div>
+                            </RadzenCard>
+                        }
+                    }
+                }
+
+                <RadzenCard class="rz-pa-4 rz-my-2">
+                    <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
+
+                    <RadzenStack>
+                        <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш комментарий" />
+                        <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
+                    </RadzenStack>
+                </RadzenCard>
+            </div>
+        </RadzenContent>
+    }
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка новости" />
+        </RadzenStack>
+    </RadzenRow>
+}

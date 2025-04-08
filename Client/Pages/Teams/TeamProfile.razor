@@ -1,0 +1,327 @@
+﻿@page "/team/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Matches
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+@inject HttpClient http
+
+@if (ready)
+{
+    <PageTitle>kTVCSS @@ Профиль команды @data.Info.Name</PageTitle>
+
+    <RadzenStack>
+        <RadzenCard>
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenImage Style="width: 128px;height: 128px;border-radius: 64px;" Path="@data.AvatarUrl" />
+                <RadzenText TextStyle="TextStyle.DisplayH4" Text="@data.Info.Name" TextAlign="TextAlign.Center" />
+            </RadzenStack>
+        </RadzenCard>
+        @if (!string.IsNullOrEmpty(data.Info.Description))
+        {
+            <RadzenCard Style="max-height: 30vh;overflow: auto;">
+                @((MarkupString)data.Info.Description)
+            </RadzenCard>
+        }
+        <RadzenCard>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Radzen.Variant.Outlined">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                            <RadzenIcon Icon="trophy" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                            <RadzenStack Gap="0">
+                                <RadzenText Text="Позиция команды" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                <RadzenText Text="@data.Info.Position.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Radzen.Variant.Outlined">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                            <RadzenIcon Icon="stars" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                            <RadzenStack Gap="0">
+                                <RadzenText Text="Рейтинг команды" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                <RadzenText Text="@data.Info.Rating.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Radzen.Variant.Outlined">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                            <RadzenIcon Icon="globe" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                            <RadzenStack Gap="0">
+                                <RadzenText Text="Сыграно матчей" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                <RadzenText Text="@data.Info.MatchesPlayed.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Radzen.Variant.Outlined">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                            <RadzenIcon Icon="trending_up" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                            <RadzenStack Gap="0">
+                                <RadzenText Text="Винрейт" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                @if (data.Info.MatchesPlayed == 0)
+                                {
+                                    <RadzenText Text="0%" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                                }
+                                else
+                                {
+                                    <RadzenText Text="@string.Concat(Math.Round((Math.Round(data.Info.MatchesWins / (double)data.Info.MatchesPlayed, 2) * 100), 2), "%")" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                                }
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+        @if (data.Achiviments.Any())
+        {
+            <RadzenCard>
+                <RadzenStack JustifyContent="JustifyContent.Center">
+                    <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH5" Text="Достижения команды"></RadzenText>
+                    @foreach (var ach in data.Achiviments)
+                    {
+                        <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                            @if (ach.Place == 1)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="gold" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                            @if (ach.Place == 2)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="silver" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                            @if (ach.Place == 3)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="bronze" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                        </RadzenStack>
+                    }
+                </RadzenStack>
+            </RadzenCard>
+        }
+        <CascadingAuthenticationState>
+            <AuthorizeView Context="ctx">
+                <Authorized>
+                    @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                    {
+                        <RadzenCard>
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    if (data.Info.BlockEdit == 0)
+                                    {
+                                        <RadzenButton Click="@(async () => { await http.GetAsync($"/api/teams/blockteam?id={Id}"); data = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}"); ShowSuccess("Состав команды был заблокирован!"); StateHasChanged(); })" Icon="lock" Text="Заблокировать состав"></RadzenButton>
+                                    }
+                                    else
+                                    {
+                                        <RadzenButton Click="@(async () => { await http.GetAsync($"/api/teams/unblockteam?id={Id}"); data = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}"); ShowSuccess("Состав команды был разблокирован!"); StateHasChanged(); })" Icon="lock_open" Text="Разблокировать состав"></RadzenButton>
+                                    }
+                                }
+                                @if (AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                                {
+                                    <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
+                                    <RadzenButton Click="DeleteTeam" Icon="delete" Text="Удалить команду"></RadzenButton>
+                                }
+                                @if (data.Members.Where(x => x.SteamID == AuthProvider.CurrentUser.SteamId).Any())
+                                {
+                                    @if (AuthProvider.CurrentUser.SteamId != data.Info.CapSteamID)
+                                    {
+                                        <RadzenButton Click="async () => { await LeaveTeam(); }" Icon="exit_to_app" Text="Покинуть команду"></RadzenButton>
+                                    }
+                                }
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
+                                }
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+
+        <RadzenRow>
+            <!-- Блок Winrate -->
+            <RadzenColumn SizeMD="6" SizeSM="12">
+                <RadzenCard>
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Винрейт по картам" />
+                        <RadzenStack>
+                            @foreach (var map in MapsWinrate)
+                            {
+                                <div style="border-radius: 16px;background-blend-mode: multiply;background-size: 100% auto;background-position: left;background-color: rgba(0, 0, 0, 0.55); height: 64px; color: white;@(string.Concat("background-image: url('", map.BackgroundImage, "');"))">
+                                    <div style="height:100%;backdrop-filter: blur(0.9px);display: flex;justify-content: center;align-items: center;">@map.Name - @map.Winrate%</div>
+                                </div>
+                            }
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+
+            <!-- Блок Total Count с прогрессбаром -->
+            <RadzenColumn SizeMD="6" SizeSM="12">
+                <RadzenCard>
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Частота выбора карт" />
+                        <RadzenStack>
+                            @foreach (var playerStat in MapStats)
+                            {
+                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                                    <RadzenLabel class="rz-pl-4" Text="@playerStat.Name" />
+                                    <RadzenProgressBar Value="@playerStat.Progress" Max="100" Style="width: 60%;height: 64px;border-radius: 16px;">
+                                        <div style="position: absolute; width: 100%; top: 0; left: 0; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                            @playerStat.Progress%
+                                        </div>
+                                    </RadzenProgressBar>
+                                </RadzenStack>
+                            }
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@data.Members">
+            <HeaderTemplate>
+                <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                    <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Состав команды"></RadzenText>
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <CascadingAuthenticationState>
+                    <AuthorizeView Context="context">
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                            {
+                                <RadzenDataGridColumn Width="50px" Title="" Context="ctx">
+                                    <Template>
+                                        <RadzenButton Disabled="data.Info.CapSteamID == ctx.SteamID" Size="ButtonSize.Small" Variant="Variant.Flat" Icon="close" Click="@(async () => { await KickPlayer(ctx.SteamID); })" />
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            }
+                            <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                                <Template>
+                                    <RadzenStack Orientation="Orientation.Horizontal">
+                                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                                    </RadzenStack>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
+                                <Template>
+                                    <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="175px" Title="Основное оружие" Context="ctx">
+                                <Template>
+                                    <RadzenImage Path="@ctx.PrimaryWeapon" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="KDR" Property="KDR" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="HSR" Property="HSR" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="AVG" Property="AVG" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="MMR" Property="MMR" />
+                        </Authorized>
+                        <NotAuthorized>
+                            <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                                <Template>
+                                    <RadzenStack Orientation="Orientation.Horizontal">
+                                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                                    </RadzenStack>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
+                                <Template>
+                                    <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="175px" Title="Основное оружие" Context="ctx">
+                                <Template>
+                                    <RadzenImage Path="@ctx.PrimaryWeapon" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="KDR" Property="KDR" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="HSR" Property="HSR" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="AVG" Property="AVG" />
+                            <RadzenDataGridColumn Context="ctx" Width="100px" Title="MMR" Property="MMR" />
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+            </Columns>
+        </RadzenDataGrid>
+        <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" Text="Последние 20 матчей команды" />
+        <RadzenDataGrid id="ktv-matches-grid" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@data.Matches" TItem="TeamMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;"))">
+            <Columns>
+                <RadzenDataGridColumn TItem="TeamMatch" Visible="true">
+                    <Template Context="ctx">
+                        <a href="/match/@ctx.ID">
+                            <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: center;">
+                                <div style="font-size: 22px;font-weight: 600;width:100%;text-align:center">@ctx.DateTime</div>
+                                <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: center;">
+                                    <div style="font-size: 22px;font-weight: 600;display:flex;text-align:center;">@ctx.Result</div>
+                                </div>
+                                <div style="font-size: 22px;font-weight: 600;">@ctx.MapName</div>
+                            </div>
+                        </a>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка профиля команды" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+<style>
+    .row-ktv {
+        background-color: rgb(0 0 0 / 50%);
+    }
+
+    .rz-progressbar-value {
+        border-radius: 16px;
+    }
+
+    .row-ktv:hover {
+        background-color: rgb(0 0 0 / 65%);
+    }
+
+    td {
+        height: 100%;
+        background-color: transparent !important;
+    }
+
+    #ktv-matches-grid > div > table > thead > tr {
+        display: none;
+        width: 100%;
+    }
+
+    .rz-text-display-h5 {
+        float: inline-end;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: auto !important;
+    }
+
+    span.rz-cell-data.rz-text-truncate {
+        height: 100%;
+    }
+</style>

@@ -1,0 +1,145 @@
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject HttpClient http
+@inject StateProvider AuthProvider
+
+<RadzenComponents />
+<RadzenDialog />
+<RadzenNotification />
+<RadzenTooltip />
+<RadzenContextMenu />
+
+<script src="scripts/layout.js"></script>
+
+<RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
+    <RadzenHeader>
+        <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenColumn Size="5">
+                <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
+            </RadzenColumn>
+            <RadzenColumn Size="7">
+                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem" class="rz-px-2">
+                    @* <CulturePicker /> *@
+                    <CascadingAuthenticationState>
+                        <AuthorizeView Context="auth">
+                            <Authorizing>
+                                <Loader Size="ProgressBarCircularSize.Small" />
+                            </Authorizing>
+                            <Authorized>
+                                <div>
+                                    <RadzenProfileMenu Style="position: relative">
+                                        <Template>
+                                            @if (AuthProvider.CurrentUser.RankPicture is not null)
+                                            {
+                                                <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                                    <img src="@AuthProvider.CurrentUser.RankPicture" alt="User Profile" style="width: 32px; height: 100%; border-radius: 50%;">
+                                                    <RadzenText Style="margin: auto;" TextAlign="TextAlign.Center" Text="@AuthProvider.CurrentUser.Username" />
+                                                </RadzenStack>
+                                            }
+                                        </Template>
+                                        <ChildContent>
+                                            <RadzenProfileMenuItem Text="Профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenProfileMenuItem>
+                                            <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
+                                                <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
+                                            </div>
+                                        </ChildContent>
+                                    </RadzenProfileMenu>
+                                </div>
+                            </Authorized>
+                            <NotAuthorized>
+                                <RadzenButton Click=@(() => { NavigationManager.NavigateTo("/login"); }) Icon="login" Text="Войти" />
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                    @* <RadzenAppearanceToggle /> *@
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenHeader>
+    <RadzenBody Expanded="@sidebarExpanded">
+        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-2 rz-pt-md-4 rz-pt-lg-6 rz-pt-xl-12 rz-pb-2 rz-pb-lg-12" Style="max-width: 1440px;">
+            <ErrorBoundary>
+                <ChildContent>
+                    <RadzenColumn Size="12">
+                        @Body
+                    </RadzenColumn>
+                </ChildContent>
+                <ErrorContent Context="exception">
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH4">
+                            Произошла ошибка
+                        </RadzenText>
+                        <RadzenCard>
+                            @exception.ToString()
+                        </RadzenCard>
+                        <RadzenButton Text="На главную" Click="@(() => { NavigationManager.NavigateTo("/", true); })" />
+                    </RadzenStack>
+                </ErrorContent>
+            </ErrorBoundary>
+            
+        </RadzenRow>
+    </RadzenBody>
+    <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
+            <RadzenImage Path="images/logo.png" style="width: 48px; height: 48px;" AlternateText="Application logo"></RadzenImage>
+            <RadzenText Text="kTVCSS" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" class="rz-mb-0" style="color: var(--rz-sidebar-color);" />
+        </RadzenStack>
+        <RadzenPanelMenu>
+            <CascadingAuthenticationState>
+                <AuthorizeView>
+                    <Authorized>
+                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        {
+                            <RadzenPanelMenuItem Expanded=false Text="Админ" Icon="shield_person">
+                                <RadzenPanelMenuItem Expanded=false Text="Новости" Icon="news">
+                                    <RadzenPanelMenuItem Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
+                                </RadzenPanelMenuItem>
+                                <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
+                                    <RadzenPanelMenuItem Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
+                                </RadzenPanelMenuItem>
+                            </RadzenPanelMenuItem>
+                        }
+                    </Authorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+            <CascadingAuthenticationState>
+                <AuthorizeView>
+                    <Authorized>
+                        <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@AuthProvider.CurrentUser.AvatarUrl">
+                            <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
+                            <RadzenPanelMenuItem Text="Мои сообщения" Path="/im" Icon="mail"></RadzenPanelMenuItem>
+                            <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
+                            <RadzenPanelMenuItem Text="Мои матчи" Path="dialog" Icon="filter_list"></RadzenPanelMenuItem>
+                        </RadzenPanelMenuItem>
+                    </Authorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+            <RadzenPanelMenuItem Icon="home" Text="Главная" Path="" />
+            <RadzenPanelMenuItem Icon="person" Text="Игроки" Path="/players" />
+            <RadzenPanelMenuItem Icon="block" Text="Банлист" Path="/banslist" />
+            <RadzenPanelMenuItem Icon="groups" Text="Команды" Path="/teams" />
+            <RadzenPanelMenuItem Icon="videogame_asset" Text="Матчи" Path="/matches" />
+        </RadzenPanelMenu>
+    </RadzenSidebar>
+    @* <RadzenFooter>
+		<ChildContent>
+			<RadzenLabel Text="@string.Concat("kTVCSS, designed by kurwanator1337 Ⓒ 2013-", DateTime.Now.Year)" />
+		</ChildContent>
+	</RadzenFooter> *@
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = true;
+
+    void SidebarToggleClick()
+    {
+        sidebarExpanded = !sidebarExpanded;
+    }
+}

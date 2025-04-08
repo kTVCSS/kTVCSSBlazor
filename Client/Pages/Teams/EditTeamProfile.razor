@@ -1,0 +1,72 @@
+﻿@page "/editteamprofile/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Редактирования профиля команды</PageTitle>
+
+@if (ready)
+{
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == team.Info.CapSteamID)
+                {
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование команды" />
+                        <RadzenFormField Text="Название команды" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@team.Info.Name" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Описание команды" Style="width: 100%;">
+                            <RadzenTextArea Rows="8" @bind-Value="@team.Info.Description" />
+                        </RadzenFormField>
+
+                        <RadzenUpload ChooseText="Изменить аватарку" Multiple="false" Auto Change=@OnClientChange
+                                      InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                        <RadzenButton Click="SetDefaultAvatar" Text="Сбросить аватар команды" />
+
+                        <RadzenStack JustifyContent="JustifyContent.Center">
+                            <RadzenLabel Text="Достижения команды" />
+                            <RadzenButton Click="@(() => team.Achiviments.Add(new()))" Text="Добавить достижение" />
+                            @foreach (var ach in team.Achiviments)
+                            {
+                                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                    <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close" Click="@(() => { team.Achiviments.Remove(ach); })" />
+                                    <RadzenFormField Text="Место" Style="width: 100%;">
+                                        <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                    </RadzenFormField>
+                                    <RadzenFormField Text="Название турнира" Style="width: 100%;">
+                                        <RadzenTextBox @bind-Value="@ach.Name" />
+                                    </RadzenFormField>
+                                </RadzenStack>
+                            }
+                        </RadzenStack>
+
+                        <RadzenButton Click="Save" Text="Сохранить" />
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            </Authorized>
+            <NotAuthorized>
+                <NoAccess />
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы редактирования профиля команды" />
+        </RadzenStack>
+    </RadzenRow>
+}
+

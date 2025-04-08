@@ -1,0 +1,41 @@
+﻿@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Players
+@inject StateProvider AuthProvider
+@inject NavigationManager nm
+@inject HttpClient http
+@inject TooltipService tooltipService
+
+<RadzenButton Text="Лучшие моменты" Click="@(() => { nm.NavigateTo($"/player/highlights/{player.MainInfo.Id}"); })" Icon="movie"></RadzenButton>
+
+<RadzenButton Click="SetMMR" Text="Задать рейтинг" Icon="accessible" />
+
+@if (player.MainInfo.Block == 1)
+{
+    <RadzenButton Click="UnbanPlayer" Icon="lock_open" Text="Разбанить"></RadzenButton>
+}
+else
+{
+    <RadzenButton Click="OpenBan" Icon="lock" Text="Забанить"></RadzenButton>
+}
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+    [Parameter] public bool isOnline { get; set; }
+
+    void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) => tooltipService.Open(elementReference, text, options);
+
+    private void SetMMR()
+    {
+
+    }
+
+    private void UnbanPlayer()
+    {
+
+    }
+
+    private void OpenBan()
+    {
+
+    }
+}

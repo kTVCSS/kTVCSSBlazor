@@ -1,0 +1,17 @@
+﻿@using kTVCSSBlazor.Db.Models.Players
+
+<RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@player.Weapons">
+    <Columns>
+        <RadzenDataGridColumn Width="200px" Title="Результат" Context="ctx">
+            <Template>
+                <img style="margin: auto;" src="/images/weapons/@(ctx.Weapon).svg" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Width="100px" Context="ctx" Title="Оружие" Property="Weapon" />
+        <RadzenDataGridColumn Width="100px" Context="ctx" Title="Убийства" Property="Count" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+}

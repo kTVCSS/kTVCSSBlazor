@@ -1,0 +1,62 @@
+﻿@page "/teams"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models;
+@using kTVCSSBlazor.Db.Models.Players
+@using kTVCSSBlazor.Db.Models.Teams
+@inject IJSRuntime JS
+@inject StateProvider StateProvider
+@implements IDisposable
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Команды</PageTitle>
+
+@if (ready)
+{
+    <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@dataSource">
+        <HeaderTemplate>
+            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список команд проекта"></RadzenText>
+            </RadzenStack>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                <Template>
+                    <RadzenStack JustifyContent="JustifyContent.Center" AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                        <div style="margin:auto">@ctx.Position</div>
+                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" Title="Команда" Context="ctx">
+                <Template>
+                    <RadzenLink Path="@string.Concat("/team/", ctx.Id)">@ctx.Name</RadzenLink>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Context="ctx" Title="Сыграно" Property="MatchesPlayed" />
+            <RadzenDataGridColumn Context="ctx" Title="Победы" Property="MatchesWins" />
+            <RadzenDataGridColumn Context="ctx" Title="Поражения" Property="MatchesLosts" />
+            <RadzenDataGridColumn Context="ctx" Title="Рейтинг" Property="Rating" />
+            <RadzenDataGridColumn Context="ctx" Title="Игроки" Property="PlayersCount" />
+        </Columns>
+    </RadzenDataGrid>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка списка заблокированных игроков проекта" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+<style>
+    .rz-custom-header {
+        width: 100% !important;
+    }
+
+    a {
+        color: var(--rz-text-color) !important;
+        text-decoration: initial !important;
+    }
+</style>

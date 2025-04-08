@@ -1,0 +1,7 @@
+﻿<RadzenProgressBarCircular Size="@Size" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Text</RadzenText>
+
+@code {
+	[Parameter] public string Text { get; set; }
+	[Parameter] public ProgressBarCircularSize Size { get; set; }
+}

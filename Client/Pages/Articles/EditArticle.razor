@@ -1,0 +1,40 @@
+﻿@page "/editarticle/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Arcticles
+@inject StateProvider AuthProvider
+@inject NotificationService notifyService
+@inject NavigationManager nm
+@inject HttpClient http
+
+@if (ready)
+{
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование новости" />
+                        <RadzenFormField Text="Заголовок" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@article.Title" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Краткое описание" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@article.ShortText" />
+                        </RadzenFormField>
+                        <RadzenHtmlEditor @bind-Value=@article.Html style="height: 600px;" />
+                        <RadzenButton Click="Edit" Text="Сохранить" />
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            </Authorized>
+            <NotAuthorized>
+                <NoAccess />
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+}

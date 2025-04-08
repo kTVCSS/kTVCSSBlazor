@@ -1,0 +1,40 @@
+﻿@page "/addwork"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Home
+@inject StateProvider AuthProvider
+@inject HttpClient http
+@inject NavigationManager nm
+@inject NotificationService notificationService
+
+<PageTitle>kTVCSS @@ Добавление вакансии</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.IsAdmin)
+            {
+                <RadzenCard>
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenFormField Text="Название" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@work.Title" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Описание" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@work.Description" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Стоимость" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@work.Price" />
+                        </RadzenFormField>
+                        <RadzenButton Text="Добавить" Click="OnAdd" />
+                    </RadzenStack>
+                </RadzenCard>
+            }
+            else
+            {
+                <kTVCSSBlazor.Client.Components.NoAccess />
+            }
+        </Authorized>
+        <NotAuthorized>
+            <kTVCSSBlazor.Client.Components.NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

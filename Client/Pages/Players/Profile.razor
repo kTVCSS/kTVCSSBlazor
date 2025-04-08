@@ -1,0 +1,177 @@
+﻿@page "/player/{Id:int}"
+@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Arcticles
+@using kTVCSSBlazor.Db.Models.UserFeed
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject HttpClient http
+@inject StateProvider AuthProvider
+@implements IDisposable
+
+@if (ready)
+{
+    <RadzenStack>
+        @if (player.MainInfo.SteamID == "STEAM_UNDEFINED")
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="Этот игрок пока не привязал STEAMID" />
+        }
+        else
+        {
+            @if (string.IsNullOrEmpty(player.HeaderPicture))
+            {
+                <RadzenCard Style=@(string.Concat("background-image: url('", player.HeaderPicture, "') !important; height: auto;"))>
+                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline player="player" />
+                </RadzenCard>
+            }
+            else
+            {
+                <RadzenCard Style=@(string.Concat("background-image: url('", player.HeaderPicture, "') !important; height: auto; background-color: rgb(0 0 0 / 30%); background-blend-mode: overlay;"))>
+                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline player="player" />
+                </RadzenCard>
+            }
+        }
+
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <RadzenCard>
+                        <RadzenStack Wrap=FlexWrap.Wrap Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                            <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Actions isOnline=isOnline player="player" />
+                        </RadzenStack>
+                    </RadzenCard>
+                    <RadzenCard>
+                        <RadzenStack Wrap=FlexWrap.Wrap Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                            <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.AdminActions player="player" />
+                        </RadzenStack>
+                    </RadzenCard>
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+
+        <RadzenRow>
+            <RadzenColumn SizeMD="7" SizeXS="12">
+                <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.LeftStats player="player" />
+            </RadzenColumn>
+            <RadzenColumn SizeMD="5" SizeXS="12">
+                <RadzenRow>
+                    <!-- Блок Winrate -->
+                    <RadzenColumn SizeMD="12" SizeSM="12">
+                        <RadzenCard Style="height: 655px; overflow: auto">
+                            <RadzenStack>
+                                <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Винрейт по картам" />
+                                <RadzenStack>
+                                    @foreach (var map in MapsWinrate)
+                                    {
+                                        <div style="border-radius: 16px;background-blend-mode: multiply;background-size: 100% auto;background-position: left;background-color: rgba(0, 0, 0, 0.55); height: 64px; color: white;@(string.Concat("background-image: url('", map.BackgroundImage, "');"))">
+                                            <div style="height:100%;backdrop-filter: blur(0.9px);display: flex;justify-content: center;align-items: center;">@map.Name - @map.Winrate%</div>
+                                        </div>
+                                    }
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenColumn>
+        </RadzenRow>
+
+        @if (player.Rating.Any())
+        {
+            <RadzenCard>
+                <RadzenChart>
+                    <RadzenChartTooltipOptions Shared="false" />
+                    <RadzenLineSeries Smooth="false" Data="@player.Rating.OrderByDescending(x => x.DateTime).Take(20).OrderBy(x => x.DateTime)" CategoryProperty="DateTime" Title="MMR" ValueProperty="Points">
+                        <RadzenMarkers Visible="true" MarkerType="MarkerType.Circle" />
+                        <RadzenSeriesDataLabels Visible="false" />
+                    </RadzenLineSeries>
+                    <RadzenCategoryAxis Padding="20" />
+                    <RadzenValueAxis>
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="MMR" />
+                    </RadzenValueAxis>
+                </RadzenChart>
+            </RadzenCard>
+        }
+
+        @if (player.NormalAchiviments.Any())
+        {
+            <RadzenCard>
+                <RadzenStack JustifyContent="JustifyContent.Center">
+                    <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH5" Text="Достижения команды"></RadzenText>
+                    @foreach (var ach in player.NormalAchiviments)
+                    {
+                        <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                            @if (ach.Place == 1)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="gold" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                            @if (ach.Place == 2)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="silver" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                            @if (ach.Place == 3)
+                            {
+                                <RadzenIcon Style="font-size: 48px" Icon="trophy" IconColor="bronze" />
+                                <RadzenText Style="margin-bottom: 0px !important;" Text="@ach.Name" TextStyle="TextStyle.DisplayH6" />
+                            }
+                        </RadzenStack>
+                    }
+                </RadzenStack>
+            </RadzenCard>
+        }
+
+        <RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@player.LastTwentyMatches">
+            <HeaderTemplate>
+                <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                    <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Последние матчи"></RadzenText>
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Width="250px" Context="ctx" Title="Дата" Property="DateTime" />
+                <RadzenDataGridColumn Title="Матч" Context="ctx">
+                    <Template>
+                        <RadzenLink Path="@(string.Concat("/match/", ctx.ID))" Text="@ctx.Result" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Width="150px" Title="Результат" Context="ctx">
+                    <Template>
+                        @if (ctx.Victory)
+                        {
+                            <div style="color: #2abf4c">Победа</div>
+                        }
+                        else
+                        {
+                            <div style="color: #fd3a2c">Поражение</div>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Убийства" Property="Kills" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Смерти" Property="Deaths" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Хедшоты" Property="Headshots" />
+                <RadzenDataGridColumn Width="250px" Context="ctx" Title="Карта" Property="MapName" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка профиля игрока" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+<style>
+    a {
+        color: var(--rz-text-color) !important;
+        text-decoration: initial !important;
+    }
+</style>
