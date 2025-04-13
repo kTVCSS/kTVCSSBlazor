@@ -8,6 +8,8 @@
 @implements IDisposable
 @inject HttpClient http
 
+<PageTitle>kTVCSS @@ Банлист</PageTitle>
+
 @if (ready)
 {
     <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@_filtered">

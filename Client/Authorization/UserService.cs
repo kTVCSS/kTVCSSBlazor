@@ -32,7 +32,19 @@ namespace kTVCSSBlazor.Client.Authorization
 
         private async Task<User?> Get(string username, string password)
         {
-            return await _http.GetFromJsonAsync<User?>($"/api/login?username={username}&password={password}");
+            try
+            {
+                var user = await _http.GetFromJsonAsync<User>($"/api/login?username={username}&password={password}");
+                if (user is not null)
+                {
+                    return user;
+                }
+            }
+            catch (Exception)
+            {
+                // null
+            }
+            return null;
         }
 
         public async Task<User?> LookupUserInDatabaseAsync(string username, string password)

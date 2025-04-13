@@ -11,7 +11,21 @@ namespace kTVCSSBlazor.Client.Pages
     public partial class Index
     {
         private bool ready = false;
-        private int selectedIndex = 0;
+        private int _selectedIndex = 0;
+        private int selectedIndex
+        {
+            get
+            {
+                return _selectedIndex;
+            }
+            set
+            {
+                _selectedIndex = value;
+
+                NavigationManager.NavigateTo($"/#{GetSectionName(value)}");
+            }
+        }
+
         private string newPostContent;
         private string uploadedFilePath;
         private IBrowserFile uploadedFile;
@@ -19,17 +33,59 @@ namespace kTVCSSBlazor.Client.Pages
         private List<Post> Posts = [];
         private List<WorkSuggestion> workSuggestions = [];
 
+        private string GetSectionName(int index)
+        {
+            switch (index)
+            {
+                case 0: return "wall";
+                case 1: return "news";
+                case 2: return "streams";
+                case 3: return "highlights";
+                case 4: return "guides";
+                case 5: return "configs";
+                case 6: return "suggestions";
+                case 7: return "halloffame";
+                default: return "";
+            }
+        }
+
+        private int GetSectionIndex(string name)
+        {
+            switch (name)
+            {
+                case "wall": return 0;
+                case "news": return 1;
+                case "streams": return 2;
+                case "highlights": return 3;
+                case "guides": return 4;
+                case "configs": return 5;
+                case "suggestions": return 6;
+                case "halloffame": return 7;
+                default: return 0;
+            }
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                //string result = await AuthProvider.LoginAsync("kurwanator1337", "Tk16y1rh");
-
                 News = await http.GetFromJsonAsync<List<Article>>("/api/articles");
 
                 Posts = await http.GetFromJsonAsync<List<Post>>("/api/userposts/getposts");
 
                 workSuggestions = await http.GetFromJsonAsync<List<WorkSuggestion>>("/api/worksuggestions");
+
+                var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+                var fragment = uri.Fragment;
+
+                if (!string.IsNullOrEmpty(fragment))
+                {
+                    var sectionId = fragment.TrimStart('#');
+
+                    selectedIndex = GetSectionIndex(sectionId);
+
+                    await InvokeAsync(StateHasChanged);
+                }
 
                 ready = true;
 
