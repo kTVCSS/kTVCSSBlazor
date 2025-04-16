@@ -1,15 +1,20 @@
-﻿@using kTVCSSBlazor.Client.Authorization
+﻿@using kTVCSS.Models.Db.Models.Statuses
+@using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Db.Models.Players
 @inject StateProvider AuthProvider
 @inject NavigationManager nm
 @inject HttpClient http
 @inject TooltipService tooltipService
+@inject NotificationService ns
 
 @if (AuthProvider.CurrentUser.Id == player.MainInfo.Id || AuthProvider.CurrentUser.IsAdmin)
 {
     <RadzenButton Click=OpenEditProfile Icon="edit" Text="Редактировать профиль"></RadzenButton>
+}
 
-    @if (player.Vip || AuthProvider.CurrentUser.IsAdmin)
+@if (AuthProvider.CurrentUser.Id == player.MainInfo.Id)
+{
+    @if (player.Vip)
     {
         <RadzenButton @ref=clrBtn MouseEnter="@(args => ShowTooltip(args, "Обнулить стастистику, не затрагивая рейтинг"))" Click=ClearProfile Icon="clear" Text="Обнулить профиль"></RadzenButton>
     }
@@ -18,11 +23,12 @@
         <RadzenButton Disabled MouseEnter="@(args => ShowTooltip(args, "Обнуление доступно VIP игрокам"))" Icon="clear" Text="Обнулить профиль"></RadzenButton>
     }
 
-    @if (player.MainInfo.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+    @if (player.MainInfo.IsPremiumVip)
     {
         <RadzenButton @ref=fullClrBtn MouseEnter="@(args => ShowTooltip(args, "Обнулить стастистику, в т.ч. и рейтинг"))" Click=FullClearProfile Icon="clear" Text="Полное обнуление"></RadzenButton>
     }
 }
+
 @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
 {
     <RadzenButton Click=SendMessage Icon="message" Text="Написать"></RadzenButton>
@@ -79,12 +85,103 @@
     private async Task ClearProfile()
     {
         clrBtn.Disabled = true;
+
+        ns.Notify(NotificationSeverity.Info, "Подождите", "Не закрывайте страницу, идет обнуление статистики...");
+
+        ResetStatsResult result = await http.GetFromJsonAsync<ResetStatsResult>($"/api/players/ClearPlayerById?id={player.MainInfo.Id}");
+
+        switch (result)
+        {
+            case ResetStatsResult.NotVip:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "У Вас нет VIP!");
+                    break;
+                }
+            case ResetStatsResult.NotEnoughMatches:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Чтобы обнулять статистику необходимо иметь минимум 10 матчей!");
+                    break;
+                }
+            case ResetStatsResult.Live:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя обнулять статистику во время матча!");
+                    break;
+                }
+            case ResetStatsResult.NotPremium:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "У Вас нет PREMIUM VIP!");
+                    break;
+                }
+            case ResetStatsResult.Fail:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Произошла непредвиденная ошибка, попробуйте позже!");
+                    break;
+                }
+            case ResetStatsResult.Success:
+                {
+                    ns.Notify(NotificationSeverity.Success, "Успех", "Статистика обнулена!");
+
+                    await Task.Delay(2000);
+
+                    nm.Refresh(true);
+
+                    return;
+                }
+        }
+
+        clrBtn.Disabled = false;
     }
 
-    private void FullClearProfile()
+    private async Task FullClearProfile()
     {
         clrBtn.Disabled = true;
         fullClrBtn.Disabled = true;
+
+        ns.Notify(NotificationSeverity.Info, "Подождите", "Не закрывайте страницу, идет обнуление статистики...");
+
+        ResetStatsResult result = await http.GetFromJsonAsync<ResetStatsResult>($"/api/players/ClearFullPlayerById?id={player.MainInfo.Id}");
+
+        switch (result)
+        {
+            case ResetStatsResult.NotVip:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "У Вас нет VIP!");
+                    break;
+                }
+            case ResetStatsResult.NotEnoughMatches:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Чтобы обнулять статистику необходимо иметь минимум 10 матчей!");
+                    break;
+                }
+            case ResetStatsResult.Live:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя обнулять статистику во время матча!");
+                    break;
+                }
+            case ResetStatsResult.NotPremium:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "У Вас нет PREMIUM VIP!");
+                    break;
+                }
+            case ResetStatsResult.Fail:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Произошла непредвиденная ошибка, попробуйте позже!");
+                    break;
+                }
+            case ResetStatsResult.Success:
+                {
+                    ns.Notify(NotificationSeverity.Success, "Успех", "Статистика обнулена!");
+
+                    await Task.Delay(2000);
+
+                    nm.Refresh(true);
+
+                    return;
+                }
+        }
+
+        clrBtn.Disabled = false;
+        fullClrBtn.Disabled = false;
     }
 
     private void SendMessage()

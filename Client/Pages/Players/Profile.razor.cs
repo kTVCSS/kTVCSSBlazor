@@ -1,4 +1,5 @@
-﻿using kTVCSSBlazor.Db.Models.Players;
+﻿using kTVCSS.Models.Db.Models.Statuses;
+using kTVCSSBlazor.Db.Models.Players;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using System.Net.Http.Json;
