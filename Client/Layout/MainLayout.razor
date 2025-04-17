@@ -112,7 +112,7 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@AuthProvider.CurrentUser.AvatarUrl">
+                        <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")">
                             <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои сообщения" Path="/im" Icon="mail"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>

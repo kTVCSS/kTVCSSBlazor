@@ -7,11 +7,26 @@ using Microsoft.AspNetCore.Components.Authorization;
 using kTVCSSBlazor.Client.Authorization;
 using Microsoft.JSInterop;
 using Blazored.LocalStorage;
+using kTVCSSBlazor.Client.Extensions;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri("http://localhost:3000") });
+
+var apiEndpoints = new List<string>()
+{
+    "http://localhost:3000",
+};
+
+builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
+
+builder.Services.AddScoped(sp =>
+{
+    var serverSelector = sp.GetRequiredService<ApiServerSelector>();
+    var serverUrl = serverSelector.GetNextServer();
+    return new HttpClient { BaseAddress = new Uri(serverUrl) };
+});
+
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
