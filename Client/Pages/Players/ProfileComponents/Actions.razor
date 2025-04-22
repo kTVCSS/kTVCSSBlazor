@@ -1,3 +1,4 @@
+@using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Statuses
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Db.Models.Players
@@ -6,6 +7,7 @@
 @inject HttpClient http
 @inject TooltipService tooltipService
 @inject NotificationService ns
+@inject DialogService DialogService
 
 @if (AuthProvider.CurrentUser.Id == player.MainInfo.Id || AuthProvider.CurrentUser.IsAdmin)
 {
@@ -33,7 +35,7 @@
 {
     <RadzenButton Click=SendMessage Icon="message" Text="Написать"></RadzenButton>
 
-    <RadzenButton Click=Report Icon="warning" Text="Репорт"></RadzenButton>
+    <RadzenButton Click=MakeReport Icon="warning" Text="Репорт"></RadzenButton>
 
     if (!string.IsNullOrEmpty(player.TeamInfo.ID))
     {
@@ -204,9 +206,47 @@
 
     }
 
-    private void Report()
-    {
+    private string _selectedReason = string.Empty;
 
+    private async Task MakeReport()
+    {
+        var reasons = await http.GetFromJsonAsync<List<string>>("/api/actions/getreportreasons");
+
+        var result = await DialogService.OpenAsync("Репорт", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <p>Выберите причину жалобы</p>
+        <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" Name="DropDownBindValue" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); SendReport(); }) />
+                <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+    );
+    }
+
+    private async Task SendReport()
+    {
+        var report = new Report()
+            {
+                FromID = AuthProvider.CurrentUser.Id,
+                FromPlayerName = AuthProvider.CurrentUser.Username,
+                Reason = _selectedReason,
+                ToID = player.MainInfo.Id,
+                ToPlayerName = player.MainInfo.Name
+            };
+
+        var response = await http.PostAsJsonAsync("/api/actions/sendreport", report);
+
+        if (await response.ReadAsync<bool>())
+        {
+            ns.Notify(NotificationSeverity.Success, "Система репортов", "Репорт успешно отправлен, администрация рассмотрит его настолько быстро, насколько это возможно!", TimeSpan.FromSeconds(5));
+        }
+        else
+        {
+            ns.Notify(NotificationSeverity.Error, "Ошибка", "Вы уже отправляли жалобу на этого игрока!");
+        }
     }
 
     private void UnbanRequest()
