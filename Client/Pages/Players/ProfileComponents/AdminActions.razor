@@ -1,9 +1,13 @@
+@using kTVCSS.Models.Db.Models.Common
+@using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Db.Models.Players
 @inject StateProvider AuthProvider
 @inject NavigationManager nm
 @inject HttpClient http
 @inject TooltipService tooltipService
+@inject DialogService DialogService
+@inject NotificationService ns
 
 <RadzenButton Text="Лучшие моменты" Click="@(() => { nm.NavigateTo($"/player/highlights/{player.MainInfo.Id}"); })" Icon="movie"></RadzenButton>
 
@@ -34,8 +38,40 @@ else
 
     }
 
-    private void OpenBan()
-    {
+    private BanReason _selectedReason;
 
+    private async Task Ban()
+    {
+        Ban ban = new Ban();
+        ban.AdminName = AuthProvider.CurrentUser.Username;
+        ban.Target = player.MainInfo.Id;
+        ban.DaysAdder = _selectedReason.DaysAdder;
+        ban.Reason = _selectedReason.Name;
+
+        await http.PostAsJsonAsync("/api/admins/ban", ban);
+
+        ns.Notify(NotificationSeverity.Success, "Успех", "Игрок был заблокирован!");
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
+    }
+
+    private async Task OpenBan()
+    {
+        var reasons = await http.GetFromJsonAsync<List<BanReason>>("/api/admins/getbanreasons");
+
+        var result = await DialogService.OpenAsync("Оформление бана", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <p>Выберите причину бана</p>
+        <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" TextProperty="@nameof(BanReason.Name)" Name="DropDownBindValue" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); Ban(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+        );
     }
 }
