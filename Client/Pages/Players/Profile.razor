@@ -42,6 +42,11 @@
             }
         }
 
+        @if (player.MainInfo.Block == 1)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose=false Text="Игрок заблокирован" />
+        }
+
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>

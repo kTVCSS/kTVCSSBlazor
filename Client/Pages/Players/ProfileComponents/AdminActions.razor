@@ -15,7 +15,7 @@
 
 @if (player.MainInfo.Block == 1)
 {
-    <RadzenButton Click="UnbanPlayer" Icon="lock_open" Text="Разбанить"></RadzenButton>
+    <RadzenButton Click="OpenUnban" Icon="lock_open" Text="Разбанить"></RadzenButton>
 }
 else
 {
@@ -33,9 +33,39 @@ else
 
     }
 
-    private void UnbanPlayer()
-    {
+    private string unbanReason;
 
+    private async Task OpenUnban()
+    {
+        var result = await DialogService.OpenAsync("Оформление бана", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <p>Выберите причину бана</p>
+            <RadzenTextBox @bind-Value=@unbanReason Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Разбанить" Click=@(() => { ds.Close(true); UnbanPlayer(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+        );
+    }
+
+    private async Task UnbanPlayer()
+    {
+        Ban ban = new Ban();
+        ban.AdminName = AuthProvider.CurrentUser.Username;
+        ban.Target = player.MainInfo.Id;
+        ban.DaysAdder = 0;
+        ban.Reason = unbanReason;
+
+        await http.PostAsJsonAsync("/api/admins/unban", ban);
+
+        ns.Notify(NotificationSeverity.Success, "Успех", "Игрок был разблокирован!");
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
     }
 
     private BanReason _selectedReason;
@@ -67,7 +97,7 @@ else
         <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" TextProperty="@nameof(BanReason.Name)" Name="DropDownBindValue" />
             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                 <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); Ban(); }) />
+                    <RadzenButton Text="Забанить" Click=@(() => { ds.Close(true); Ban(); }) />
                     <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
                 </RadzenStack>
             </RadzenStack>
