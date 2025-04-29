@@ -74,7 +74,7 @@ namespace kTVCSSBlazor.Client.Pages.Teams
                 if (result.Status)
                 {
                     team.AvatarUrl = result.Message;
-                    NotificationService.Notify(NotificationSeverity.Success, "Успех", "Файл успешно загружен, можете теперь публиковать пост!");
+                    NotificationService.Notify(NotificationSeverity.Success, "Успех", "Файл успешно загружен!");
                 }
                 else
                 {

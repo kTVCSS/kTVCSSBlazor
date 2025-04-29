@@ -213,17 +213,17 @@
         var reasons = await http.GetFromJsonAsync<List<string>>("/api/actions/getreportreasons");
 
         var result = await DialogService.OpenAsync("Репорт", ds =>
-    @<RadzenStack Gap="1.5rem">
-        <p>Выберите причину жалобы</p>
-        <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" Name="DropDownBindValue" />
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            <RadzenStack Orientation="Orientation.Horizontal">
-                <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); SendReport(); }) />
-                <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+        @<RadzenStack Gap="1.5rem">
+            <p>Выберите причину жалобы</p>
+            <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" Name="DropDownBindValue" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); SendReport(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
             </RadzenStack>
         </RadzenStack>
-    </RadzenStack>
-    );
+        );
     }
 
     private async Task SendReport()

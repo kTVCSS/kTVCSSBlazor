@@ -1,0 +1,139 @@
+﻿@page "/editprofile/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Редактирования профиля игрока</PageTitle>
+
+@if (ready)
+{
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == Id)
+                {
+                    <RadzenStack JustifyContent="JustifyContent.Center">
+                        <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование профиля" />
+
+                        @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.IsVip)
+                        {
+                            <RadzenFormField Text="Ник" Style="width: 100%;">
+                                <RadzenTextBox @bind-Value="@profile.Login" />
+                            </RadzenFormField>
+                        }
+                        else
+                        {
+                            <RadzenFormField Text="Ник" Style="width: 100%;">
+                                <RadzenTextBox Disabled Value="Для изменения ника необходимы VIP привилегии" />
+                            </RadzenFormField>
+                        }
+
+                        <RadzenFormField Text="Пароль" Style="width: 100%;">
+                            <RadzenPassword @bind-Value=@profile.Password aria-label="enter password" />
+                        </RadzenFormField>
+
+                        @if (profile.Telegram.HasValue)
+                        {
+                            @if (AuthProvider.CurrentUser.IsAdmin && profile.Telegram.Value > 0)
+                            {
+                                <RadzenFormField Text="Telegram" Style="width: 100%;">
+                                    <ChildContent>
+                                        <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram Placeholder="Введите Telegram ID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                    </ChildContent>
+                                    <Helper>
+                                        <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID. Нажмите сюда, чтобы узнать его!</RadzenLink>
+                                    </Helper>
+                                </RadzenFormField>
+                            }
+                        }
+                        else
+                        {
+                            <RadzenFormField Text="Telegram" Style="width: 100%;">
+                                <ChildContent>
+                                    <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram Placeholder="Введите Telegram ID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                </ChildContent>
+                                <Helper>
+                                    <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID. Нажмите сюда, чтобы узнать его</RadzenLink>
+                                </Helper>
+                            </RadzenFormField>
+                        }
+
+                        @* <RadzenFormField Text="О себе" Style="width: 100%;">
+                            <RadzenTextArea Rows="8" @bind-Value="@profile.Description" />
+                        </RadzenFormField> *@
+
+                        <RadzenRow>
+                            <RadzenColumn SizeMD="6" SizeXS="12">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                                    <RadzenUpload ChooseText="Изменить аватарку" Multiple="false" Auto Change=@OnClientChange
+                                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                                    <RadzenButton Click="SetDefaultAvatar" Text="Сбросить аватар" />
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn SizeMD="6" SizeXS="12">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                                    <RadzenUpload ChooseText="Изменить шапку" Multiple="false" Auto Change=@OnClientChangeHeader
+                                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                                    <RadzenButton Click="SetDefaultHeader" Text="Сбросить шапку" />
+                                </RadzenStack>
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        {
+                            <RadzenStack JustifyContent="JustifyContent.Center">
+                                <RadzenLabel Text="Достижения игрока" />
+                                <RadzenButton Click="@(() => profile.Achiviments.Add(new()))" Text="Добавить достижение" />
+                                @foreach (var ach in profile.Achiviments)
+                                {
+                                    <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                        <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close" Click="@(() => { profile.Achiviments.Remove(ach); })" />
+                                        <RadzenFormField Text="Место" Style="width: 100%;">
+                                            <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                        </RadzenFormField>
+                                        <RadzenFormField Text="Название турнира" Style="width: 100%;">
+                                            <RadzenTextBox @bind-Value="@ach.Name" />
+                                        </RadzenFormField>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        }
+
+                        <RadzenFormField Text="Ссылка на VK" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@profile.VkId" />
+                        </RadzenFormField>
+                         <RadzenFormField Text="Ссылка на YouTube" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@profile.YoutubeUrl" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Ссылка на Twitch" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@profile.TwitchUrl" />
+                        </RadzenFormField>
+
+                        <RadzenButton Click="Save" Text="Сохранить" />
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            </Authorized>
+            <NotAuthorized>
+                <NoAccess />
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы редактирования профиля игрока" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
