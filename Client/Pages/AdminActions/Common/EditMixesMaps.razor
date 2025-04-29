@@ -1,0 +1,182 @@
+﻿@page "/editmixesmaps"
+@using kTVCSS.Models.Db.Models.Common
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject StateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Редактор списка миксовых карт</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.IsAdmin)
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Info" Text="Для редактирования имеющейся карты нужно удалить ее, а потом добавить заного с новым именем" />
+
+                <RadzenDataGrid @ref="itemsGrid" AllowAlternatingRows="true" AllowVirtualization EditMode="@editMode"
+                                Data="@items" TItem="Map" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+                    <HeaderTemplate>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Добавить" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && itemsToInsert.Count() > 0)" />
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Map.MAP" Title="Карта">
+                            <EditTemplate Context="item">
+                                <RadzenTextBox @bind-Value="item.MAP" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Context="item" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+                            <Template Context="item">
+                                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" Click="@(() => InsertAfterRow(item))" title="Add new row after this row" Disabled="@(editMode == DataGridEditMode.Single && itemsToInsert.Count() > 0)" />
+                                @* <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(item))" @onclick:stopPropagation="true" /> *@
+                                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(item))" @onclick:stopPropagation="true" />
+                            </Template>
+                            <EditTemplate Context="item">
+                                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(item))" aria-label="Save" />
+                                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(item))" aria-label="Cancel" />
+                                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(item))" aria-label="Delete" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+            else
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger">У Вас нет прав для просмотра этой страницы!</RadzenAlert>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <RadzenAlert AlertStyle="AlertStyle.Danger">Вы должны быть авторизованы для просмотра этой страницы!</RadzenAlert>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    RadzenDataGrid<Map> itemsGrid;
+    IEnumerable<Map> items;
+
+    DataGridEditMode editMode = DataGridEditMode.Single;
+
+    List<Map> itemsToInsert = new List<Map>();
+    List<Map> itemsToUpdate = new List<Map>();
+
+    void Reset()
+    {
+        itemsToInsert.Clear();
+        itemsToUpdate.Clear();
+    }
+
+    void Reset(Map item)
+    {
+        itemsToInsert.Remove(item);
+        itemsToUpdate.Remove(item);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Task.Run(async () =>
+        {
+            items = await http.GetFromJsonAsync<List<Map>>("/api/mixesmaps");
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    async Task EditRow(Map item)
+    {
+        if (!itemsGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        itemsToUpdate.Add(item);
+        await itemsGrid.EditRow(item);
+    }
+
+    async Task OnUpdateRow(Map item)
+    {
+        Reset(item);
+
+        await http.PutAsJsonAsync($"/api/mixesmaps/{item.MAP}", item);
+    }
+
+    async Task SaveRow(Map item)
+    {
+        await itemsGrid.UpdateRow(item);
+    }
+
+    void CancelEdit(Map item)
+    {
+        Reset(item);
+
+        itemsGrid.CancelEditRow(item);
+
+        // var itemEntry = dbContext.Entry(item);
+        // if (itemEntry.State == EntityState.Modified)
+        // {
+        //     itemEntry.CurrentValues.SetValues(itemEntry.OriginalValues);
+        //     itemEntry.State = EntityState.Unchanged;
+        // }
+    }
+
+    async Task DeleteRow(Map item)
+    {
+        Reset(item);
+
+        if (items.Contains(item))
+        {
+            await http.DeleteAsync($"/api/mixesmaps/{item.MAP}");
+
+            items = await http.GetFromJsonAsync<List<Map>>("/api/mixesmaps");
+        }
+        else
+        {
+            itemsGrid.CancelEditRow(item);
+            items = await http.GetFromJsonAsync<List<Map>>("/api/mixesmaps");
+        }
+    }
+
+    async Task InsertRow()
+    {
+        if (!itemsGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var item = new Map();
+        itemsToInsert.Add(item);
+        await itemsGrid.InsertRow(item);
+    }
+
+    async Task InsertAfterRow(Map row)
+    {
+        if (!itemsGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var item = new Map();
+        itemsToInsert.Add(item);
+        await itemsGrid.InsertAfterRow(item, row);
+    }
+
+    async Task OnCreateRow(Map item)
+    {
+        await http.PostAsJsonAsync("/api/mixesmaps", item);
+
+        itemsToInsert.Remove(item);
+
+        items = await http.GetFromJsonAsync<List<Map>>("/api/mixesmaps");
+    }
+}
