@@ -28,9 +28,31 @@ else
 
     void ShowTooltip(ElementReference elementReference, string text, TooltipOptions options = null) => tooltipService.Open(elementReference, text, options);
 
-    private void SetMMR()
+    private async Task SetMMR()
     {
+        var result = await DialogService.OpenAsync("Изменение рейтинга", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <p>Изменение рейтинга будет работать правильно только у откалиброванных игроков</p>
+            <RadzenNumeric @bind-Value=@player.MainInfo.MMR Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Изменить" Click=@(() => { ds.Close(true); ExecuteSetMMR(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    );
+    }
 
+    private async Task ExecuteSetMMR()
+    {
+        await http.GetAsync($"/api/players/setmmr?id={player.MainInfo.Id}&mmr={player.MainInfo.MMR}&admin={AuthProvider.CurrentUser.Username}");
+
+        ns.Notify(NotificationSeverity.Success, "Успех", "Игроку задан новый рейтинг!");
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
     }
 
     private string unbanReason;
