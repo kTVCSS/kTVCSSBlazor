@@ -1,5 +1,6 @@
 @using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Statuses
+@using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Db.Models.Players
 @inject StateProvider AuthProvider
@@ -28,6 +29,11 @@
     @if (player.MainInfo.IsPremiumVip)
     {
         <RadzenButton @ref=fullClrBtn MouseEnter="@(args => ShowTooltip(args, "Обнулить стастистику, в т.ч. и рейтинг"))" Click=FullClearProfile Icon="clear" Text="Полное обнуление"></RadzenButton>
+    }
+
+    @if (player.MainInfo.Block == 1)
+    {
+        <RadzenButton Icon="question_exchange" Text="Заявка на разбан" Click="OpenUnbanRequest" />
     }
 }
 
@@ -77,6 +83,7 @@
     {
         if (player.MainInfo.Block == 1)
         {
+            ns.Notify(NotificationSeverity.Error, "Бан", "Редактирования профиля при наличии активного бана запрещено!");
             return;
         }
         nm.NavigateTo($"/editprofile/{player.MainInfo.Id}");
@@ -213,29 +220,29 @@
         var reasons = await http.GetFromJsonAsync<List<string>>("/api/actions/getreportreasons");
 
         var result = await DialogService.OpenAsync("Репорт", ds =>
-        @<RadzenStack Gap="1.5rem">
-            <p>Выберите причину жалобы</p>
-            <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" Name="DropDownBindValue" />
-            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); SendReport(); }) />
-                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
-                </RadzenStack>
+    @<RadzenStack Gap="1.5rem">
+        <p>Выберите причину жалобы</p>
+        <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" Name="DropDownBindValue" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); SendReport(); }) />
+                <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
             </RadzenStack>
         </RadzenStack>
-        );
+    </RadzenStack>
+    );
     }
 
     private async Task SendReport()
     {
         var report = new Report()
-            {
-                FromID = AuthProvider.CurrentUser.Id,
-                FromPlayerName = AuthProvider.CurrentUser.Username,
-                Reason = _selectedReason,
-                ToID = player.MainInfo.Id,
-                ToPlayerName = player.MainInfo.Name
-            };
+                {
+                    FromID = AuthProvider.CurrentUser.Id,
+                    FromPlayerName = AuthProvider.CurrentUser.Username,
+                    Reason = _selectedReason,
+                    ToID = player.MainInfo.Id,
+                    ToPlayerName = player.MainInfo.Name
+                };
 
         var response = await http.PostAsJsonAsync("/api/actions/sendreport", report);
 
@@ -249,8 +256,39 @@
         }
     }
 
-    private void UnbanRequest()
-    {
+    private string _unbanRequestString = string.Empty;
 
+    private async Task OpenUnbanRequest()
+    {
+        var result = await DialogService.OpenAsync("Заявка на разбан", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <p>Пожалуйста, опишите коротко и ясно суть проблемы</p>
+            <RadzenTextArea Rows="10" @bind-Value=@_unbanRequestString Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); UnbanRequest(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+        );
+    }
+
+    private async Task UnbanRequest()
+    {
+        var response = await http.PostAsJsonAsync("/api/players/unbanrequest", new InitialUnbanRequest()
+            {
+                Message = _unbanRequestString,
+                PlayerID = AuthProvider.CurrentUser.Id,
+                PlayerName = AuthProvider.CurrentUser.Username
+            });
+
+        int ticketId = await response.Content.ReadFromJsonAsync<int>();
+
+        ns.Notify(NotificationSeverity.Success, "Успех", "Ваша заявка на разбан успешно создана! Сейчас мы Вас перенаправим в созданный тикет", TimeSpan.FromSeconds(3));
+
+        await Task.Delay(3000);
+
+        nm.NavigateTo($"/ticket/{ticketId}");
     }
 }

@@ -1,0 +1,72 @@
+﻿@page "/tickets"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Тикеты</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                @if (AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@_tickets">
+                        <HeaderTemplate>
+                            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Открытые тикеты проекта"></RadzenText>
+                            </RadzenStack>
+                        </HeaderTemplate>
+                        <Columns>
+                            <RadzenDataGridColumn Width="200px" Title="Статус" Context="ctx">
+                                <Template>
+                                    @switch (ctx.Status)
+                                    {
+                                        case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Created:
+                                            {
+                                                <RadzenText Style="margin:auto" Text="Открыт" />
+                                                break;
+                                            }
+                                        case kTVCSS.Models.Db.Models.Statuses.TicketStatus.InProcess:
+                                            {
+                                                <RadzenText Style="margin:auto" Text="В процессе" />
+                                                break;
+                                            }
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="200px" Context="ctx" Title="Дата создания" Property="CreatedAt" />
+                            <RadzenDataGridColumn Width="200px" Context="ctx" Title="Дата обновления" Property="UpdatedAt" />
+                            <RadzenDataGridColumn Title="" Context="ctx">
+                                <Template>
+                                    <RadzenButton Text="Перейти" Click="@(() => { NavigationManager.NavigateTo($"/ticket/{ctx.TicketId}"); })" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы тикетов" />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
