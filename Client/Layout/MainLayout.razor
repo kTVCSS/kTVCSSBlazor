@@ -18,7 +18,7 @@
 
 <script src="scripts/layout.js"></script>
 
-<RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
+<RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body' 'rz-footer rz-footer';">
     <RadzenHeader>
         <RadzenRow JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="0">
             <RadzenColumn Size="5">
@@ -64,29 +64,6 @@
             </RadzenColumn>
         </RadzenRow>
     </RadzenHeader>
-    <RadzenBody Expanded="@sidebarExpanded">
-        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-2 rz-pt-md-4 rz-pt-lg-6 rz-pt-xl-12 rz-pb-2 rz-pb-lg-12" Style="max-width: 1440px;">
-            <ErrorBoundary>
-                <ChildContent>
-                    <RadzenColumn Size="12">
-                        @Body
-                    </RadzenColumn>
-                </ChildContent>
-                <ErrorContent Context="exception">
-                    <RadzenStack>
-                        <RadzenText TextStyle="TextStyle.DisplayH4">
-                            Произошла ошибка
-                        </RadzenText>
-                        <RadzenCard>
-                            @exception.ToString()
-                        </RadzenCard>
-                        <RadzenButton Text="На главную" Click="@(() => { NavigationManager.NavigateTo("/", true); })" />
-                    </RadzenStack>
-                </ErrorContent>
-            </ErrorBoundary>
-            
-        </RadzenRow>
-    </RadzenBody>
     <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="Radzen.AlignItems.Center" class="rz-py-4 rz-py-lg-6" Style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border);">
             <RadzenImage Path="images/logo.png" style="width: 48px; height: 48px;" AlternateText="Application logo"></RadzenImage>
@@ -138,6 +115,40 @@
             <RadzenPanelMenuItem Icon="videogame_asset" Text="Матчи" Path="/matches" />
         </RadzenPanelMenu>
     </RadzenSidebar>
+    <RadzenBody Expanded="@sidebarExpanded">
+        <RadzenRow class="rz-mx-auto rz-px-4 rz-pt-2 rz-pt-md-4 rz-pt-lg-6 rz-pt-xl-12 rz-pb-2 rz-pb-lg-12" Style="max-width: 1440px;">
+            <ErrorBoundary>
+                <ChildContent>
+                    <RadzenColumn Size="12">
+                        @Body
+                    </RadzenColumn>
+                </ChildContent>
+                <ErrorContent Context="exception">
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH4">
+                            Произошла ошибка
+                        </RadzenText>
+                        <RadzenCard>
+                            @exception.ToString()
+                        </RadzenCard>
+                        <RadzenButton Text="На главную" Click="@(() => { NavigationManager.NavigateTo("/", true); })" />
+                    </RadzenStack>
+                </ErrorContent>
+            </ErrorBoundary>
+            
+        </RadzenRow>
+    </RadzenBody>
+    
+    <RadzenFooter>
+        <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+            <RadzenLink class="rz-text-caption" Path="https://t.me/kurwanator1337" Target="_blank" Text="@string.Concat("kTVCSS designed by kurwanator1337 Ⓒ 2013-", DateTime.Now.Year)" />
+            <RadzenLink class="rz-text-caption" Path="/about" Text="О проекте" />
+            <RadzenLink class="rz-text-caption" Path="/about" Text="Правила" />
+            <RadzenLink class="rz-text-caption" Path="/about" Text="Контакты" />
+            <RadzenLink class="rz-text-caption" Path="/about" Text="FAQ" />
+            <RadzenLink class="rz-text-caption" Path="/about" Text="Загрузки" />
+        </RadzenStack>
+    </RadzenFooter>
     @* <RadzenFooter>
 		<ChildContent>
 			<RadzenLabel Text="@string.Concat("kTVCSS, designed by kurwanator1337 Ⓒ 2013-", DateTime.Now.Year)" />
@@ -153,3 +164,19 @@
         sidebarExpanded = !sidebarExpanded;
     }
 }
+
+<style>
+    .rz-link-text {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .rz-link {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+</style>
