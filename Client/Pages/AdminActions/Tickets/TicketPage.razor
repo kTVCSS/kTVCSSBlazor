@@ -1,0 +1,196 @@
+﻿@page "/ticket/{Id:int}"
+@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Arcticles
+@using kTVCSSBlazor.Db.Models.UserFeed
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
+@inject TooltipService TooltipService
+@inject NotificationService NotificationService
+@inject HttpClient http
+@inject StateProvider AuthProvider
+
+<PageTitle>kTVCSS @@ Обращение #@Id</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _ticket.PlayerId)
+                {
+                    <RadzenStack Gap="8px">
+                        <RadzenCard>
+                            <RadzenStack Gap="2px">
+                                <RadzenText Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
+                                @* <RadzenText Text="@string.Concat("Дата регистрации обращения: ", _ticket.CreatedAt.ToShortDateString())" /> *@
+
+                                @switch (_ticket.Status)
+                                {
+                                    case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Created:
+                                        <RadzenText Text="Статус обращения: открыто" />
+                                        break;
+                                    case kTVCSS.Models.Db.Models.Statuses.TicketStatus.InProcess:
+                                        <RadzenText Text="Статус обращения: рассматривается модерацией" />
+                                        break;
+                                    case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed:
+                                        <RadzenText Text="Статус обращения: закрыто" />
+                                        break;
+                                }
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    <RadzenText>Профиль игрока: <RadzenLink Path="@string.Concat("/player/", _ticket.PlayerId)" Target="_blank" Text="открыть"></RadzenLink></RadzenText>
+                                }
+                            </RadzenStack>
+                        </RadzenCard>
+
+                        <RadzenCard>
+                            <div style="height: 500px; overflow: auto" class="messages-list">
+                                <RadzenStack Gap="8px">
+                                    @foreach (var msg in _ticket.Messages.Skip(1))
+                                    {
+                                        <RadzenCard Style="position: relative">
+                                            <RadzenStack Orientation="Orientation.Horizontal">
+                                                @if (msg.SenderType == kTVCSS.Models.Db.Models.Tickets.SenderType.Admin)
+                                                {
+                                                    <div class="avatar">
+                                                        <img style="height: 40px;border-radius: 128px;" src="/images/moderator.png" />
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="avatar">
+                                                        <img style="height: 40px;border-radius: 128px;" src="@_ticket.PlayerInfo.MainInfo.PhotoUrl" />
+                                                    </div>
+                                                }
+                                                <div class="content">
+                                                    @if (msg.SenderType == kTVCSS.Models.Db.Models.Tickets.SenderType.Admin)
+                                                    {
+                                                        @if (AuthProvider.CurrentUser.IsAdmin)
+                                                        {
+                                                            <div>@msg.UserName</div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @if (msg.MessageText != "Благодарим за обращение! Администрация ответит как только, так сразу!" && msg.MessageText != "Обращение было отмечено как решенное, поэтому диалог с модератором был автоматически закрыт.")
+                                                            {
+                                                                <div>Модератор</div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div>Система</div>
+                                                            }
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <div>@msg.UserName</div>
+                                                    }
+                                                    <div class="text">@msg.MessageText</div>
+                                                    <div class="time">@msg.CreatedAt.ToString("dd.MM.yy HH:mm")</div>
+                                                </div>
+                                            </RadzenStack>
+                                        </RadzenCard>
+                                    }
+                                </RadzenStack>
+                            </div>
+
+                            <div class="chat-input">
+                                <RadzenStack Style="width: 100%;">
+                                    <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                                        <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="width: 70%;flex:1; min-height:50px;" />
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Text="Отправить" Style="width: 175px;height: 10px;margin-left:10px;" Click="@SendMessage" />
+                                    </RadzenStack>
+                                    @if (!AuthProvider.CurrentUser.IsAdmin)
+                                    {
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Если у Вас больше нет вопросов, то Вы можете закрыть обращение" Click="Close" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Закрыть обращение" Click="Close" />
+                                    }
+                                </RadzenStack>
+                            </div>
+                        </RadzenCard>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы обращения" />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+<style>
+    .messages-list {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .avatar {
+        margin: 0 8px;
+        align-self: center;
+    }
+
+    .message {
+        display: flex;
+        margin-bottom: 10px;
+        max-width: 100%;
+    }
+
+        .message .text {
+            padding: 8px 12px;
+            border-radius: 16px;
+            word-wrap: break-word;
+        }
+
+        .time {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 0.75rem;
+            color: #777;
+        }
+
+        .message.my .text {
+            flex-direction: row-reverse;
+            /* background-color: var(--rz-base-300); */
+            align-self: flex-end;
+        }
+
+        .message.other .text {
+            flex-direction: row;
+            /* background-color: var(--rz-base-300); */
+            align-self: flex-start;
+        }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chat-input {
+        display: flex;
+        justify-content: center;
+        align-items:center;
+        padding: 10px;
+        border-top: 1px solid #636465;
+    }
+</style>
