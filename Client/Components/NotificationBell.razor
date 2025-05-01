@@ -1,0 +1,128 @@
+﻿@using kTVCSS.Models.Db.Models.Common
+@using kTVCSSBlazor.Client.Authorization
+@inject HttpClient http
+@inject NavigationManager nm
+@inject StateProvider AuthProvider
+
+<RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+
+@if (drawerVisible)
+{
+    <!-- Полупрозрачный фон -->
+    <div class="drawer-overlay" @onclick="ToggleDrawer"></div>
+
+    <!-- Панель-список уведомлений -->
+    <div class="notification-drawer">
+        <div class="notification-header">
+            Уведомления (@unreadCount)
+        </div>
+
+        @if (notifications == null)
+        {
+            <div style="padding:16px;">Загрузка...</div>
+        }
+        else if (!notifications.Any())
+        {
+            <div style="padding:16px;">Новых уведомлений нет.</div>
+        }
+        else
+        {
+            @foreach (var n in notifications)
+            {
+                <div class="notification-item @(n.IsRead ? "" : "unread")"
+                     @onclick="@(() => OnNotificationClick(n))">
+                    <div><strong>@n.Title</strong></div>
+                    <div style="font-size:0.9em; color:#8b8b8b;overflow-wrap: anywhere;">@n.Message</div>
+                    <div style="font-size:0.8em; color:#999; margin-top:4px;">
+                        @n.CreatedAt.ToLocalTime().ToString("g")
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+
+<style>
+    .drawer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 1000;
+    }
+
+    .notification-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 500px;
+        height: 100%;
+        background: #131417;
+        box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .notification-header {
+        padding: 16px;
+        border-bottom: 1px solid #eaeaea;
+        font-weight: bold;
+    }
+
+    .notification-item {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f1f1;
+        cursor: pointer;
+    }
+
+        .notification-item.unread {
+            background: #121518
+        }
+
+        .notification-item:hover {
+            background: #171818;
+        }
+</style>
+
+@code {
+    private bool drawerVisible;
+    private int unreadCount;
+    private List<Notification> notifications;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotifications();
+    }
+
+    private async Task LoadNotifications()
+    {
+        var userId = AuthProvider.CurrentUser.Id;
+        notifications = await http.GetFromJsonAsync<List<Notification>>($"api/notifications/user/{userId}");
+        unreadCount = notifications.Count();
+        StateHasChanged();
+    }
+
+    private async Task ToggleDrawer()
+    {
+        drawerVisible = !drawerVisible;
+        if (drawerVisible)
+        {
+            await LoadNotifications();
+        }
+    }
+
+    private async Task OnNotificationClick(Notification n)
+    {
+        if (!string.IsNullOrEmpty(n.Link))
+        {
+            nm.NavigateTo(n.Link);
+        }
+
+        await http.PutAsync($"api/notifications/{n.Id}/read", null);
+
+        await LoadNotifications();
+    }
+}

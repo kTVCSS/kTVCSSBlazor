@@ -33,7 +33,8 @@
                                 <Loader Size="ProgressBarCircularSize.Small" />
                             </Authorizing>
                             <Authorized>
-                                <div>
+                                <RadzenStack Orientation="Orientation.Horizontal">
+                                    <NotificationBell />
                                     <RadzenProfileMenu Style="position: relative">
                                         <Template>
                                             @if (AuthProvider.CurrentUser.RankPicture is not null)
@@ -51,7 +52,7 @@
                                             </div>
                                         </ChildContent>
                                     </RadzenProfileMenu>
-                                </div>
+                                </RadzenStack>
                             </Authorized>
                             <NotAuthorized>
                                 <RadzenButton Click=@(() => { NavigationManager.NavigateTo("/login"); }) Icon="login" Text="Войти" />
