@@ -52,7 +52,7 @@
                 <Authorized>
                     <RadzenCard>
                         <RadzenStack Wrap=FlexWrap.Wrap Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
-                            <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Actions isOnline=isOnline player="player" />
+                            <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Actions isOnline=isOnline player="player" isMeAFriend=isMeAFriend FriendRequest=FriendRequest />
                         </RadzenStack>
                     </RadzenCard>
                     @if (AuthProvider.CurrentUser.IsAdmin)

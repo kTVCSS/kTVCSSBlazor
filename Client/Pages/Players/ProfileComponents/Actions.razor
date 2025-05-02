@@ -2,6 +2,7 @@
 @using kTVCSS.Models.Db.Models.Statuses
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Extensions
 @using kTVCSSBlazor.Db.Models.Players
 @inject StateProvider AuthProvider
 @inject NavigationManager nm
@@ -48,13 +49,28 @@
         <RadzenButton @ref=itBtn Click="SendInviteToTeam" Icon="add_business" Text="Пригласить в команду"></RadzenButton>
     }
 
-    @if (isMeAFriend)
+    @if (FriendRequest is null)
     {
-        <RadzenButton Click=AddFriend Text="Удалить из друзей" Icon="remove_circle" />
+        @if (isMeAFriend)
+        {
+            <RadzenButton Click=RemoveFriend Text="Удалить из друзей" Icon="remove_circle" />
+        }
+        else
+        {
+            <RadzenButton Click=AddFriend Text="Добавить в друзья" Icon="add_circle" />
+        }
     }
     else
     {
-        <RadzenButton Click=RemoveFriend Text="Добавить в друзья" Icon="add_circle" />
+        if (FriendRequest.Requester.PlayerID == AuthProvider.CurrentUser.Id)
+        {
+            <RadzenButton Click=CancelFriendRequest Text="Отменить заявку" Icon="remove_circle" />
+        }
+        else
+        {
+            <RadzenButton Click=AcceptFriendRequest Text="Принять заявку" Icon="add_circle" />
+            <RadzenButton Click=RejectFriendRequest Text="Отменить заявку" Icon="remove_circle" />
+        }
     }
 }
 
@@ -74,6 +90,7 @@
     [Parameter] public PlayerInfo player { get; set; }
     [Parameter] public bool isOnline { get; set; }
     [Parameter] public bool isMeAFriend { get; set; }
+    [Parameter] public kTVCSS.Models.Db.Models.Players.FriendRequest? FriendRequest { get; set; }
 
     RadzenButton? clrBtn;
     RadzenButton? fullClrBtn;
@@ -198,19 +215,64 @@
 
     }
 
+    private async Task CancelFriendRequest()
+    {
+        await http.GetAsync($"/api/friendsengine/CancelFriendRequest?requesterId={FriendRequest.Requester.PlayerID}&addresseeId={FriendRequest.Addressee.PlayerID}");
+
+        ns.Notify(NotificationSeverity.Info, "kTVCSS", "Заявка отменена!");
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
+    }
+
+    private async Task AcceptFriendRequest()
+    {
+        var result = await http.GetFromJsonAsync<FriendsEngineStatus>($"/api/friendsengine/AcceptFriendRequest?requesterId={FriendRequest.Requester.PlayerID}&addresseeId={FriendRequest.Addressee.PlayerID}");
+
+        ns.Notify(result < FriendsEngineStatus.Ok ? NotificationSeverity.Error : NotificationSeverity.Success, "kTVCSS", EnumDescriptor.GetFriendStatus(result));
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
+    }
+
+    private async Task RejectFriendRequest()
+    {
+        var result = await http.GetFromJsonAsync<FriendsEngineStatus>($"/api/friendsengine/RejectFriendRequest?requesterId={FriendRequest.Requester.PlayerID}&addresseeId={FriendRequest.Addressee.PlayerID}");
+
+        ns.Notify(result < FriendsEngineStatus.Ok ? NotificationSeverity.Error : NotificationSeverity.Success, "kTVCSS", EnumDescriptor.GetFriendStatus(result));
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
+    }
+
     private void SendInviteToTeam()
     {
         itBtn.Disabled = true;
     }
 
-    private void AddFriend()
+    private async Task AddFriend()
     {
+        var result = await http.GetFromJsonAsync<FriendsEngineStatus>($"/api/friendsengine/SendFriendRequest?requesterId={AuthProvider.CurrentUser.Id}&addresseeId={player.MainInfo.Id}");
 
+        ns.Notify(result < FriendsEngineStatus.Ok ? NotificationSeverity.Error : NotificationSeverity.Success, "kTVCSS", EnumDescriptor.GetFriendStatus(result));
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
     }
 
-    private void RemoveFriend()
+    private async Task RemoveFriend()
     {
+        var result = await http.GetFromJsonAsync<FriendsEngineStatus>($"/api/friendsengine/RemoveFriend?playerId={AuthProvider.CurrentUser.Id}&friendId={player.MainInfo.Id}");
 
+        ns.Notify(result < FriendsEngineStatus.Ok ? NotificationSeverity.Error : NotificationSeverity.Success, "kTVCSS", EnumDescriptor.GetFriendStatus(result));
+
+        await Task.Delay(1000);
+
+        nm.Refresh(true);
     }
 
     private string _selectedReason = string.Empty;

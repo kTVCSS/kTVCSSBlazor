@@ -20,6 +20,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private bool isMeAFriend = false;
 
+        private kTVCSS.Models.Db.Models.Players.FriendRequest? FriendRequest;
+
         // Пример данных для карт с винрейтом
         public List<MapWinrate> MapsWinrate = [];
 
@@ -58,6 +60,22 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 NavigationManager.LocationChanged += HandleLocationChanged;
 
                 player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={Id}");
+
+                isMeAFriend = await http.GetFromJsonAsync<bool>($"/api/friendsengine/ismefriend?playerid={AuthProvider.CurrentUser.Id}&friendid={Id}");
+
+                try
+                {
+                    var tst = await http.GetFromJsonAsync<kTVCSS.Models.Db.Models.Players.FriendRequest?>($"/api/friendsengine/GetFriendRequest?requesterId={AuthProvider.CurrentUser.Id}&addresseeId={Id}");
+
+                    if (tst is not null)
+                    {
+                        FriendRequest = tst;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
 
                 foreach (var map in player.LastTwentyMatches.DistinctBy(x => x.MapName))
                 {
