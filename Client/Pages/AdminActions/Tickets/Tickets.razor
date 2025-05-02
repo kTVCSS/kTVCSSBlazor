@@ -17,7 +17,7 @@
             {
                 @if (AuthProvider.CurrentUser.IsAdmin)
                 {
-                    <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@_tickets">
+                    <RadzenDataGrid EmptyText="Новых тикетов пока что нет" AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@_tickets">
                         <HeaderTemplate>
                             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
                                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Открытые тикеты проекта"></RadzenText>
