@@ -31,148 +31,10 @@
                 <RadzenTabs TabPosition="TabPosition.Top" @bind-SelectedIndex=@selectedIndex>
                     <Tabs>
                         <RadzenTabsItem Icon="view_list" Text="Стена">
-                            <RadzenRow JustifyContent="JustifyContent.Center">
-                                <RadzenColumn SizeSM="12" SizeMD="9">
-                                    <RadzenStack>
-                                        <RadzenCard>
-                                            <RadzenStack>
-                                                <RadzenFormField Text="Что у вас нового?" Style="width: 100%;">
-                                                    <RadzenTextBox @bind-Value="@newPostContent" />
-                                                </RadzenFormField>
-                                                <RadzenStack Orientation="Orientation.Horizontal">
-                                                    <RadzenButton Click="PostNews" Style="" Text="Опубликовать" Icon="post_add" />
-                                                    <RadzenUpload ChooseText="Прикрепить вложение" Multiple="false" Auto Change=@OnClientChange
-                                                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-                                                </RadzenStack>
-                                            </RadzenStack>
-                                        </RadzenCard>
-                                        <RadzenStack>
-                                            @foreach (var post in Posts)
-                                            {
-                                                <RadzenCard>
-                                                    <RadzenStack>
-                                                        <RadzenStack Orientation="Orientation.Horizontal">
-                                                            <img style="width: 60px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
-                                                            <RadzenStack>
-                                                                <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
-                                                                <small>@post.PostDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                            </RadzenStack>
-                                                        </RadzenStack>
-                                                    </RadzenStack>
-                                                    <div class="post-content">
-                                                        <p>@post.Content</p>
-                                                    </div>
-                                                    @if (!string.IsNullOrEmpty(post.MediaUrl))
-                                                    {
-                                                        if (post.MediaType == MediaType.Image)
-                                                        {
-                                                            <RadzenImage Path="@post.MediaUrl" Style="max-width: 640px" />
-                                                        }
-                                                        else if (post.MediaType == MediaType.Video)
-                                                        {
-                                                            <video controls style="max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
-                                                        }
-                                                    }
-                                                    <div class="rz-my-2">
-                                                        <RadzenStack Gap="8px" Orientation="Orientation.Horizontal">
-                                                            <RadzenButton Icon="thumb_up" Text="@post.LikesCount.ToString()" Click="() => LikePost(post)" />
-                                                            <RadzenButton Icon="thumb_down" Text="@post.DislikesCount.ToString()" Click="() => DislikePost(post)" />
-                                                            @if (AuthProvider.CurrentUser.IsAdmin || post.AuthorId == AuthProvider.CurrentUser.Id)
-                                                            {
-                                                                <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="Удалить"></RadzenButton>
-                                                            }
-                                                        </RadzenStack>
-                                                    </div>
-                                                    <div class="post-comments">
-                                                        @if (post.Comments.Any())
-                                                        {
-                                                            <h4>Комментарии</h4>
-                                                            @if (post.Comments.Count > 3)
-                                                            {
-                                                                @foreach (var comment in post.Comments.Take(3))
-                                                                {
-                                                                    <RadzenStack>
-                                                                        <RadzenStack Orientation="Orientation.Horizontal">
-                                                                            <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
-                                                                            <RadzenStack Gap="4px">
-                                                                                <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
-                                                                                <div>@comment.Content</div>
-                                                                                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                                    <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                                    <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
-                                                                                </RadzenStack>
-                                                                            </RadzenStack>
-                                                                        </RadzenStack>
-                                                                    </RadzenStack>
-                                                                }
-                                                                <RadzenAccordion>
-                                                                    <Items>
-                                                                        <RadzenAccordionItem Text="Показать остальные комментарии">
-                                                                            @foreach (var comment in post.Comments.Skip(3))
-                                                                            {
-                                                                                <RadzenStack>
-                                                                                    <RadzenStack Orientation="Orientation.Horizontal">
-                                                                                        <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
-                                                                                        <RadzenStack Gap="4px">
-                                                                                            <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
-                                                                                            <div>@comment.Content</div>
-                                                                                            <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                                                <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
-                                                                                            </RadzenStack>
-                                                                                        </RadzenStack>
-                                                                                    </RadzenStack>
-                                                                                </RadzenStack>
-                                                                            }
-                                                                        </RadzenAccordionItem>
-                                                                    </Items>
-                                                                </RadzenAccordion>
-                                                            }
-                                                            else
-                                                            {
-                                                                @foreach (var comment in post.Comments)
-                                                                {
-                                                                    <RadzenStack>
-                                                                        <RadzenStack Orientation="Orientation.Horizontal">
-                                                                            <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
-                                                                            <RadzenStack Gap="4px">
-                                                                                <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
-                                                                                <div>@comment.Content</div>
-                                                                                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                                    <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                                    <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
-                                                                                </RadzenStack>
-                                                                            </RadzenStack>
-                                                                        </RadzenStack>
-                                                                    </RadzenStack>
-                                                                }
-                                                            }
-                                                        }
-                                                    </div>
-                                                    <RadzenStack>
-                                                        <RadzenFormField Text="Комментарий" Style="width: 100%;">
-                                                            <RadzenTextBox @bind-Value="@post.NewComment" />
-                                                        </RadzenFormField>
-                                                        <RadzenButton Style="width: 200px" Icon="send" Text="Отправить" Click="() => AddComment(post)"></RadzenButton>
-                                                    </RadzenStack>
-                                                </RadzenCard>
-                                            }
-                                        </RadzenStack>
-                                    </RadzenStack>
-                                </RadzenColumn>
-                            </RadzenRow>
+                            <kTVCSSBlazor.Client.Components.Home.Wall />
                         </RadzenTabsItem>
                         <RadzenTabsItem Icon="news" Text="Новости">
-                            <RadzenRow JustifyContent="JustifyContent.Center">
-                                <RadzenColumn SizeMD="9" SizeSM="12">
-                                    <RadzenPanelMenu>
-                                        @foreach (var article in News)
-                                        {
-                                            <RadzenPanelMenuItem Click="@(() => { NavigationManager.NavigateTo("/article/" + article.Id); })" Text="@string.Concat(article.Title, ": ", article.ShortText)" />
-                                        }
-                                    </RadzenPanelMenu>
-                                </RadzenColumn>
-                            </RadzenRow>
+                            <kTVCSSBlazor.Client.Components.Home.NewsComponent />
                         </RadzenTabsItem>
                         <RadzenTabsItem Icon="cast" Text="Стримы">
 
@@ -187,89 +49,16 @@
 
                         </RadzenTabsItem>
                         <RadzenTabsItem Icon="crisis_alert" Text="Объявления проекта">
-                            @if (workSuggestions.Any())
-                            {
-                                <RadzenStack>
-                                    @foreach (var work in workSuggestions)
-                                    {
-                                        <RadzenCard>
-                                            <RadzenStack>
-                                                <RadzenStack Gap="2px">
-                                                    <RadzenText TextStyle="TextStyle.DisplayH4">@work.Title</RadzenText>
-                                                    <RadzenText TextStyle="TextStyle.DisplayH6">Описание: @work.Description</RadzenText>
-                                                    <RadzenStack Orientation="Orientation.Horizontal"><RadzenText>Оплата: </RadzenText><RadzenText Style="color: limegreen">@work.Price</RadzenText></RadzenStack>
-                                                </RadzenStack>
-                                                <RadzenButton Click=@(async () => { await MakeWorkEntry(work); }) Style="width: 250px" Text="Откликнуться" />
-                                                <CascadingAuthenticationState>
-                                                    <AuthorizeView>
-                                                        <Authorized Context="ctx">
-                                                            @if (AuthProvider.CurrentUser.IsAdmin)
-                                                            {
-                                                                <RadzenButton Click=@(async () => { await DeleteWorkEntry(work); }) Style="width: 250px" Text="Удалить" />
-                                                            }
-                                                        </Authorized>
-                                                    </AuthorizeView>
-                                                </CascadingAuthenticationState>
-                                            </RadzenStack>
-                                        </RadzenCard>
-                                    }
-                                </RadzenStack>
-                            }
+                            <kTVCSSBlazor.Client.Components.Home.WorkSuggestions />
                         </RadzenTabsItem>
                         <RadzenTabsItem Icon="trophy" Text="Доска почета">
-
+                            <kTVCSSBlazor.Client.Components.Home.CupWinners />
                         </RadzenTabsItem>
                     </Tabs>
                 </RadzenTabs>
             </Authorized>
             <NotAuthorized>
-                <RadzenRow Gap="5" RowGap="5">
-                    <RadzenColumn Size="12">
-                        <RadzenText Text="Добро пожаловать на kTVCSS" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
-                        <RadzenText Text="Проект, ориентированный на соревновательный Counter-Strike Source" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="Radzen.Blazor.TagName.H2" class="mt-5"></RadzenText>
-                        <RadzenText Text="Присоединяйтесь к нам и получите доступ к турнирам, командным матчам, матчмейкингу и прочему" TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-4" Style="font-size: 20px; line-height: 24px"></RadzenText>
-                        <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px;">
-                            <RadzenRow>
-                                <RadzenColumn Size="12" SizeMD="4">
-                                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                                            <RadzenIcon Icon="trophy" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                                            <RadzenStack Gap="0">
-                                                <RadzenText Text="Сыграно турниров" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
-                                            </RadzenStack>
-                                        </RadzenStack>
-                                    </RadzenCard>
-                                </RadzenColumn>
-                                <RadzenColumn Size="12" SizeMD="4">
-                                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                                            <RadzenIcon Icon="account_circle" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                                            <RadzenStack Gap="0">
-                                                <RadzenText Text="Количество игроков" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
-                                            </RadzenStack>
-                                        </RadzenStack>
-                                    </RadzenCard>
-                                </RadzenColumn>
-                                <RadzenColumn Size="12" SizeMD="4">
-                                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                                            <RadzenIcon Icon="globe" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                                            <RadzenStack Gap="0">
-                                                <RadzenText Text="Сыграно матчей" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
-                                            </RadzenStack>
-                                        </RadzenStack>
-                                    </RadzenCard>
-                                </RadzenColumn>
-                            </RadzenRow>
-                        </RadzenCard>
-                    </RadzenColumn>
-                </RadzenRow>
-                <RadzenRow>
-                    <RadzenColumn Size="12" Style="margin-top: 10px"></RadzenColumn>
-                </RadzenRow>
+                <kTVCSSBlazor.Client.Components.Home.NotAuthorizedView />
             </NotAuthorized>
         </AuthorizeView>
     </CascadingAuthenticationState>

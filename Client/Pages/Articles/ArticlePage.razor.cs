@@ -34,13 +34,15 @@ namespace kTVCSSBlazor.Client.Pages.Articles
         {
             article.ArticleComments.Add(new()
             {
+                //Article = article,
+                Id = 0,
                 Text = text,
                 UserName = AuthProvider.CurrentUser.Username
             });
 
             await http.PutAsJsonAsync($"/api/articles/{Id}", article);
 
-            article = await http.GetFromJsonAsync<Article>($"/api/articles?id={Id}");
+            //article = await http.GetFromJsonAsync<Article>($"/api/articles?id={Id}");
 
             text = "";
 

@@ -1,0 +1,23 @@
+﻿@using kTVCSSBlazor.Db.Models.Arcticles
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<RadzenRow JustifyContent="JustifyContent.Center">
+    <RadzenColumn SizeMD="9" SizeSM="12">
+        <RadzenPanelMenu>
+            @foreach (var article in News)
+            {
+                <RadzenPanelMenuItem Click="@(() => { NavigationManager.NavigateTo("/article/" + article.Id); })" Text="@string.Concat(article.Title, ": ", article.ShortText)" />
+            }
+        </RadzenPanelMenu>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private List<Article> News = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        News = await http.GetFromJsonAsync<List<Article>>("/api/articles");
+    }
+}

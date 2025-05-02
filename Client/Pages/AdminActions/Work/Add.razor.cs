@@ -16,7 +16,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Work
             if (result is not null)
             {
                 notificationService.Notify(NotificationSeverity.Success, "Успех", "Вакансия добавлена");
-                nm.NavigateTo($"/work/{result.Id}");
+                nm.NavigateTo($"/#suggestions");
             }
         }
     }

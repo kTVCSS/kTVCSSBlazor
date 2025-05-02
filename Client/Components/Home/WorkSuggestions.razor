@@ -1,0 +1,66 @@
+﻿@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Home
+@inject HttpClient http
+@inject NotificationService NotificationService
+@inject StateProvider AuthProvider
+
+@if (workSuggestions.Any())
+{
+    <RadzenStack>
+        @foreach (var work in workSuggestions)
+        {
+            <RadzenCard>
+                <RadzenStack>
+                    <RadzenStack Gap="2px">
+                        <RadzenText TextStyle="TextStyle.DisplayH4">@work.Title</RadzenText>
+                        <RadzenText TextStyle="TextStyle.DisplayH6">Описание: @work.Description</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal"><RadzenText>Оплата: </RadzenText><RadzenText Style="color: limegreen">@work.Price</RadzenText></RadzenStack>
+                    </RadzenStack>
+                    <RadzenButton Click=@(async () => { await MakeWorkEntry(work); }) Style="width: 250px" Text="Откликнуться" />
+                    <CascadingAuthenticationState>
+                        <AuthorizeView>
+                            <Authorized Context="ctx">
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    <RadzenButton Click=@(async () => { await DeleteWorkEntry(work); }) Style="width: 250px" Text="Удалить" />
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
+                </RadzenStack>
+            </RadzenCard>
+        }
+    </RadzenStack>
+}
+
+@code {
+    private List<WorkSuggestion> workSuggestions = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        workSuggestions = await http.GetFromJsonAsync<List<WorkSuggestion>>("/api/worksuggestions");
+    }
+
+
+    private async Task DeleteWorkEntry(WorkSuggestion suggestion)
+    {
+        await http.DeleteAsync($"/api/worksuggestions/{suggestion.Id}");
+
+        workSuggestions.Remove(suggestion);
+
+        NotificationService.Notify(NotificationSeverity.Warning, "Успех", "Вакансия была удалена!");
+    }
+
+    private async Task MakeWorkEntry(WorkSuggestion suggestion)
+    {
+        await http.PostAsJsonAsync("/api/MakeEntry2Work",
+            new WorkEntry()
+                {
+                    UserName = AuthProvider.CurrentUser.Username,
+                    WorkSuggestion = suggestion
+                });
+
+        NotificationService.Notify(NotificationSeverity.Success, "Успех", "Ваше желание помочь проекту было доставлено администрации, спасибо!");
+    }
+}

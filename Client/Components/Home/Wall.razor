@@ -1,0 +1,301 @@
+@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Arcticles
+@using kTVCSSBlazor.Db.Models.UserFeed
+@inject HttpClient http
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@implements IDisposable
+
+<RadzenRow JustifyContent="JustifyContent.Center">
+    <RadzenColumn SizeSM="12" SizeMD="9">
+        <RadzenStack>
+            <RadzenCard>
+                <RadzenStack>
+                    <RadzenFormField Text="Что у вас нового?" Style="width: 100%;">
+                        <RadzenTextBox @bind-Value="@newPostContent" />
+                    </RadzenFormField>
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Click="PostNews" Style="" Text="Опубликовать" Icon="post_add" />
+                        <RadzenUpload ChooseText="Прикрепить вложение" Multiple="false" Auto Change=@OnClientChange
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+            <RadzenStack>
+                @if (Posts.Any())
+                {
+                    @foreach (var post in Posts)
+                    {
+                        <RadzenCard>
+                            <RadzenStack>
+                                <RadzenStack Orientation="Orientation.Horizontal">
+                                    <img style="width: 60px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                    <RadzenStack>
+                                        <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
+                                        <small>@post.PostDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                    </RadzenStack>
+                                </RadzenStack>
+                            </RadzenStack>
+                            <div class="post-content">
+                                <p>@post.Content</p>
+                            </div>
+                            @if (!string.IsNullOrEmpty(post.MediaUrl))
+                            {
+                                if (post.MediaType == MediaType.Image)
+                                {
+                                    <RadzenImage Path="@post.MediaUrl" Style="max-width: 640px" />
+                                }
+                                else if (post.MediaType == MediaType.Video)
+                                {
+                                    <video controls style="max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
+                                }
+                            }
+                            <div class="rz-my-2">
+                                <RadzenStack Gap="8px" Orientation="Orientation.Horizontal">
+                                    <RadzenButton Icon="thumb_up" Text="@post.LikesCount.ToString()" Click="() => LikePost(post)" />
+                                    <RadzenButton Icon="thumb_down" Text="@post.DislikesCount.ToString()" Click="() => DislikePost(post)" />
+                                    @if (AuthProvider.CurrentUser.IsAdmin || post.AuthorId == AuthProvider.CurrentUser.Id)
+                                    {
+                                        <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="Удалить"></RadzenButton>
+                                    }
+                                </RadzenStack>
+                            </div>
+                            <div class="post-comments">
+                                @if (post.Comments.Any())
+                                {
+                                    <h4>Комментарии</h4>
+                                    @if (post.Comments.Count > 3)
+                                    {
+                                        @foreach (var comment in post.Comments.Take(3))
+                                        {
+                                            <RadzenStack>
+                                                <RadzenStack Orientation="Orientation.Horizontal">
+                                                    <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                    <RadzenStack Gap="4px">
+                                                        <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
+                                                        <div>@comment.Content</div>
+                                                        <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                                            <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                            <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                        </RadzenStack>
+                                                    </RadzenStack>
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        }
+                                        <RadzenAccordion>
+                                            <Items>
+                                                <RadzenAccordionItem Text="Показать остальные комментарии">
+                                                    @foreach (var comment in post.Comments.Skip(3))
+                                                    {
+                                                        <RadzenStack>
+                                                            <RadzenStack Orientation="Orientation.Horizontal">
+                                                                <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                                <RadzenStack Gap="4px">
+                                                                    <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
+                                                                    <div>@comment.Content</div>
+                                                                    <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                                                        <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                                        <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                                    </RadzenStack>
+                                                                </RadzenStack>
+                                                            </RadzenStack>
+                                                        </RadzenStack>
+                                                    }
+                                                </RadzenAccordionItem>
+                                            </Items>
+                                        </RadzenAccordion>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var comment in post.Comments)
+                                        {
+                                            <RadzenStack>
+                                                <RadzenStack Orientation="Orientation.Horizontal">
+                                                    <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                    <RadzenStack Gap="4px">
+                                                        <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
+                                                        <div>@comment.Content</div>
+                                                        <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                                            <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                            <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                        </RadzenStack>
+                                                    </RadzenStack>
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        }
+                                    }
+                                }
+                            </div>
+                            <RadzenStack>
+                                <RadzenFormField Text="Комментарий" Style="width: 100%;">
+                                    <RadzenTextBox @bind-Value="@post.NewComment" />
+                                </RadzenFormField>
+                                <RadzenButton Style="width: 200px" Icon="send" Text="Отправить" Click="() => AddComment(post)"></RadzenButton>
+                            </RadzenStack>
+                        </RadzenCard>
+                    }
+                }
+                else
+                {
+                    <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
+                        <Loader Text="Идет загрузка постов" />
+                    </RadzenStack>
+                }
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private List<Post> Posts = [];
+    private string newPostContent;
+    private string uploadedFilePath;
+    private IBrowserFile uploadedFile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Posts = await http.GetFromJsonAsync<List<Post>>("/api/userposts/getposts");
+    }
+
+    private async Task PostNews()
+    {
+        if (!string.IsNullOrWhiteSpace(newPostContent))
+        {
+            var post = new Post()
+                {
+                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                    AuthorId = AuthProvider.CurrentUser.Id,
+                    AuthorName = AuthProvider.CurrentUser.Username,
+                    Content = newPostContent,
+                    MediaType = uploadedFile?.ContentType == "video/mp4" ? MediaType.Video : MediaType.Image,
+                    MediaUrl = uploadedFile != null ? $"{uploadedFilePath}" : null,
+                    PostDate = DateTime.Now,
+                };
+
+            Console.Write(post);
+
+            if (AuthProvider.CurrentUser.IsVip)
+            {
+                post.IsVip = true;
+            }
+
+            if (AuthProvider.CurrentUser.IsAdmin)
+            {
+                post.IsVip = false;
+                post.IsAdmin = true;
+            }
+
+            await http.PostAsJsonAsync("/api/userposts/addpost", post, new System.Text.Json.JsonSerializerOptions()
+                {
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+                });
+
+            newPostContent = string.Empty;
+            uploadedFile = null;
+            uploadedFilePath = string.Empty;
+
+            Posts.Clear();
+
+            Posts = await http.GetFromJsonAsync<List<Post>>("/api/userposts/getposts");
+
+            NotificationService.Notify(NotificationSeverity.Success, "Успех", "Ваш пост был опубликован!");
+        }
+    }
+
+    private async Task DeleteComment(Post post, Comment comment)
+    {
+        await http.PostAsJsonAsync("/api/userposts/removecomment", comment);
+
+        Posts.FirstOrDefault(x => x.PostId == post.PostId).Comments.RemoveAll(x => x.CommentId == comment.CommentId);
+    }
+
+    private async Task LikePost(Post post)
+    {
+        await http.PostAsJsonAsync($"/api/userposts/likepost?id={AuthProvider.CurrentUser.Id}", post);
+        var p = await http.GetFromJsonAsync<Post>($"/api/userposts/getpost?id={post.PostId}");
+        Posts.First(x => x.PostId == post.PostId).Likes = p.Likes;
+    }
+
+    private async Task DislikePost(Post post)
+    {
+        await http.PostAsJsonAsync($"/api/userposts/dislikepost?id={AuthProvider.CurrentUser.Id}", post);
+        var p = await http.GetFromJsonAsync<Post>($"/api/userposts/getpost?id={post.PostId}");
+        Posts.First(x => x.PostId == post.PostId).Likes = p.Likes;
+    }
+
+    private async Task AddComment(Post post)
+    {
+        if (!string.IsNullOrEmpty(post.NewComment))
+        {
+            var com = new Comment
+                {
+                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                    AuthorId = AuthProvider.CurrentUser.Id,
+                    AuthorName = AuthProvider.CurrentUser.Username,
+                    Content = post.NewComment,
+                    PostId = post.PostId
+                };
+
+            if (AuthProvider.CurrentUser.IsVip)
+            {
+                com.IsVip = true;
+            }
+
+            if (AuthProvider.CurrentUser.IsAdmin)
+            {
+                com.IsVip = false;
+                com.IsAdmin = true;
+            }
+
+            await http.PostAsJsonAsync($"/api/userposts/addcomment?postId={post.PostId}", com);
+
+            var p = await http.GetFromJsonAsync<Post>($"/api/userposts/getpost?id={post.PostId}");
+
+            Posts.First(x => x.PostId == post.PostId).Comments = p.Comments;
+
+            post.NewComment = string.Empty;
+        }
+    }
+
+    async Task OnClientChange(UploadChangeEventArgs args)
+    {
+        foreach (var file in args.Files)
+        {
+            uploadedFile = file;
+
+            using var content = new MultipartFormDataContent();
+            var fileStream = uploadedFile.OpenReadStream(maxAllowedSize: 10_000_000);
+            var streamContent = new StreamContent(fileStream);
+
+            streamContent.Headers.ContentType = new(uploadedFile.ContentType);
+            content.Add(streamContent, "file", uploadedFile.Name);
+
+            var httpRequest = await http.PostAsync("/api/userposts/UploadAttachment", content);
+
+            var result = await httpRequest.Content.ReadFromJsonAsync<FileUploadResult>();
+
+            if (result.Status)
+            {
+                uploadedFilePath = result.Message;
+                NotificationService.Notify(NotificationSeverity.Success, "Успех", "Файл успешно загружен, можете теперь публиковать пост!");
+            }
+            else
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Ошибка", result.Message);
+            }
+        }
+    }
+
+    private async Task RemovePost(int postId)
+    {
+        await http.GetAsync($"/api/userposts/removepost?id={postId}");
+        Posts.RemoveAll(x => x.PostId == postId);
+    }
+
+    public void Dispose()
+    {
+        Posts = null;
+    }
+}

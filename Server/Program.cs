@@ -11,6 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
       .AddInteractiveWebAssemblyComponents();
 
+#if RELEASE
+
+builder.WebHost.UseWebRoot(builder.Configuration.GetValue<string>("wwwroot"));
+
+#endif
+
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpClient();

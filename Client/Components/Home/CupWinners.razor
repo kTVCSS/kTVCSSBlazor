@@ -1,0 +1,47 @@
+﻿@using kTVCSSBlazor.Db.Models.Home
+@inject HttpClient http
+
+@if (winners == null)
+{
+    <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
+        <Loader Text="Идет загрузка списка победителей турниров" />
+    </RadzenStack>
+}
+else if (!winners.Any())
+{
+    <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
+        <Loader Text="Идет загрузка списка победителей турниров" />
+    </RadzenStack>
+}
+else
+{
+    @foreach (var group in winners.OrderByDescending(w => w.Year).GroupBy(w => w.Year))
+    {
+        <div>
+            <span>@group.Key</span>
+        </div>
+
+        <ul class="list-unstyled">
+            @foreach (var item in group)
+            {
+                <li class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong>@item.CupName</strong>
+                    </div>
+                    <div class="text-primary">
+                        @item.Winner
+                    </div>
+                </li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private List<CupWinner> winners = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        winners = await http.GetFromJsonAsync<List<CupWinner>>("/api/cupwinners");
+    }
+}
