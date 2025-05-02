@@ -16,6 +16,16 @@
         <HeaderTemplate>
             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список заблокированных игроков проекта"></RadzenText>
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.IsAdmin)
+                            {
+                                <RadzenButton Icon="lock_open" Text="Снять баны системы" Click="Unban" />
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
                 <div class="rz-pr-2">
                     <RadzenTextBox Style="width: 300px" Placeholder="Например, ник или стим" @bind-Value="@SearchString" />
                 </div>

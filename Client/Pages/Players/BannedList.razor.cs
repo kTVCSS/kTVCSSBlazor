@@ -1,4 +1,5 @@
-﻿using kTVCSSBlazor.Db.Models.Players;
+﻿using kTVCSS.Models.Models;
+using kTVCSSBlazor.Db.Models.Players;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Pages.Players
@@ -21,6 +22,26 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
                 _filtered = dataSource.Where(QuickFilter).ToList();
             }
+        }
+
+        private async Task Unban()
+        {
+            var players = _filtered.Where(x => x.BannedBy == "Система");
+
+            foreach (var player in players)
+            {
+                var ban = new Ban()
+                {
+                    AdminName = AuthProvider.CurrentUser.Username,
+                    DaysAdder = 0,
+                    Reason = "Снятие банов системы",
+                    Target = player.Id
+                };
+
+                http.PostAsJsonAsync("/api/admins/unban", ban);
+            }
+
+            NavigationManager.Refresh(true);
         }
 
         private Func<BannedUser, bool> QuickFilter => x =>
