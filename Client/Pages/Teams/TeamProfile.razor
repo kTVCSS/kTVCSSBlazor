@@ -150,46 +150,49 @@
             </AuthorizeView>
         </CascadingAuthenticationState>
 
-        <RadzenRow>
-            <!-- Блок Winrate -->
-            <RadzenColumn SizeMD="6" SizeSM="12">
-                <RadzenCard>
-                    <RadzenStack>
-                        <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Винрейт по картам" />
+        @if (MapsWinrate.Any() && MapStats.Any())
+        {
+            <RadzenRow>
+                <!-- Блок Winrate -->
+                <RadzenColumn SizeMD="6" SizeSM="12">
+                    <RadzenCard>
                         <RadzenStack>
-                            @foreach (var map in MapsWinrate)
-                            {
-                                <div style="border-radius: 16px;background-blend-mode: multiply;background-size: 100% auto;background-position: left;background-color: rgba(0, 0, 0, 0.55); height: 64px; color: white;@(string.Concat("background-image: url('", map.BackgroundImage, "');"))">
-                                    <div style="height:100%;backdrop-filter: blur(0.9px);display: flex;justify-content: center;align-items: center;">@map.Name - @map.Winrate%</div>
-                                </div>
-                            }
+                            <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Винрейт по картам" />
+                            <RadzenStack>
+                                @foreach (var map in MapsWinrate)
+                                {
+                                    <div style="border-radius: 16px;background-blend-mode: multiply;background-size: 100% auto;background-position: left;background-color: rgba(0, 0, 0, 0.55); height: 64px; color: white;@(string.Concat("background-image: url('", map.BackgroundImage, "');"))">
+                                        <div style="height:100%;backdrop-filter: blur(0.9px);display: flex;justify-content: center;align-items: center;">@map.Name - @map.Winrate%</div>
+                                    </div>
+                                }
+                            </RadzenStack>
                         </RadzenStack>
-                    </RadzenStack>
-                </RadzenCard>
-            </RadzenColumn>
+                    </RadzenCard>
+                </RadzenColumn>
 
-            <!-- Блок Total Count с прогрессбаром -->
-            <RadzenColumn SizeMD="6" SizeSM="12">
-                <RadzenCard>
-                    <RadzenStack>
-                        <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Частота выбора карт" />
+                <!-- Блок Total Count с прогрессбаром -->
+                <RadzenColumn SizeMD="6" SizeSM="12">
+                    <RadzenCard>
                         <RadzenStack>
-                            @foreach (var playerStat in MapStats)
-                            {
-                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
-                                    <RadzenLabel class="rz-pl-4" Text="@playerStat.Name" />
-                                    <RadzenProgressBar Value="@playerStat.Progress" Max="100" Style="width: 60%;height: 64px;border-radius: 16px;">
-                                        <div style="position: absolute; width: 100%; top: 0; left: 0; height: 100%; display: flex; align-items: center; justify-content: center;">
-                                            @playerStat.Progress%
-                                        </div>
-                                    </RadzenProgressBar>
-                                </RadzenStack>
-                            }
+                            <RadzenText TextStyle="TextStyle.DisplayH5" TextAlign="TextAlign.Center" Text="Частота выбора карт" />
+                            <RadzenStack>
+                                @foreach (var playerStat in MapStats)
+                                {
+                                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                                        <RadzenLabel class="rz-pl-4" Text="@playerStat.Name" />
+                                        <RadzenProgressBar Value="@playerStat.Progress" Max="100" Style="width: 60%;height: 64px;border-radius: 16px;">
+                                            <div style="position: absolute; width: 100%; top: 0; left: 0; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                                @playerStat.Progress%
+                                            </div>
+                                        </RadzenProgressBar>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
                         </RadzenStack>
-                    </RadzenStack>
-                </RadzenCard>
-            </RadzenColumn>
-        </RadzenRow>
+                    </RadzenCard>
+                </RadzenColumn>
+            </RadzenRow>
+        } 
 
         <RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@data.Members">
             <HeaderTemplate>
@@ -260,24 +263,28 @@
                 </CascadingAuthenticationState>
             </Columns>
         </RadzenDataGrid>
-        <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" Text="Последние 20 матчей команды" />
-        <RadzenDataGrid id="ktv-matches-grid" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@data.Matches" TItem="TeamMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;"))">
-            <Columns>
-                <RadzenDataGridColumn TItem="TeamMatch" Visible="true">
-                    <Template Context="ctx">
-                        <a href="/match/@ctx.ID">
-                            <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: center;">
-                                <div style="font-size: 22px;font-weight: 600;width:100%;text-align:center">@ctx.DateTime</div>
-                                <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: center;">
-                                    <div style="font-size: 22px;font-weight: 600;display:flex;text-align:center;">@ctx.Result</div>
+
+        @if (data.Matches.Any())
+        {
+            <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" Text="Последние 20 матчей команды" />
+            <RadzenDataGrid id="ktv-matches-grid" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@data.Matches" TItem="TeamMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;"))">
+                <Columns>
+                    <RadzenDataGridColumn TItem="TeamMatch" Visible="true">
+                        <Template Context="ctx">
+                            <a href="/match/@ctx.ID">
+                                <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: center;">
+                                    <div style="font-size: 22px;font-weight: 600;width:100%;text-align:center">@ctx.DateTime</div>
+                                    <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: center;">
+                                        <div style="font-size: 22px;font-weight: 600;display:flex;text-align:center;">@ctx.Result</div>
+                                    </div>
+                                    <div style="font-size: 22px;font-weight: 600;">@ctx.MapName</div>
                                 </div>
-                                <div style="font-size: 22px;font-weight: 600;">@ctx.MapName</div>
-                            </div>
-                        </a>
-                    </Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
+                            </a>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        }
     </RadzenStack>
 }
 else
