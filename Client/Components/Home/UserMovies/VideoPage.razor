@@ -1,0 +1,153 @@
+﻿@page "/video/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Home
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+@if (ready)
+{
+    <PageTitle>kTVCSS @@ @video.Title</PageTitle>
+
+    <RadzenStack>
+        <div style="width: 100%;display: flex;justify-content: center;">
+            <div style="width: 100%;display: flex; align-self: center;">
+                <video autoplay controls style="width: 100%; height: 100%" src="@video.Url" />
+            </div>
+        </div>
+
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText TextStyle=TextStyle.DisplayH6 Text="@video.Title" />
+            <RadzenText Text="@(string.Concat(video.Views.ToString(), " просмотров"))" />
+        </RadzenStack>
+
+        <RadzenStack JustifyContent=JustifyContent.SpaceBetween Orientation="Orientation.Horizontal">
+            <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                <img style="height: 40px;border-radius: 128px;" src="@video.AuthorAvatar" />
+                <RadzenText Text="@video.AuthorName" />
+            </RadzenStack>
+            <RadzenText Text="@(string.Concat("Дата публикации: ", video.DateTime.ToShortDateString()))" />
+        </RadzenStack>
+
+        @if (!string.IsNullOrEmpty(video.Description))
+        {
+            <RadzenCard>
+                <RadzenText Text="@video.Description" />
+            </RadzenCard>
+        }
+
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == video.AuthorId)
+                    {
+                        <RadzenStack JustifyContent=JustifyContent.End Gap="4px" Orientation="Orientation.Horizontal">
+                            <RadzenButton Icon="edit" Text="Изменить" Variant="Variant.Text" Click="@(() => { NavigationManager.NavigateTo($"/editvideo/{Id}"); })" />
+                            <RadzenButton Icon="remove_circle" Text="Удалить" Variant="Variant.Text" Click="Remove" />
+                        </RadzenStack>
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+
+        <RadzenText TextStyle="TextStyle.DisplayH6" Text="Комментарии" />
+
+        @if (video.Comments is not null)
+        {
+            @if (video.Comments.Count == 0)
+            {
+                <RadzenText>Комментарии не найдены. Будьте первым, кто оставит комментарий!</RadzenText>
+            }
+            else
+            {
+                @foreach (var item in video.Comments)
+                {
+                    <RadzenCard class="rz-pa-3 rz-my-2">
+                        <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+
+                        <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+                            <RadzenText>@item.Text</RadzenText>
+                        </div>
+                    </RadzenCard>
+                }
+            }
+        }
+
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    <RadzenCard class="rz-pa-4 rz-my-2">
+                        <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
+
+                        <RadzenStack>
+                            <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш комментарий" />
+                            <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
+                        </RadzenStack>
+                    </RadzenCard>
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка видео" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    private bool ready = false;
+    private Video video;
+
+    private string text = "";
+
+    private async Task Remove()
+    {
+        await http.DeleteAsync($"/api/uservideos/{Id}");
+
+        NotificationService.Notify(NotificationSeverity.Success, "Успех", "Видео удалено!");
+
+        await Task.Delay(1500);
+
+        NavigationManager.NavigateTo("/");
+    }
+
+    private async Task Send()
+    {
+        video.Comments.Add(new()
+            {
+                Id = 0,
+                Text = text,
+                UserName = AuthProvider.CurrentUser.Username
+            });
+
+        await http.PutAsJsonAsync($"/api/uservideos/{Id}", video);
+
+        text = "";
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            video = await http.GetFromJsonAsync<Video>($"/api/uservideos/{Id}");
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

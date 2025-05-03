@@ -225,32 +225,32 @@
             </div>
         </RadzenCard>
 
+        <RadzenText TextStyle="TextStyle.DisplayH6" Text="Обсуждение матча" />
+
+        @if (match.Commentaries is not null)
+        {
+            @if (match.Commentaries.Count == 0)
+            {
+                <RadzenText>Обсуждение пока не начиналось. Будьте первым, кто оставит комментарий!</RadzenText>
+            }
+            else
+            {
+                @foreach (var item in match.Commentaries)
+                {
+                    <RadzenCard class="rz-pa-3 rz-my-2">
+                        <RadzenText>@item.User - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+
+                        <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+                            <RadzenText>@item.Text</RadzenText>
+                        </div>
+                    </RadzenCard>
+                }
+            }
+        }
+
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>
-                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="Обсуждение матча" />
-
-                    @if (match.Commentaries is not null)
-                    {
-                        @if (match.Commentaries.Count == 0)
-                        {
-                            <RadzenText>Обсуждение пока не начиналось. Будьте первым, кто оставит комментарий!</RadzenText>
-                        }
-                        else
-                        {
-                            @foreach (var item in match.Commentaries)
-                            {
-                                <RadzenCard class="rz-pa-3 rz-my-2">
-                                    <RadzenText>@item.User - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
-
-                                    <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
-                                        <RadzenText>@item.Text</RadzenText>
-                                    </div>
-                                </RadzenCard>
-                            }
-                        }
-                    }
-
                     <RadzenCard class="rz-pa-4 rz-my-2">
                         <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
 

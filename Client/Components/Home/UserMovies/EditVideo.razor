@@ -1,0 +1,39 @@
+﻿@page "/editvideo/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Изменение хайлайта</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <RadzenStack>
+                <RadzenStack>
+                    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Изменение хайлайта" />
+                </RadzenStack>
+
+                <RadzenStack>
+                    <RadzenFormField Text="Заголовок" Variant="Variant.Filled">
+                        <RadzenTextBox @bind-Value="_video.Title" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Описание" Variant="Variant.Filled">
+                        <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
+                    </RadzenFormField>
+                    <RadzenUpload ChooseText="Загрузить обложку для видео" Multiple="false" Auto Change=@OnPreviewChange
+                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+
+                    <RadzenButton Icon="publish" Text="Изменить" Click="Submit" />
+                </RadzenStack>
+            </RadzenStack>
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

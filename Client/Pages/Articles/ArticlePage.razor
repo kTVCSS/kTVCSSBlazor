@@ -61,14 +61,20 @@
                     }
                 }
 
-                <RadzenCard class="rz-pa-4 rz-my-2">
-                    <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            <RadzenCard class="rz-pa-4 rz-my-2">
+                                <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
 
-                    <RadzenStack>
-                        <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш комментарий" />
-                        <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
-                    </RadzenStack>
-                </RadzenCard>
+                                <RadzenStack>
+                                    <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш комментарий" />
+                                    <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
+                                </RadzenStack>
+                            </RadzenCard>
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
             </div>
         </RadzenContent>
     }

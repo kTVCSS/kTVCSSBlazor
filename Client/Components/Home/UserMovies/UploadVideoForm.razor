@@ -1,0 +1,47 @@
+﻿@page "/uploadvideo"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Добавление хайлайта</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <RadzenStack>
+                <RadzenStack>
+                    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Добавление хайлайта" />
+                </RadzenStack>
+
+                <RadzenStack>
+                    <RadzenStack Gap="4px">
+                        <RadzenAlert AllowClose=false Size=AlertSize.Small AlertStyle="AlertStyle.Info" Text="Файл должен быть не менее 512 МБайт" />
+                        <RadzenAlert AllowClose=false Size=AlertSize.Small AlertStyle="AlertStyle.Info" Text="Будет неплохо, если Вы воспользуетесь такими программами, как Handbrake, чтобы сжать исходное видео" />
+                        <RadzenAlert AllowClose=false Size=AlertSize.Small AlertStyle="AlertStyle.Info" Text="Наилучший битрейт для видео - 8192 КБит/с (8 МБит/с)" />
+                    </RadzenStack>
+
+                    <RadzenFormField Text="Заголовок" Variant="Variant.Filled">
+                        <RadzenTextBox @bind-Value="_video.Title" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Описание" Variant="Variant.Filled">
+                        <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
+                    </RadzenFormField>
+                    <RadzenUpload @ref=_uploader ChooseText="Загрузить видео" Multiple="false" Auto Change=@OnVideoChange
+                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                    <RadzenUpload ChooseText="Загрузить обложку для видео" Multiple="false" Auto Change=@OnPreviewChange
+                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+
+                    <RadzenButton Icon="publish" Text="Опубликовать" Click="Submit" />
+                </RadzenStack>
+            </RadzenStack>
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

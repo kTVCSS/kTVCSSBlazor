@@ -1,0 +1,106 @@
+﻿@using kTVCSSBlazor.Db.Models.Home
+@inject HttpClient http
+@inject NavigationManager nm
+
+<RadzenStack Style="padding-bottom: 8px" Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Хайлайты игроков проекта" />
+    <RadzenLink Text="Добавить новое видео" Path="/uploadvideo" />
+</RadzenStack>
+
+<RadzenRow Gap="20px">
+    @foreach (var video in _videos)
+    {
+        <RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3">
+            <RadzenCard class="video-card" Style="padding-bottom: 8px;" @onclick="@(() => OnVideoClick(video.Id))">
+                <div style="position: relative;">
+                    <img src="@video.PreviewImage" alt="@video.Title" class="thumbnail" />
+                    @*                     <span class="duration-badge">@video.Duration</span> *@
+                </div>
+                <div class="card-content">
+                    <div class="channel-info">
+                        <img src="@video.AuthorAvatar" class="channel-avatar" />
+                        <div style="flex:1;">
+                            <div style="font-weight:500; font-size:14px; line-height:1.2; margin-bottom:4px;">@video.Title</div>
+                            <div class="video-meta">@video.AuthorName • @video.Views просмотров • @video.DateTime.ToShortDateString()</div>
+                        </div>
+                    </div>
+                </div>
+            </RadzenCard>
+        </RadzenColumn>
+    }
+</RadzenRow>
+
+<style>
+    .video-card {
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        cursor: pointer;
+        max-height: 260px;
+        min-width: 360px;
+        overflow: hidden;
+    }
+
+    .thumbnail {
+        width: 100%;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        object-fit: cover;
+        max-height: 200px;
+        min-width: 360px;
+    }
+
+    .duration-badge {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .card-content {
+        padding-top: 8px;
+        margin: 4px;
+    }
+
+    .channel-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 8px;
+        object-fit: cover;
+    }
+
+    .channel-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .video-meta {
+        font-size: 13px;
+        color: #aaa;
+    }
+</style>
+
+@code {
+    private List<Video> _videos = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            _videos = await http.GetFromJsonAsync<List<Video>>("/api/uservideos");
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private async Task OnVideoClick(int id)
+    {
+        nm.NavigateTo($"/video/{id}");
+    }
+}
