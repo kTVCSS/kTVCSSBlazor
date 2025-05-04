@@ -27,25 +27,28 @@
                         </RadzenFormField>
 
                         <RadzenUpload ChooseText="Изменить аватарку" Multiple="false" Auto Change=@OnClientChange
-                                      InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
                         <RadzenButton Click="SetDefaultAvatar" Text="Сбросить аватар команды" />
 
-                        <RadzenStack JustifyContent="JustifyContent.Center">
-                            <RadzenLabel Text="Достижения команды" />
-                            <RadzenButton Click="@(() => team.Achiviments.Add(new()))" Text="Добавить достижение" />
-                            @foreach (var ach in team.Achiviments)
-                            {
-                                <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                    <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close" Click="@(() => { team.Achiviments.Remove(ach); })" />
-                                    <RadzenFormField Text="Место" Style="width: 100%;">
-                                        <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
-                                    </RadzenFormField>
-                                    <RadzenFormField Text="Название турнира" Style="width: 100%;">
-                                        <RadzenTextBox @bind-Value="@ach.Name" />
-                                    </RadzenFormField>
-                                </RadzenStack>
-                            }
-                        </RadzenStack>
+                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        {
+                            <RadzenStack JustifyContent="JustifyContent.Center">
+                                <RadzenLabel Text="Достижения команды" />
+                                <RadzenButton Click="@(() => team.Achiviments.Add(new()))" Text="Добавить достижение" />
+                                @foreach (var ach in team.Achiviments)
+                                {
+                                    <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                        <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close" Click="@(() => { team.Achiviments.Remove(ach); })" />
+                                        <RadzenFormField Text="Место" Style="width: 100%;">
+                                            <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                        </RadzenFormField>
+                                        <RadzenFormField Text="Название турнира" Style="width: 100%;">
+                                            <RadzenTextBox @bind-Value="@ach.Name" />
+                                        </RadzenFormField>
+                                    </RadzenStack>
+                                }
+                            </RadzenStack>
+                        }
 
                         <RadzenButton Click="Save" Text="Сохранить" />
                     </RadzenStack>

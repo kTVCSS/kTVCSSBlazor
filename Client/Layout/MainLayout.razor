@@ -1,5 +1,8 @@
+@using kTVCSS.Models.Db.Models.Teams
+@using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Players
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -47,6 +50,12 @@
                                         </Template>
                                         <ChildContent>
                                             <RadzenProfileMenuItem Text="Профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenProfileMenuItem>
+                                            @if (string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
+                                            {
+                                                <div @onclick=@(async (MouseEventArgs e) => OpenTeamCreation())>
+                                                    <RadzenProfileMenuItem Text="Создать команду" Icon="add_circle"></RadzenProfileMenuItem>
+                                                </div>
+                                            }
                                             <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
                                                 <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
                                             </div>
@@ -135,10 +144,10 @@
                     </RadzenStack>
                 </ErrorContent>
             </ErrorBoundary>
-            
+
         </RadzenRow>
     </RadzenBody>
-    
+
     <RadzenFooter>
         <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
             <RadzenLink class="rz-text-caption" Path="https://t.me/kurwanator1337" Target="_blank" Text="@string.Concat("kTVCSS Ⓒ 2013 - ", DateTime.Now.Year)" />
@@ -162,6 +171,78 @@
     void SidebarToggleClick()
     {
         sidebarExpanded = !sidebarExpanded;
+    }
+
+    private string _teamName = string.Empty;
+
+    private async Task OpenTeamCreation()
+    {
+        var result = await DialogService.OpenAsync("Создание команды", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenStack Gap="0px">
+                <RadzenText>Вы собираетесь создать команду на проекте!</RadzenText>
+                <RadzenText>Команда необходима для участия в командных матчах, а также в турнирах.</RadzenText>
+                <RadzenText>При указании тега учитывайте то, что он должен совпадать полностью с тем, что Вы собираетесь использовать в игре.</RadzenText>
+                <RadzenText>Иначе результаты матчей не будут учитываться в профиль команды!</RadzenText>
+            </RadzenStack>
+        <RadzenTextBox Placeholder="Напишите название команды (тег)" @bind-Value=@_teamName Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); CreateTeam(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    );
+    }
+
+    private async Task CreateTeam()
+    {
+        var data = new CreateTeamData()
+            {
+                Name = _teamName,
+                SteamID = AuthProvider.CurrentUser.SteamId
+            };
+
+        var request = await http.PostAsJsonAsync("/api/teams/createteam", data);
+
+        var response = await request.Content.ReadFromJsonAsync<CreateTeamResult>();
+
+        switch (response)
+        {
+            case CreateTeamResult.AlreadyCreatedLatestly:
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Вы недавно создавали команду, подождите немного");
+                    break; 
+                }
+            case CreateTeamResult.TeamExist:
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Команда с таким названием уже существует");
+                    break; 
+                }
+            case CreateTeamResult.PlayerExistInTeam:
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "У Вас уже есть команда!");
+                    break; 
+                }
+            case CreateTeamResult.TooManyTeams:
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя регистрировать несколько команд сразу");
+                    break; 
+                }
+            case CreateTeamResult.Ok:
+                {
+                    NotificationService.Notify(NotificationSeverity.Success, "Успех", "Команда создана успешно!");
+
+                    var player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={AuthProvider.CurrentUser.Id}");
+
+                    await Task.Delay(500);
+
+                    NavigationManager.NavigateTo($"/team/{player.TeamInfo.ID}");
+
+                    break;
+                }
+        }
     }
 }
 
