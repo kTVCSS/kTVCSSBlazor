@@ -5,6 +5,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 using Microsoft.JSInterop;
 
+// TODO на завтра
+// в редактировании профиля кнопки неадекватно себя ведут которые за загрузку файлов отвечают
+// остался открытым вопрос с конфигами игроков - заливка файлов через nginx не работает
+// аватарки на стене
+// таймаут хттп клиента
+// репорты - тоже в сервис оповещений и создавать тикет
+// остальное дальше по плану
+
 var options = new WebApplicationOptions
 {
     Args = args,
