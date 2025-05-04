@@ -1,0 +1,73 @@
+﻿@page "/editconfig/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Teams
+@inject StateProvider AuthProvider
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Редактирование конфига</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _config.AuthorId)
+            {
+                <RadzenStack>
+                    <RadzenStack>
+                        <RadzenText TextStyle=TextStyle.DisplayH4 Text="Редактирование конфига" />
+                    </RadzenStack>
+
+                    <RadzenStack>
+                        <RadzenFormField Text="Заголовок" Variant="Variant.Filled">
+                            <RadzenTextBox @bind-Value="_config.Name" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Описание" Variant="Variant.Filled">
+                            <RadzenTextArea Rows="8" @bind-Value="_config.Description" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Название монитора" Variant="Variant.Filled">
+                            <RadzenTextBox @bind-Value="_config.MonitorName" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Частота монитора" Variant="Variant.Filled">
+                            <RadzenNumeric ShowUpDown=false @bind-Value="_config.MonitorFrequency" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Разрешение монитора в игре" Variant="Variant.Filled">
+                            <RadzenTextBox Placeholder="Например, 1920х1080" @bind-Value="_config.MonitorResolution" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Название мышки" Variant="Variant.Filled">
+                            <RadzenTextBox @bind-Value="_config.MouseName" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="DPI мышки" Variant="Variant.Filled">
+                            <RadzenNumeric ShowUpDown=false @bind-Value="_config.MouseSensitivity" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Чувствительность в игре" Variant="Variant.Filled">
+                            <RadzenNumeric ShowUpDown=false @bind-Value="_config.InGameSensitivity" />
+                        </RadzenFormField>
+
+                        <RadzenFormField Text="Чувствительность зума" Variant="Variant.Filled">
+                            <RadzenNumeric ShowUpDown=false @bind-Value="_config.ZoomSensitivity" />
+                        </RadzenFormField>
+
+                        <RadzenButton Icon="publish" Text="Опубликовать" Click="Submit" />
+                    </RadzenStack>
+                </RadzenStack>
+            }
+            else
+            {
+                <NoAccess />
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

@@ -16,6 +16,7 @@
     <div class="notification-drawer">
         <div class="notification-header">
             <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenButton IconColor="white" Variant=Variant.Text Icon="arrow_back" Click="ToggleDrawer" />
                 Уведомления (@unreadCount)
                 <RadzenButton Style="color: white" Variant="Variant.Text" Text="Скрыть все" Icon="close" Click="CloseAll" />
             </RadzenStack>
@@ -34,7 +35,7 @@
             @foreach (var n in notifications)
             {
                 <div class="notification-item @(n.IsRead ? "" : "unread")"
-                @onclick="@(() => OnNotificationClick(n))">
+                     @onclick="@(() => OnNotificationClick(n))">
                     <div><strong>@n.Title</strong></div>
                     <div style="font-size:0.9em; color:#8b8b8b;overflow-wrap: anywhere;">@n.Message</div>
                     <div style="font-size:0.8em; color:#999; margin-top:4px;">
@@ -48,47 +49,48 @@
 
 <style>
     .drawer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 1000;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+        z-index: 1000;
     }
 
     .notification-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 500px;
-    height: 100%;
-    background: #131417;
-    box-shadow: -2px 0 6px rgba(0,0,0,0.2);
-    z-index: 1001;
-    display: flex;
-    flex-direction: column;
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        max-width: 500px;
+        height: 100%;
+        background: #131417;
+        box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
     }
 
     .notification-header {
-    padding: 16px;
-    border-bottom: 1px solid #eaeaea;
-    font-weight: bold;
+        padding: 16px;
+        border-bottom: 1px solid #eaeaea;
+        font-weight: bold;
     }
 
     .notification-item {
-    padding: 12px 16px;
-    border-bottom: 1px solid #f1f1f1;
-    cursor: pointer;
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f1f1;
+        cursor: pointer;
     }
 
-    .notification-item.unread {
-    background: #121518
-    }
+        .notification-item.unread {
+            background: #121518
+        }
 
-    .notification-item:hover {
-    background: #171818;
-    }
+        .notification-item:hover {
+            background: #171818;
+        }
 </style>
 
 @code {

@@ -1,0 +1,65 @@
+﻿@using kTVCSSBlazor.Db.Models.Home
+@inject HttpClient http
+
+<RadzenStack Style="padding-bottom: 8px" Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Конфиги игроков проекта" />
+    <RadzenLink Text="Добавить новый конфиг" Path="/uploadconfig" />
+</RadzenStack>
+
+@if (ready)
+{
+    <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
+        @if (_configs.Any())
+        {
+            @foreach (var config in _configs)
+            {
+                <RadzenCard Style="width: 400px">
+                    <RadzenRow AlignItems="AlignItems.Center">
+                        <RadzenStack JustifyContent=JustifyContent.Start Orientation="Orientation.Horizontal">
+                            <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                                <img style="height: 40px;border-radius: 128px;" src="@config.AuthorAvatar" />
+                                <RadzenLink Style="color: white" Text="@config.AuthorName" Path="@string.Concat("/player/", config.AuthorId)" />
+                            </RadzenStack>
+                        </RadzenStack>
+                        <RadzenStack Style="width: 100%">
+                            <RadzenLink Style="color: white" Text="@config.Name" Path="@string.Concat("/config/", config.Id)" />
+                            <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
+                            <RadzenText Text="@(string.Concat("Опубликован: ", config.DateTime.ToShortDateString()))" />
+                            <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
+                            <RadzenText Text="@(string.Concat("Просмотров: ", config.Views, " • Скачиваний: ", config.Downloads))" />
+                        </RadzenStack>
+                    </RadzenRow>
+                </RadzenCard>
+            }
+        }
+        else
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Text="Конфигов пока нет" />
+        }
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка конфигов" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+@code {
+    List<GameConfig> _configs = [];
+    bool ready = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            _configs = await http.GetFromJsonAsync<List<GameConfig>>("/api/gameconfigs");
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

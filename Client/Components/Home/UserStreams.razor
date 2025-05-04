@@ -1,5 +1,21 @@
-﻿@using kTVCSSBlazor.Db.Models.Home
+﻿@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Home
 @inject HttpClient http
+@inject StateProvider AuthProvider
+
+<RadzenStack Style="padding-bottom: 8px" Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Стримы игроков проекта" />
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenLink Text="Добавить новый стрим" Path="/addstream" />
+                }
+            </Authorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+</RadzenStack>
 
 <RadzenRow JustifyContent="JustifyContent.Center">
     <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
@@ -11,7 +27,7 @@
                 <RadzenStack class="rz-mt-2" JustifyContent=JustifyContent.Start Orientation="Orientation.Horizontal">
                     <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
                         <img style="height: 40px;border-radius: 128px;" src="@stream.PlayerAvatar" />
-                        <RadzenText Text="@stream.PlayerName" />
+                        <RadzenLink Style="color: white" Text="@stream.PlayerName" Path="@string.Concat("/player/", stream.PlayerId)" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenCard>

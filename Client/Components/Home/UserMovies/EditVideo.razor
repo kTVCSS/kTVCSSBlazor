@@ -13,24 +13,31 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            <RadzenStack>
+            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _video.AuthorId)
+            {
                 <RadzenStack>
-                    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Изменение хайлайта" />
-                </RadzenStack>
+                    <RadzenStack>
+                        <RadzenText TextStyle=TextStyle.DisplayH4 Text="Изменение хайлайта" />
+                    </RadzenStack>
 
-                <RadzenStack>
-                    <RadzenFormField Text="Заголовок" Variant="Variant.Filled">
-                        <RadzenTextBox @bind-Value="_video.Title" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Описание" Variant="Variant.Filled">
-                        <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
-                    </RadzenFormField>
-                    <RadzenUpload ChooseText="Загрузить обложку для видео" Multiple="false" Auto Change=@OnPreviewChange
-                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                    <RadzenStack>
+                        <RadzenFormField Text="Заголовок" Variant="Variant.Filled">
+                            <RadzenTextBox @bind-Value="_video.Title" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Описание" Variant="Variant.Filled">
+                            <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
+                        </RadzenFormField>
+                        <RadzenUpload ChooseText="Загрузить обложку для видео" Multiple="false" Auto Change=@OnPreviewChange
+                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
 
-                    <RadzenButton Icon="publish" Text="Изменить" Click="Submit" />
+                        <RadzenButton Icon="publish" Text="Изменить" Click="Submit" />
+                    </RadzenStack>
                 </RadzenStack>
-            </RadzenStack>
+            }
+            else
+            {
+                <NoAccess />
+            }
         </Authorized>
         <NotAuthorized>
             <NoAccess />

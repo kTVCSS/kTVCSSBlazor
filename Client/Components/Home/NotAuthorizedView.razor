@@ -1,51 +1,78 @@
-﻿<RadzenRow Gap="5" RowGap="5">
-    <RadzenColumn Size="12">
-        <RadzenText Text="Добро пожаловать на kTVCSS" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
-        <RadzenText Text="Проект, ориентированный на соревновательный Counter-Strike Source" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="Radzen.Blazor.TagName.H2" class="mt-5"></RadzenText>
-        <RadzenText Text="Присоединяйтесь к нам и получите доступ к турнирам, командным матчам, матчмейкингу и прочему" TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-4" Style="font-size: 20px; line-height: 24px"></RadzenText>
-        <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px;">
-            <RadzenRow>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                            <RadzenIcon Icon="trophy" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                            <RadzenStack Gap="0">
-                                <RadzenText Text="Сыграно турниров" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+﻿@using kTVCSS.Models.Db.Models.Home
+@inject HttpClient http
+
+@if (ready)
+{
+    <RadzenRow Gap="5" RowGap="5">
+        <RadzenColumn Size="12">
+            <RadzenText Text="Добро пожаловать на kTVCSS" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
+            <RadzenText Text="Проект, ориентированный на соревновательный Counter-Strike Source" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="Radzen.Blazor.TagName.H2" class="mt-5"></RadzenText>
+            <RadzenText Text="Присоединяйтесь к нам и получите доступ к турнирам, командным матчам, матчмейкингу и прочему" TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-4" Style="font-size: 20px; line-height: 24px"></RadzenText>
+            <RadzenCard Style="margin-top: 40px;">
+                <RadzenRow>
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenCard Variant="Radzen.Variant.Outlined">
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                                <RadzenIcon Icon="trophy" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                                <RadzenStack Gap="0">
+                                    <RadzenText Text="Сыграно турниров" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                    <RadzenText Text="@stat.Cups.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                                </RadzenStack>
                             </RadzenStack>
-                        </RadzenStack>
-                    </RadzenCard>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                            <RadzenIcon Icon="account_circle" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                            <RadzenStack Gap="0">
-                                <RadzenText Text="Количество игроков" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                        </RadzenCard>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenCard Variant="Radzen.Variant.Outlined">
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                                <RadzenIcon Icon="account_circle" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                                <RadzenStack Gap="0">
+                                    <RadzenText Text="Количество игроков" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                    <RadzenText Text="@stat.Players.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                                </RadzenStack>
                             </RadzenStack>
-                        </RadzenStack>
-                    </RadzenCard>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenCard Variant="Radzen.Variant.Outlined">
-                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                            <RadzenIcon Icon="globe" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                            <RadzenStack Gap="0">
-                                <RadzenText Text="Сыграно матчей" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                                <RadzenText Text="12345" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                        </RadzenCard>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="4">
+                        <RadzenCard Variant="Radzen.Variant.Outlined">
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                                <RadzenIcon Icon="globe" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                                <RadzenStack Gap="0">
+                                    <RadzenText Text="Сыграно матчей" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                                    <RadzenText Text="@stat.Matches.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                                </RadzenStack>
                             </RadzenStack>
-                        </RadzenStack>
-                    </RadzenCard>
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenCard>
-    </RadzenColumn>
-</RadzenRow>
-<RadzenRow>
-    <RadzenColumn Size="12" Style="margin-top: 10px"></RadzenColumn>
-</RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn Size="12" Style="margin-top: 10px"></RadzenColumn>
+    </RadzenRow>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы" />
+        </RadzenStack>
+    </RadzenRow>
+}
 
 @code {
+    private GuestStat stat = new();
+    private bool ready = false;
 
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            stat = await http.GetFromJsonAsync<GuestStat>("/api/guest");
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
 }

@@ -5,41 +5,65 @@
 @inject NotificationService NotificationService
 @inject StateProvider AuthProvider
 
-@if (workSuggestions.Any())
-{
-    <RadzenStack>
-        @foreach (var work in workSuggestions)
+<RadzenStack>
+    @if (ready)
+    {
+        @if (workSuggestions.Any())
         {
-            <RadzenCard>
-                <RadzenStack>
-                    <RadzenStack Gap="2px">
-                        <RadzenText TextStyle="TextStyle.DisplayH4">@work.Title</RadzenText>
-                        <RadzenText TextStyle="TextStyle.DisplayH6">Описание: @work.Description</RadzenText>
-                        <RadzenStack Orientation="Orientation.Horizontal"><RadzenText>Оплата: </RadzenText><RadzenText Style="color: limegreen">@work.Price</RadzenText></RadzenStack>
+            @foreach (var work in workSuggestions)
+            {
+                <RadzenCard>
+                    <RadzenStack>
+                        <RadzenStack Gap="2px">
+                            <RadzenText TextStyle="TextStyle.DisplayH4">@work.Title</RadzenText>
+                            <RadzenText TextStyle="TextStyle.DisplayH6">Описание: @work.Description</RadzenText>
+                            <RadzenStack Orientation="Orientation.Horizontal"><RadzenText>Оплата: </RadzenText><RadzenText Style="color: limegreen">@work.Price</RadzenText></RadzenStack>
+                        </RadzenStack>
+                        <RadzenButton Click=@(async () => { await MakeWorkEntry(work); }) Style="width: 250px" Text="Откликнуться" />
+                        <CascadingAuthenticationState>
+                            <AuthorizeView>
+                                <Authorized Context="ctx">
+                                    @if (AuthProvider.CurrentUser.IsAdmin)
+                                    {
+                                        <RadzenButton Click=@(async () => { await DeleteWorkEntry(work); }) Style="width: 250px" Text="Удалить" />
+                                    }
+                                </Authorized>
+                            </AuthorizeView>
+                        </CascadingAuthenticationState>
                     </RadzenStack>
-                    <RadzenButton Click=@(async () => { await MakeWorkEntry(work); }) Style="width: 250px" Text="Откликнуться" />
-                    <CascadingAuthenticationState>
-                        <AuthorizeView>
-                            <Authorized Context="ctx">
-                                @if (AuthProvider.CurrentUser.IsAdmin)
-                                {
-                                    <RadzenButton Click=@(async () => { await DeleteWorkEntry(work); }) Style="width: 250px" Text="Удалить" />
-                                }
-                            </Authorized>
-                        </AuthorizeView>
-                    </CascadingAuthenticationState>
-                </RadzenStack>
-            </RadzenCard>
+                </RadzenCard>
+            }
         }
-    </RadzenStack>
-}
+        else
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Text="Предложений пока нет" />
+        }
+    }
+    else
+    {
+        <RadzenRow JustifyContent="JustifyContent.Center">
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка объявлений проекта" />
+            </RadzenStack>
+        </RadzenRow>
+    }
+</RadzenStack>
+
 
 @code {
     private List<WorkSuggestion> workSuggestions = [];
+    private bool ready = false;
 
     protected override async Task OnInitializedAsync()
     {
-        workSuggestions = await http.GetFromJsonAsync<List<WorkSuggestion>>("/api/worksuggestions");
+        Task.Run(async () =>
+        {
+            workSuggestions = await http.GetFromJsonAsync<List<WorkSuggestion>>("/api/worksuggestions");
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
     }
 
 

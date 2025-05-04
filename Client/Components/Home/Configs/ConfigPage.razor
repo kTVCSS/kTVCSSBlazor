@@ -1,0 +1,231 @@
+﻿@page "/config/{Id:int}"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Home
+@using kTVCSSBlazor.Db.Models.Players
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject StateProvider AuthProvider
+@inject NotificationService ns
+
+<PageTitle>kTVCSS @@ @config.Name</PageTitle>
+
+@if (ready)
+{
+    <RadzenStack>
+        <RadzenStack Gap="0px">
+            <RadzenText TextStyle="TextStyle.DisplayH3" Text="@config.Name" />
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Variant=Variant.Text Text="К конфигам" Icon="arrow_back" Click="@(() => { NavigationManager.NavigateTo("/#configs"); })" />
+                <RadzenButton Variant=Variant.Text Text="Скачать ZIP" Icon="download" Click="() => DownloadZip()" />
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == config.AuthorId)
+                            {
+                                <RadzenButton Variant=Variant.Text Text="Редактировать" Icon="edit" Click="@(() => { NavigationManager.NavigateTo("/editconfig/" + Id); })" />
+                                <RadzenButton Variant=Variant.Text Text="Удалить" Icon="remove_circle" Click="() => Remove()" />
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+            </RadzenStack>
+        </RadzenStack>
+        <RadzenStack Gap="0px">
+            <RadzenText>
+                <strong>Автор: </strong> @config.AuthorName (TOP-@(player.MainInfo.Position) • @(Math.Round(player.MainInfo.KDR.Value, 2)) KDR • @(Math.Round(player.MainInfo.AVG.Value, 2)) AVG • @(player.MainInfo.MMR) ELO)
+            </RadzenText>
+            <RadzenText>
+                <strong>Дата публикации: </strong> @config.DateTime.ToLongDateString()
+            </RadzenText>
+            <RadzenText>
+                <strong>Просмотров: </strong> @config.Views
+            </RadzenText>
+            <RadzenText>
+                <strong>Скачиваний: </strong> @config.Downloads
+            </RadzenText>
+        </RadzenStack>
+
+        @if (!string.IsNullOrEmpty(config.Description))
+        {
+            <RadzenStack Wrap=FlexWrap.Wrap Gap="0px">
+                <RadzenText TextStyle=TextStyle.DisplayH4 Text="Описание" />
+                <RadzenText Text="@config.Description" Style="overflow-wrap: anywhere;" />
+            </RadzenStack>
+        }
+
+        <RadzenStack Wrap="FlexWrap.Wrap">
+            @if (!string.IsNullOrEmpty(config.MonitorName) || config.MonitorFrequency.HasValue || !string.IsNullOrEmpty(config.MonitorResolution))
+            {
+                <RadzenStack Gap="0px">
+                    <RadzenText TextStyle=TextStyle.DisplayH4 Text="О мониторе" />
+
+                    @if (!string.IsNullOrEmpty(config.MonitorName))
+                    {
+                        <RadzenText>
+                            <strong>Монитор: </strong> @config.MonitorName
+                        </RadzenText>
+                    }
+                    @if (config.MonitorFrequency.HasValue)
+                    {
+                        <RadzenText>
+                            <strong>Частота: </strong> @config.MonitorFrequency
+                        </RadzenText>
+                    }
+                    @if (!string.IsNullOrEmpty(config.MonitorResolution))
+                    {
+                        <RadzenText>
+                            <strong>Разрешение: </strong> @config.MonitorResolution
+                        </RadzenText>
+                    }
+                </RadzenStack>
+            }
+
+            <RadzenStack Gap="0px">
+                @if (!string.IsNullOrEmpty(config.MouseName) || config.MouseSensitivity.HasValue ||
+            config.InGameSensitivity.HasValue || config.InGameSensitivity.HasValue)
+                {
+                    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Об игровой мышке" />
+
+                    @if (!string.IsNullOrEmpty(config.MouseName))
+                    {
+                        <RadzenText>
+                            <strong>Мышь: </strong> @config.MouseName
+                        </RadzenText>
+                    }
+                    @if (config.MouseSensitivity.HasValue)
+                    {
+                        <RadzenText>
+                            <strong>DPI: </strong> @config.MouseSensitivity
+                        </RadzenText>
+                    }
+                    @if (config.InGameSensitivity.HasValue)
+                    {
+                        <RadzenText>
+                            <strong>Чувствительность в игре: </strong> @config.InGameSensitivity
+                        </RadzenText>
+                    }
+                    @if (config.ZoomSensitivity.HasValue)
+                    {
+                        <RadzenText>
+                            <strong>Чувствительность зума: </strong> @config.ZoomSensitivity
+                        </RadzenText>
+                    }
+                }
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenStack>
+
+    <RadzenText TextStyle="TextStyle.DisplayH4" Text="Комментарии" />
+
+    @if (config.GameConfigsComments is not null)
+    {
+        @if (config.GameConfigsComments.Count == 0)
+        {
+            <RadzenText>Комментарии не найдены. Будьте первым, кто оставит комментарий!</RadzenText>
+        }
+        else
+        {
+            @foreach (var item in config.GameConfigsComments)
+            {
+                <RadzenCard class="rz-pa-3 rz-my-2">
+                    <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+
+                    <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+                        <RadzenText>@item.Text</RadzenText>
+                    </div>
+                </RadzenCard>
+            }
+        }
+    }
+
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                <RadzenCard class="rz-pa-4 rz-my-2">
+                    <RadzenText TextStyle="TextStyle.DisplayH6">Оставить комментарий</RadzenText>
+
+                    <RadzenStack>
+                        <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш комментарий" />
+                        <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
+                    </RadzenStack>
+                </RadzenCard>
+            </Authorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка конфига" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+@code {
+    [Parameter] 
+    [SupplyParameterFromQuery]
+    public int Id { get; set; }
+
+    private bool ready = false;
+    private GameConfig config = new();
+    private PlayerInfo player = new();
+    private string text = "";
+
+    private async Task Remove()
+    {
+        await Http.DeleteAsync($"/api/gameconfigs/{Id}");
+
+        ns.Notify(NotificationSeverity.Success, "Успех", "Конфиг удален!");
+
+        await Task.Delay(1500);
+
+        NavigationManager.NavigateTo("/#configs");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            config = await Http.GetFromJsonAsync<GameConfig>($"api/gameconfigs/{Id}");
+            player = await Http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={config.AuthorId}");
+            ready = true;
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    private async Task Send()
+    {
+        config.GameConfigsComments.Add(new()
+            {
+                Id = 0,
+                Text = text,
+                UserName = AuthProvider.CurrentUser.Username
+            });
+
+        await Http.PutAsJsonAsync($"/api/gameconfigs/{Id}", config);
+
+        text = "";
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    void DownloadZip()
+    {
+        if (AuthProvider.CurrentUser is null)
+        {
+            ns.Notify(NotificationSeverity.Error, "VIP", "Для скачивания конфига необходимо быть авторизованным");
+            return;
+        }
+        if (AuthProvider.CurrentUser.IsVip || config.AuthorId == AuthProvider.CurrentUser.Id)
+        {
+            config.Downloads += 1;
+            NavigationManager.NavigateTo(config.ZipUrl, true);
+            Http.PutAsJsonAsync($"/api/gameconfigs/{Id}", config);
+        }
+        else
+        {
+            ns.Notify(NotificationSeverity.Error, "VIP", "Для скачивания конфига необходимы VIP привилегии");
+        }
+    }
+}

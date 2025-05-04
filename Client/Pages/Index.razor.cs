@@ -34,10 +34,9 @@ namespace kTVCSSBlazor.Client.Pages
                 case 1: return "news";
                 case 2: return "streams";
                 case 3: return "highlights";
-                case 4: return "guides";
-                case 5: return "configs";
-                case 6: return "suggestions";
-                case 7: return "halloffame";
+                case 4: return "configs";
+                case 5: return "suggestions";
+                case 6: return "halloffame";
                 default: return "";
             }
         }
@@ -50,10 +49,9 @@ namespace kTVCSSBlazor.Client.Pages
                 case "news": return 1;
                 case "streams": return 2;
                 case "highlights": return 3;
-                case "guides": return 4;
-                case "configs": return 5;
-                case "suggestions": return 6;
-                case "halloffame": return 7;
+                case "configs": return 4;
+                case "suggestions": return 5;
+                case "halloffame": return 6;
                 default: return 0;
             }
         }
