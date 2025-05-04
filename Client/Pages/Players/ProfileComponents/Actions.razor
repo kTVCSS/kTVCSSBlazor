@@ -1,5 +1,6 @@
 @using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Statuses
+@using kTVCSS.Models.Db.Models.Teams
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Extensions
@@ -44,9 +45,12 @@
 
     <RadzenButton Click=MakeReport Icon="warning" Text="Репорт"></RadzenButton>
 
-    if (!string.IsNullOrEmpty(player.TeamInfo.ID))
+    if (string.IsNullOrEmpty(player.TeamInfo.ID))
     {
-        <RadzenButton @ref=itBtn Click="SendInviteToTeam" Icon="add_business" Text="Пригласить в команду"></RadzenButton>
+        @if (AuthProvider.CurrentUser.IsCaptain)
+        {
+            <RadzenButton @ref=itBtn Click="SendInviteToTeam" Icon="add_business" Text="Пригласить в команду"></RadzenButton>
+        }
     }
 
     @if (FriendRequest is null)
@@ -248,9 +252,41 @@
         nm.Refresh(true);
     }
 
-    private void SendInviteToTeam()
+    private async Task SendInviteToTeam()
     {
         itBtn.Disabled = true;
+
+        InviteResult result =
+            await http.GetFromJsonAsync<InviteResult>($"/api/teams/makeinvite?captain={AuthProvider.CurrentUser.Id}&player={player.MainInfo.Id}");
+
+        switch (result)
+        {
+            case InviteResult.AlreadyInTeam:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Игрок уже есть в какой-то команде!");
+                    break;
+                }
+            case InviteResult.BlockEditing:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Редактирование составов для Вашей команды сейчас запрещено!");
+                    break;
+                }
+            case InviteResult.NoPlayer:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Такого игрока не существует!"); // lol
+                    break;
+                }
+            case InviteResult.FullStack:
+                {
+                    ns.Notify(NotificationSeverity.Error, "Ошибка", "Состав Вашей команды уже достиг максимума!");
+                    break;
+                }
+            case InviteResult.Ok:
+                {
+                    ns.Notify(NotificationSeverity.Info, "kTVCSS", "Приглашение отправлено!");
+                    break;
+                }
+        }
     }
 
     private async Task AddFriend()
@@ -292,7 +328,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-    );
+        );
     }
 
     private async Task SendReport()
@@ -323,16 +359,16 @@
     private async Task OpenUnbanRequest()
     {
         var result = await DialogService.OpenAsync("Заявка на разбан", ds =>
-        @<RadzenStack Gap="1.5rem">
-            <p>Пожалуйста, опишите коротко и ясно суть проблемы</p>
-            <RadzenTextArea Rows="10" @bind-Value=@_unbanRequestString Style="width: 100%;" />
-            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); UnbanRequest(); }) />
-                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
-                </RadzenStack>
+    @<RadzenStack Gap="1.5rem">
+        <p>Пожалуйста, опишите коротко и ясно суть проблемы</p>
+        <RadzenTextArea Rows="10" @bind-Value=@_unbanRequestString Style="width: 100%;" />
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenButton Text="Отправить" Click=@(() => { ds.Close(true); UnbanRequest(); }) />
+                <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
             </RadzenStack>
         </RadzenStack>
+    </RadzenStack>
         );
     }
 

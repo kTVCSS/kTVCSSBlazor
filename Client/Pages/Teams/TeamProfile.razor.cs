@@ -1,4 +1,5 @@
-﻿using kTVCSSBlazor.Db.Models.Teams;
+﻿using kTVCSS.Models.Db.Models.Teams;
+using kTVCSSBlazor.Db.Models.Teams;
 using Microsoft.AspNetCore.Components;
 using Radzen;
 using System.Net.Http.Json;
@@ -104,7 +105,7 @@ namespace kTVCSSBlazor.Client.Pages.Teams
             if (result == 2)
             {
                 ShowSuccess("Вы вышли из команды!");
-                NavigationManager.NavigateTo("/myprofile");
+                NavigationManager.NavigateTo("/");
             }
         }
 
@@ -123,6 +124,47 @@ namespace kTVCSSBlazor.Client.Pages.Teams
             {
                 ShowSuccess("Игрок был выгнан из команды!");
                 data = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}");
+            }
+        }
+
+        private async Task CheckInvite()
+        {
+            if (AuthProvider.CurrentUser is not null)
+            {
+                var exist = await http.GetFromJsonAsync<bool>($"/api/teams/checkinvite?id={AuthProvider.CurrentUser.Id}");
+
+                if (exist)
+                {
+                    var result = await DialogService.Confirm("Вы были приглашены в эту команду, хотите принять приглашение?", "kTVCSS", new ConfirmOptions() { OkButtonText = "Вступить", CancelButtonText = "Отклонить" });
+
+                    if (result.HasValue)
+                    {
+                        if (result.Value)
+                        {
+                            AcceptInviteResult acceptInviteResult = 
+                                await http.GetFromJsonAsync<AcceptInviteResult>($"/api/teams/acceptinvite?id={AuthProvider.CurrentUser.Id}");
+
+                            if (acceptInviteResult == AcceptInviteResult.FullStack)
+                            {
+                                ShowError("Состав команды уже достиг максимума!");
+                            }
+                            else if (acceptInviteResult == AcceptInviteResult.Ok)
+                            {
+                                ShowSuccess($"Добро пожаловать в команду {data.Info.Name}!");
+
+                                await Task.Delay(1000);
+
+                                NavigationManager.Refresh(true);
+                            }
+                        }
+                        else
+                        {
+                            await http.GetAsync($"/api/teams/declineinvite?id={AuthProvider.CurrentUser.Id}");
+
+                            ShowSuccess($"Заявка была отклонена!");
+                        }
+                    }
+                }
             }
         }
 
@@ -170,6 +212,10 @@ namespace kTVCSSBlazor.Client.Pages.Teams
                     ready = true;
 
                     await InvokeAsync(StateHasChanged);
+
+                    await Task.Delay(2000);
+
+                    CheckInvite();
                 });
             }
         }

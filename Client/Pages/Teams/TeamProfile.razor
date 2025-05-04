@@ -8,6 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 @inject HttpClient http
+@inject DialogService DialogService
 
 @if (ready)
 {
@@ -192,7 +193,7 @@
                     </RadzenCard>
                 </RadzenColumn>
             </RadzenRow>
-        } 
+        }
 
         <RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@data.Members">
             <HeaderTemplate>
