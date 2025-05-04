@@ -153,6 +153,7 @@
     private string newPostContent;
     private string uploadedFilePath;
     private IBrowserFile uploadedFile;
+    private Post post;
 
     protected override async Task OnInitializedAsync()
     {
@@ -163,7 +164,7 @@
     {
         if (!string.IsNullOrWhiteSpace(newPostContent))
         {
-            var post = new Post()
+            post = new Post()
                 {
                     AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
                     AuthorId = AuthProvider.CurrentUser.Id,
@@ -278,7 +279,9 @@
 
             if (result.Status)
             {
+                Console.WriteLine(result.Message);
                 uploadedFilePath = result.Message;
+                
                 NotificationService.Notify(NotificationSeverity.Success, "Успех", "Файл успешно загружен, можете теперь публиковать пост!");
             }
             else

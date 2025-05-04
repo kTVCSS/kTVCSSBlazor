@@ -196,7 +196,7 @@
                     <Template>
                         @if (ctx.SteamID == match.MVP)
                         {
-                            <RadzenLink Style="color: orange !important" Path="@ctx.ID">@ctx.Name</RadzenLink>
+                            <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
                         }
                         else
                         {
