@@ -1,0 +1,34 @@
+﻿@using kTVCSSBlazor.Db.Models.Home
+@inject HttpClient http
+
+<RadzenRow JustifyContent="JustifyContent.Center">
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        @foreach (var stream in _streams)
+        {
+            <RadzenCard Style="width: 854px">
+                <iframe src="@stream.Channel" frameborder="0" scrolling="no" allowfullscreen="true" style="width: 100%;height: 480px">
+                </iframe>
+                <RadzenStack class="rz-mt-2" JustifyContent=JustifyContent.Start Orientation="Orientation.Horizontal">
+                    <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                        <img style="height: 40px;border-radius: 128px;" src="@stream.PlayerAvatar" />
+                        <RadzenText Text="@stream.PlayerName" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        }
+    </RadzenStack>
+</RadzenRow>
+
+@code {
+    List<UserStream> _streams = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _streams = await http.GetFromJsonAsync<List<UserStream>>("/api/userstreams");
+
+        foreach (var stream in _streams)
+        {
+            stream.Channel = $"https://player.twitch.tv/?channel={stream.Name}&parent=ktvcss.ru";
+        }
+    }
+}

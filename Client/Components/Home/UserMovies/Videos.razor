@@ -7,12 +7,12 @@
     <RadzenLink Text="Добавить новое видео" Path="/uploadvideo" />
 </RadzenStack>
 
-<RadzenRow Gap="20px">
+<RadzenRow JustifyContent=JustifyContent.Start Gap="20px">
     @foreach (var video in _videos)
     {
         <RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3">
             <RadzenCard class="video-card" Style="padding-bottom: 8px;" @onclick="@(() => OnVideoClick(video.Id))">
-                <div style="position: relative;">
+                <div>
                     <img src="@video.PreviewImage" alt="@video.Title" class="thumbnail" />
                     @*                     <span class="duration-badge">@video.Duration</span> *@
                 </div>
@@ -36,8 +36,8 @@
         border: none;
         box-shadow: none;
         cursor: pointer;
-        max-height: 260px;
-        min-width: 360px;
+/*         max-height: 260px;
+        min-width: 360px; */
         overflow: hidden;
     }
 

@@ -15,7 +15,10 @@
     <!-- Панель-список уведомлений -->
     <div class="notification-drawer">
         <div class="notification-header">
-            Уведомления (@unreadCount)
+            <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+                Уведомления (@unreadCount)
+                <RadzenButton Style="color: white" Variant="Variant.Text" Text="Скрыть все" Icon="close" Click="CloseAll" />
+            </RadzenStack>
         </div>
 
         @if (notifications == null)
@@ -127,6 +130,16 @@
         {
             await LoadNotifications();
         }
+    }
+
+    private async Task CloseAll()
+    {
+        foreach (var n in notifications)
+        {
+            await http.PutAsync($"api/notifications/{n.Id}/read", null);
+        }
+
+        await LoadNotifications();
     }
 
     private async Task OnNotificationClick(Notification n)
