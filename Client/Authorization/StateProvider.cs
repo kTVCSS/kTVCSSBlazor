@@ -90,13 +90,9 @@ namespace kTVCSSBlazor.Client.Authorization
             return error;
         }
 
-        public async Task<string> SignupAsync(string username, string password)
+        public async Task<RegisterResult> SignupAsync(string username, string password)
         {
-            string error = string.Empty;
-
-            error = await _userService.Register(username, password);
-
-            return error;
+            return await _userService.Register(username, password);
         }
 
         public async Task LogoutAsync()

@@ -23,11 +23,9 @@ namespace kTVCSSBlazor.Client.Authorization
             _http = http;
         }
 
-        public async Task<string> Register(string username, string password)
+        public async Task<RegisterResult> Register(string username, string password)
         {
-            // api
-
-            return null;
+            return await _http.GetFromJsonAsync<RegisterResult>($"/api/register?username={username}&password={password}");
         }
 
         private async Task<User?> Get(string username, string password)

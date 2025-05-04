@@ -52,9 +52,12 @@
                                             <RadzenProfileMenuItem Text="Профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenProfileMenuItem>
                                             @if (string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
                                             {
-                                                <div @onclick=@(async (MouseEventArgs e) => OpenTeamCreation())>
-                                                    <RadzenProfileMenuItem Text="Создать команду" Icon="add_circle"></RadzenProfileMenuItem>
-                                                </div>
+                                                @if (AuthProvider.CurrentUser.SteamId != "STEAM_UNDEFINED")
+                                                {
+                                                    <div @onclick=@(async (MouseEventArgs e) => OpenTeamCreation())>
+                                                        <RadzenProfileMenuItem Text="Создать команду" Icon="add_circle"></RadzenProfileMenuItem>
+                                                    </div>
+                                                }
                                             }
                                             <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
                                                 <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
