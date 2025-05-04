@@ -13,12 +13,27 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddBlazoredLocalStorage();
 
+#if DEBUG
+
 var apiEndpoints = new List<string>()
 {
     "http://localhost:3000",
 };
 
 builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
+
+#endif
+
+#if RELEASE 
+
+var apiEndpoints = new List<string>()
+{
+    "https://api.ktvcss.ru",
+};
+
+builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
+
+#endif
 
 builder.Services.AddScoped(sp =>
 {

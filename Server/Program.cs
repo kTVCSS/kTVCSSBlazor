@@ -5,17 +5,20 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 using Microsoft.JSInterop;
 
-var builder = WebApplication.CreateBuilder(args);
+var options = new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+#if RELEASE
+    WebRootPath = "/home/aspnet/ktvcss.ru/wwwroot"
+#endif
+};
+
+var builder = WebApplication.CreateBuilder(options);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
       .AddInteractiveWebAssemblyComponents();
-
-#if RELEASE
-
-builder.WebHost.UseWebRoot(builder.Configuration.GetValue<string>("wwwroot"));
-
-#endif
 
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
@@ -26,6 +29,8 @@ builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 
 var app = builder.Build();
+
+app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -38,12 +43,6 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-#if DEBUG
-
-app.UseHttpsRedirection();
-
-#endif
 
 app.MapControllers();
 app.UseStaticFiles();

@@ -32,7 +32,7 @@
                             <RadzenCard>
                                 <RadzenStack>
                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                        <img style="width: 60px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                        <img style="width: 60px;height: 60px; border-radius: 128px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                         <RadzenStack>
                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
                                             <small>@post.PostDate.ToString("dd.MM.yyyy HH:mm")</small>
@@ -73,7 +73,7 @@
                                             {
                                                 <RadzenStack>
                                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                                        <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                                         <RadzenStack Gap="4px">
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
@@ -92,7 +92,7 @@
                                                         {
                                                             <RadzenStack>
                                                                 <RadzenStack Orientation="Orientation.Horizontal">
-                                                                    <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                                    <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                                                     <RadzenStack Gap="4px">
                                                                         <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                                         <div>@comment.Content</div>
@@ -114,7 +114,7 @@
                                             {
                                                 <RadzenStack>
                                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                                        <img style="width: 30px;height: 30px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
+                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                                         <RadzenStack Gap="4px">
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
@@ -273,7 +273,7 @@
             uploadedFile = file;
 
             using var content = new MultipartFormDataContent();
-            var fileStream = uploadedFile.OpenReadStream(maxAllowedSize: 10_000_000);
+            var fileStream = uploadedFile.OpenReadStream(maxAllowedSize: 512 * 1024 * 1024);
             var streamContent = new StreamContent(fileStream);
 
             streamContent.Headers.ContentType = new(uploadedFile.ContentType);
