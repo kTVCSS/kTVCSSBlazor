@@ -57,8 +57,9 @@
 
                     @if (!canPost)
                     {
-                        <RadzenUpload Auto ChooseText="Загрузить файлы" Multiple="true" Url="@_uploadPath" Style="width: 100%" Progress=@OnProgress
-                                      InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
+                        <RadzenUpload Auto ChooseText="Загрузить файлы" Multiple="true" Change="OnFilesChanged" Style="width: 100%"
+                                      InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})">
+                        </RadzenUpload>
                     }
                     <RadzenButton Disabled=!canPost Icon="publish" Text="Опубликовать" Click="Submit" />
                 </RadzenStack>

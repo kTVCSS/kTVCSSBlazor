@@ -115,7 +115,7 @@
                             <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои сообщения" Path="/im" Icon="mail"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
-                            <RadzenPanelMenuItem Text="Мои матчи" Path="dialog" Icon="filter_list"></RadzenPanelMenuItem>
+                            <RadzenPanelMenuItem Text="Мои матчи" Path="@(string.Concat("/mp/", AuthProvider.CurrentUser.Id))" Icon="filter_list"></RadzenPanelMenuItem>
                         </RadzenPanelMenuItem>
                     </Authorized>
                 </AuthorizeView>

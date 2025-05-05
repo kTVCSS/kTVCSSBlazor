@@ -13,7 +13,7 @@
 
 @if (ready)
 {
-    <RadzenDataGrid AllowVirtualization Style="height: 81svh" Density="Density.Default" Data="@dataSource">
+    <RadzenDataGrid AllowVirtualization Style="height: 77svh" Density="Density.Default" Data="@dataSource">
         <HeaderTemplate>
             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список команд проекта"></RadzenText>
@@ -45,7 +45,7 @@ else
 {
     <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка списка заблокированных игроков проекта" />
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка списка команд проекта" />
         </RadzenStack>
     </RadzenRow>
 }

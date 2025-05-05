@@ -7,7 +7,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
     public partial class Matches
     {
         List<TotalMatch> matches = [];
-        double dataGridHeight = 81;
+        double dataGridHeight = 77;
         bool ready = false;
 
         void RowRender(RowRenderEventArgs<TotalMatch> args)

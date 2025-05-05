@@ -22,10 +22,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private kTVCSS.Models.Db.Models.Players.FriendRequest? FriendRequest;
 
-        // Пример данных для карт с винрейтом
         public List<MapWinrate> MapsWinrate = [];
 
-        // Пример данных для прогресса Total Count
         public List<MapStat> MapStats = [];
 
         public class MapWinrate
@@ -43,7 +41,6 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         public void Dispose()
         {
-            Console.WriteLine("player profile disposed");
             ready = false;
             player = null;
             NavigationManager.LocationChanged -= HandleLocationChanged;
@@ -55,8 +52,6 @@ namespace kTVCSSBlazor.Client.Pages.Players
         {
             Task.Run(async () =>
             {
-                Console.WriteLine("player profile is rendering");
-
                 NavigationManager.LocationChanged += HandleLocationChanged;
 
                 player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={Id}");
@@ -101,7 +96,6 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            // !!! rerender
             Dispose();
             StateHasChanged();
         }

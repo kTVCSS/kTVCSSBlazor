@@ -1,4 +1,5 @@
 ﻿using kTVCSS.Models.Models;
+using kTVCSSBlazor.Client.Components.Home.UserMovies;
 using kTVCSSBlazor.Db.Models.Home;
 using Microsoft.AspNetCore.Components.Forms;
 using Radzen;
@@ -18,6 +19,8 @@ namespace kTVCSSBlazor.Client.Components.Home.Configs
         protected override Task OnInitializedAsync()
         {
             _uploadPath = http.BaseAddress + "api/uploadconfigfiles?guid=" + guid;
+
+            Console.WriteLine(_uploadPath);
 
             return base.OnInitializedAsync();
         }
@@ -61,13 +64,54 @@ namespace kTVCSSBlazor.Client.Components.Home.Configs
             }
         }
 
-        void OnProgress(UploadProgressArgs args)
+        async Task OnFilesChanged(UploadChangeEventArgs args)
         {
-            if (args.Progress == 100)
+            if (args.Files == null || !args.Files.Any())
             {
-                canPost = true;
-                _config.ZipUrl = $"/configs/{guid}.zip";
-                NotificationService.Notify(NotificationSeverity.Info, "Успех", "Файлы были успешно загружены на сервер!");
+                return;
+            }
+
+            foreach (var file in args.Files)
+            {
+                Console.WriteLine(file.ContentType);
+                Console.WriteLine(file.Size);
+            }
+
+            using var content = new MultipartFormDataContent();
+
+            var streams = new List<Stream>();
+
+            try
+            {
+                foreach (var file in args.Files)
+                {
+                    var fileStream = file.OpenReadStream(maxAllowedSize: 512 * 1024 * 1024);
+                    streams.Add(fileStream);
+
+                    var streamContent = new StreamContent(fileStream);
+                    streamContent.Headers.ContentType = new(file.ContentType);
+                    content.Add(streamContent, "files", file.Name);
+                }
+
+                var httpRequest = await http.PostAsync(_uploadPath, content);
+
+                if (httpRequest.IsSuccessStatusCode)
+                {
+                    canPost = true;
+                    _config.ZipUrl = $"/configs/{guid}.zip";
+                    NotificationService.Notify(NotificationSeverity.Info, "Успех", "Файлы были успешно загружены на сервер!");
+                }
+                else
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Произошла ошибка");
+                }
+            }
+            finally
+            {
+                foreach (var stream in streams)
+                {
+                    stream.Dispose();
+                }
             }
         }
     }
