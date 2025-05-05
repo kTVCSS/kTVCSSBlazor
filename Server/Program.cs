@@ -4,6 +4,7 @@ using kTVCSSBlazor.Client.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
 using Microsoft.JSInterop;
+using kTVCSSBlazor.Client.Extensions;
 
 // TODO на завтра
 // в редактировании профиля кнопки неадекватно себя ведут которые за загрузку файлов отвечают +
@@ -12,7 +13,7 @@ using Microsoft.JSInterop;
 // таймаут хттп клиента + 
 // репорты - тоже в сервис оповещений и создавать тикет +
 // остальное дальше по плану
-// api метод на фронте, который будет обновлять кеш игроков, ссылаясь на апи
+// api метод на фронте, который будет обновлять кеш игроков, ссылаясь на апи +
 
 var options = new WebApplicationOptions
 {
