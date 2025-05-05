@@ -88,8 +88,15 @@ namespace kTVCSSBlazor.Client.Components.Home.Configs
                     var fileStream = file.OpenReadStream(maxAllowedSize: 512 * 1024 * 1024);
                     streams.Add(fileStream);
 
+                    var tct = file.ContentType;
+
+                    if (string.IsNullOrEmpty(tct))
+                    {
+                        tct = "application/octet-stream";
+                    }
+
                     var streamContent = new StreamContent(fileStream);
-                    streamContent.Headers.ContentType = new(file.ContentType);
+                    streamContent.Headers.ContentType = new(tct);
                     content.Add(streamContent, "files", file.Name);
                 }
 
