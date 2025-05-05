@@ -1,6 +1,7 @@
 @using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Statuses
 @using kTVCSS.Models.Db.Models.Teams
+@using kTVCSS.Models.Db.Models.Tickets
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Extensions
@@ -328,7 +329,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-        );
+    );
     }
 
     private async Task SendReport()
@@ -344,13 +345,26 @@
 
         var response = await http.PostAsJsonAsync("/api/actions/sendreport", report);
 
-        if (await response.ReadAsync<bool>())
+        try
         {
-            ns.Notify(NotificationSeverity.Success, "Система репортов", "Репорт успешно отправлен, администрация рассмотрит его настолько быстро, насколько это возможно!", TimeSpan.FromSeconds(5));
+            var ticket = await response.Content.ReadFromJsonAsync<Ticket?>();
+
+            if (ticket is not null)
+            {
+                ns.Notify(NotificationSeverity.Success, "Система репортов", "Репорт успешно отправлен, мы создали для Вас тикет, на который сейчас перенаправим!", TimeSpan.FromSeconds(5));
+
+                await Task.Delay(3000);
+
+                nm.NavigateTo($"/ticket/{ticket.TicketId}");
+            }
+            else
+            {
+                ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько жалоб подряд, дождитесь рассмотрения хотя бы одной!");
+            }
         }
-        else
+        catch (Exception)
         {
-            ns.Notify(NotificationSeverity.Error, "Ошибка", "Вы уже отправляли жалобу на этого игрока!");
+            ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько жалоб подряд, дождитесь рассмотрения хотя бы одной!");
         }
     }
 
@@ -369,7 +383,7 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenStack>
-        );
+    );
     }
 
     private async Task UnbanRequest()
@@ -381,12 +395,27 @@
                 PlayerName = AuthProvider.CurrentUser.Username
             });
 
-        int ticketId = await response.Content.ReadFromJsonAsync<int>();
 
-        ns.Notify(NotificationSeverity.Success, "Успех", "Ваша заявка на разбан успешно создана! Сейчас мы Вас перенаправим в созданный тикет", TimeSpan.FromSeconds(3));
+        try
+        {
+            var ticket = await response.Content.ReadFromJsonAsync<Ticket?>();
 
-        await Task.Delay(3000);
+            if (ticket is not null)
+            {
+                ns.Notify(NotificationSeverity.Success, "Успех", "Ваша заявка на разбан успешно создана! Сейчас мы Вас перенаправим в созданный тикет", TimeSpan.FromSeconds(3));
 
-        nm.NavigateTo($"/ticket/{ticketId}");
+                await Task.Delay(3000);
+
+                nm.NavigateTo($"/ticket/{ticket.TicketId}");
+            }
+            else
+            {
+                ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько обращений подряд, дождитесь рассмотрения хотя бы одной!");
+            }
+        }
+        catch (Exception)
+        {
+            ns.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько обращений подряд, дождитесь рассмотрения хотя бы одной!");
+        }
     }
 }
