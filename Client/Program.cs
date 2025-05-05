@@ -39,7 +39,7 @@ builder.Services.AddScoped(sp =>
 {
     var serverSelector = sp.GetRequiredService<ApiServerSelector>();
     var serverUrl = serverSelector.GetNextServer();
-    return new HttpClient { BaseAddress = new Uri(serverUrl) };
+    return new HttpClient { BaseAddress = new Uri(serverUrl), Timeout = TimeSpan.FromSeconds(30) };
 });
 
 builder.Services.AddScoped<UserService>();

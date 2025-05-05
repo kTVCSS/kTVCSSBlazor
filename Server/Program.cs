@@ -9,7 +9,7 @@ using Microsoft.JSInterop;
 // в редактировании профиля кнопки неадекватно себя ведут которые за загрузку файлов отвечают +
 // остался открытым вопрос с конфигами игроков - заливка файлов через nginx не работает
 // аватарки на стене + 
-// таймаут хттп клиента
+// таймаут хттп клиента + 
 // репорты - тоже в сервис оповещений и создавать тикет
 // остальное дальше по плану
 // api метод на фронте, который будет обновлять кеш игроков, ссылаясь на апи
@@ -31,7 +31,7 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("default", c => c.Timeout = TimeSpan.FromSeconds(30));
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StateProvider>();
