@@ -168,7 +168,7 @@
         {
             post = new Post()
                 {
-                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png",
                     AuthorId = AuthProvider.CurrentUser.Id,
                     AuthorName = AuthProvider.CurrentUser.Username,
                     Content = newPostContent,
@@ -238,7 +238,7 @@
         {
             var com = new Comment
                 {
-                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                    AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png",
                     AuthorId = AuthProvider.CurrentUser.Id,
                     AuthorName = AuthProvider.CurrentUser.Username,
                     Content = post.NewComment,
