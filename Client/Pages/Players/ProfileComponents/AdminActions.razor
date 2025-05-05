@@ -59,9 +59,9 @@ else
 
     private async Task OpenUnban()
     {
-        var result = await DialogService.OpenAsync("Оформление бана", ds =>
+        var result = await DialogService.OpenAsync("Снятие бана", ds =>
         @<RadzenStack Gap="1.5rem">
-            <p>Выберите причину бана</p>
+            <p>Опишите причину разбана</p>
             <RadzenTextBox @bind-Value=@unbanReason Style="width: 100%;" />
             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                 <RadzenStack Orientation="Orientation.Horizontal">
@@ -113,7 +113,7 @@ else
     {
         var reasons = await http.GetFromJsonAsync<List<BanReason>>("/api/admins/getbanreasons");
 
-        var result = await DialogService.OpenAsync("Оформление бана", ds =>
+        var result = await DialogService.OpenAsync("Снятие бана", ds =>
         @<RadzenStack Gap="1.5rem">
             <p>Выберите причину бана</p>
         <RadzenDropDown @bind-Value=@_selectedReason Data=@reasons Style="width: 100%;" TextProperty="@nameof(BanReason.Name)" Name="DropDownBindValue" />
