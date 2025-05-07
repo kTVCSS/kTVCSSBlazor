@@ -34,7 +34,7 @@
     <RadzenStack JustifyContent=JustifyContent.Center AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
         @if (!string.IsNullOrEmpty(player.TeamInfo.Name))
         {
-            <RadzenLink class="rz-text-display-h4" Path="@string.Concat("/team/", player.TeamInfo.ID)">@player.TeamInfo.Name</RadzenLink>
+            <RadzenLink Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" class="rz-text-display-h4" Path="@string.Concat("/team/", player.TeamInfo.ID)">@player.TeamInfo.Name</RadzenLink>
             <RadzenText Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" TextStyle=TextStyle.DisplayH4 Text=@(string.Concat(player.MainInfo.Name.Replace(player.TeamInfo.Name, null))) />
         }
         else
