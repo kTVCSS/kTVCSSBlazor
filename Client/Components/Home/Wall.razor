@@ -1,3 +1,4 @@
+@using Radzen.Blazor.Rendering
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
@@ -7,6 +8,12 @@
 @inject StateProvider AuthProvider
 @inject NotificationService NotificationService
 @implements IDisposable
+
+<Popup @ref=popup Lazy=true class="my-popup">
+    <RadzenStack>
+        <RadzenImage Path="@currentFile" Style="width: 100%; height: 100%" />
+    </RadzenStack>
+</Popup>
 
 <RadzenStack>
     <RadzenRow JustifyContent="JustifyContent.Center">
@@ -46,11 +53,11 @@
                                 {
                                     if (post.MediaType == MediaType.Image)
                                     {
-                                        <RadzenImage Path="@post.MediaUrl" Style="max-width: 640px" />
+                                        <RadzenImage @ref=image Click=@(() => { currentFile = post.MediaUrl; popup.ToggleAsync(image.Element); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%; cursor: pointer;" />
                                     }
                                     else if (post.MediaType == MediaType.Video)
                                     {
-                                        <video controls style="max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
+                                        <video controls style="width: 100%;max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
                                     }
                                 }
                                 <div class="rz-my-2">
@@ -150,12 +157,35 @@
     </RadzenRow>
 </RadzenStack>
 
+<style>
+    .my-popup {
+        display: none;
+        position: fixed;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        max-height: calc(100% - 120px) !important;
+        max-width: calc(100% - 120px) !important;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius);
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+    }
+</style>
+
 @code {
     private List<Post> Posts = [];
     private string newPostContent;
     private string uploadedFilePath;
     private IBrowserFile uploadedFile;
     private Post post;
+    private Popup popup;
+    private string currentFile;
+    private RadzenImage image;
 
     protected override async Task OnInitializedAsync()
     {
