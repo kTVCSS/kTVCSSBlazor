@@ -1,81 +1,35 @@
 ﻿@page "/faq"
+@using kTVCSSBlazor.Client.Components
+@inject HttpClient http
 
 <PageTitle>kTVCSS @@ Вопросы и ответы</PageTitle>
 
 <RadzenText TextStyle="TextStyle.H2" Text="Вопросы и ответы" />
-<RadzenAccordion>
-    <Items>
-        <RadzenAccordionItem Icon="contact_support" Text="Как начать играть?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Если у Вас привязан STEAMID, то нажмите просто справа сверху кнопку ПОИСК. С телефона искать игру не получится." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Почему я не могу начать поиск игры с телефона?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Мы ограничили поиск с телефона дабы не было ситуаций, когда человек не увидел, что игра нашлась и не жаловался, что его забанило из-за этого." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Как купить VIP?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Справа сверху в меню профиля есть кнопка Купить VIP. Нажмите на нее и следуйте инструкциям." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Как поменять STEAMID?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Свяжитесь с администрацией в контактах." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Что дает VIP?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Обнуление статистики на сайте, просмотр и скачивание хайлайтов матча или игрока, изменение логина на сайте, просмотр игроков, находящихся в поиске игры." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Что делать, если я на сайте, но пишет, что вы уже к нему подключены?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Справа сверху в меню профиля есть кнопка Отключиться от хаба. Нажмите на нее." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Как добавить игрока в пати?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Зайдите на страницу Друзья или нажмите сверху кнопку Лобби. Далее в строке нужного Вам друга нажмите на кнопку Пригласить." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Почему я не вижу других игроков в пати?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Вы не владелец лобби, поэтому Вы не можете посмотреть на тех, с кем Вы в пати. Позже возможно мы сделаем эту возможность не только для хостов." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Как зайти на TeamSpeak 3 проекта?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Скачайте тимспик с официального сайта. Зайдите в Подключения->Подключиться и вставьте наш адрес сервера ts.ktvcss.ru." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="У меня не заходит на игровой сервер, что делать?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Возможно, вы с Украины. К сожалению, мы ничем не можем Вам помочь, т.к. провайдеры России и Украины блокируют друг друга периодически. Рекомендуем воспользоваться средствами VPN." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Почему мою команду не видно в списке всех команд?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="Теперь на сайте для отображения команды в общем списке или в списках Т1 и Т2 команд нужно иметь в составе команды не менее 5 игроков и должно быть сыграно более 1 матча." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Мне отправили заявку на вступление в команду, где ее посмотреть?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="В своем профиле." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Как работают миксы?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="На данный момент есть разделение на TIER игроков. Игроки разных TIER не могут запуститься друг с другом. Однако, если онлайн маленький, матч в любом случае будет создан. Т.е. если Т1 игроков 10 в поиске и Т2 в поиске 5 человек, то запустится Т1 матч. Если Т1 менее 10 игроков в поиске и есть необходимое количество Т2 игроков для создания матча, то будет создан микс без учета TIER игроков. Сейчас нет модального окна для принятия игры - матч сразу будет создан. Также карта нынче выбирается случайным образом." />
-            </ChildContent>
-        </RadzenAccordionItem>
-        <RadzenAccordionItem Icon="contact_support" Text="Моя команда автоматически удалилась. Почему?" ExpandTitle="Нажми, чтобы открыть">
-            <ChildContent>
-                <RadzenText Text="В рамках борьбы с бесполезными командами, в момент запуска сайт идет проверка и удаление команд по критерию, если в ней менее 4 человек. Сайт перезапускается раз в день, если не ведется активная разработка, приводящая к частым перезапускам дабы применить изменения." />
-            </ChildContent>
-        </RadzenAccordionItem>
-    </Items>
-</RadzenAccordion>
 
-<RadzenText Style="color: var(--rz-text-tertiary-color); margin-top: 5vh;" TextAlign="TextAlign.Center" Text="Последняя правка - 14.06.2024" />
+@if (ready)
+{
+    <RadzenStack>
+        <RadzenAccordion>
+            <Items>
+                @foreach (var item in items)
+                {
+                    <RadzenAccordionItem Icon="contact_support" Text="@item.Question" ExpandTitle="Нажми, чтобы открыть">
+                        <ChildContent>
+                            <RadzenText Text="@item.Answer" />
+                        </ChildContent>
+                    </RadzenAccordionItem>
+                }
+            </Items>
+        </RadzenAccordion>
+
+        <RadzenText TextAlign="TextAlign.Center" Text="@string.Concat("Последняя правка - ", items.OrderByDescending(x => x.Id).First().CreatedAt.ToShortDateString())" />
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы" />
+        </RadzenStack>
+    </RadzenRow>
+}
