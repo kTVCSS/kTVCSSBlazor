@@ -91,6 +91,14 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 ready = true;
 
                 await InvokeAsync(StateHasChanged);
+
+                if (FriendRequest is not null)
+                {
+                    if (FriendRequest.Requester.PlayerID != AuthProvider.CurrentUser.Id)
+                    {
+                        NotificationService.Notify(Radzen.NotificationSeverity.Info, "Заявка в друзья", "Вас хотят добавить в друзья! Принять или отклонить заявку можно в меню действий под шапкой игрока.");
+                    }
+                }
             });
         }
 
