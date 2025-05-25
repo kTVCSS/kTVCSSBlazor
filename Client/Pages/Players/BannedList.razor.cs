@@ -10,6 +10,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
         private List<BannedUser> _filtered = new List<BannedUser>();
         private bool ready = false;
         private string _searchString;
+        private bool unbanning = false;
+
         private string SearchString
         {
             get
@@ -26,6 +28,10 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private async Task Unban()
         {
+            unbanning = true;
+
+            await InvokeAsync(StateHasChanged);
+
             var players = _filtered.Where(x => x.BannedBy == "Система");
 
             foreach (var player in players)
@@ -38,7 +44,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
                     Target = player.Id
                 };
 
-                http.PostAsJsonAsync("/api/admins/unban", ban);
+                await http.PostAsJsonAsync("/api/admins/unban", ban);
             }
 
             NavigationManager.Refresh(true);
