@@ -2,6 +2,7 @@
 @using kTVCSSBlazor.Db.Models.Home
 @inject HttpClient http
 @inject StateProvider AuthProvider
+@inject DialogService DialogService
 
 <RadzenStack Style="padding-bottom: 8px" Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween">
     <RadzenText TextStyle=TextStyle.DisplayH4 Text="Стримы игроков проекта" />
@@ -10,7 +11,7 @@
             <Authorized>
                 @if (AuthProvider.CurrentUser.IsAdmin)
                 {
-                    <RadzenLink Text="Добавить новый стрим" Path="/addstream" />
+                    <RadzenButton Variant="Variant.Text" Click="OpenStreamAddition" Text="Добавить новый стрим" />
                 }
             </Authorized>
         </AuthorizeView>
@@ -29,6 +30,16 @@
                         <img style="height: 40px;border-radius: 128px;" src="@stream.PlayerAvatar" />
                         <RadzenLink Style="color: white" Text="@stream.PlayerName" Path="@string.Concat("/player/", stream.PlayerId)" />
                     </RadzenStack>
+                    <CascadingAuthenticationState>
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                {
+                                    <RadzenButton Variant="Variant.Text" Click="@(() => { RemoveStream(stream.Id); })" Text="Удалить" />
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
                 </RadzenStack>
             </RadzenCard>
         }
@@ -46,5 +57,56 @@
         {
             stream.Channel = $"https://player.twitch.tv/?channel={stream.Name}&parent=dev.ktvcss.ru";
         }
+    }
+
+    private string streamName = string.Empty;
+    private string streamLink = string.Empty;
+    private int profileId;
+
+    private async Task RemoveStream(int id)
+    {
+        await http.DeleteAsync("/api/userstreams/" + id);
+
+        await OnInitializedAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task AddStream()
+    {
+        var stream = new UserStream()
+            {
+                Channel = streamLink,
+                Name = streamName,
+                Type = StreamType.Twitch,
+                Url = streamLink,
+                PlayerId = profileId
+            };
+
+        await http.PostAsJsonAsync("/api/userstreams", stream);
+
+        await OnInitializedAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OpenStreamAddition()
+    {
+        var result = await DialogService.OpenAsync("Добавление нового стрима", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenStack Gap="0px">
+                <RadzenText>Добавление нового стрима</RadzenText>
+            </RadzenStack>
+            <RadzenTextBox Placeholder="Название стрима" @bind-Value=@streamName Style="width: 100%;" />
+            <RadzenTextBox Placeholder="Ссылка на Twitch канал" @bind-Value=@streamLink Style="width: 100%;" />
+            <RadzenNumeric Placeholder="ID игрока" @bind-Value=@profileId Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); AddStream(); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+        );
     }
 }
