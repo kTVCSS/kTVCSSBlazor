@@ -171,6 +171,32 @@
 @code {
     bool sidebarExpanded = true;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        Task.Run(async () =>
+        {
+            await Task.Delay(3000);
+
+            if (AuthProvider.CurrentUser is not null)
+            {
+                if (AuthProvider.CurrentUser.SteamId.ToLower().Contains("undef"))
+                {
+                    string verifyCode = await http.GetStringAsync("/api/players/getregcode?id=" + AuthProvider.CurrentUser.Id);
+
+                    var result = await DialogService.OpenAsync("Привязка STEAMID", ds =>
+                        @<RadzenStack Gap="1.5rem">
+                            <RadzenStack Gap="0px">
+                                <RadzenText>Чтобы начать играть или всячески взаимодействовать с сайтом, Вам необходимо зайти на сервер, чтобы зарегистрировать и подтвердить Ваш SteamID.</RadzenText>
+                                <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.ru:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
+                                <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
+                            </RadzenStack>
+                        </RadzenStack>
+                    , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
+                }
+            }
+        });
+    }
+
     void SidebarToggleClick()
     {
         sidebarExpanded = !sidebarExpanded;

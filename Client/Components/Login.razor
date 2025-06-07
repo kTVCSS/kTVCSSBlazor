@@ -10,7 +10,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView Context="auth">
         <Authorized>
-            <RadzenAlert AlertStyle="AlertStyle.Success">Добро пожаловать!</RadzenAlert>
+            <RadzenAlert AlertStyle="AlertStyle.Success">Добро пожаловать, @AuthProvider.CurrentUser.Username. Сейчас вы будете перенаправлены на главную страницу!</RadzenAlert>
         </Authorized>
         <NotAuthorized>
             <RadzenRow JustifyContent="JustifyContent.Center">
@@ -54,8 +54,6 @@
                 });
             return;
         }
-
-        notify.Notify(NotificationSeverity.Success, "Успех", $"Добро пожаловать, {args.Username}. Сейчас вы будете перенаправлены на главную страницу!", TimeSpan.FromSeconds(5));
 
         await Task.Delay(1500);
 
