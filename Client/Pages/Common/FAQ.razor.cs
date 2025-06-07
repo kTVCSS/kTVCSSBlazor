@@ -4,7 +4,7 @@ using kTVCSS.Models.Models;
 using Radzen;
 using Radzen.Blazor;
 
-namespace kTVCSSBlazor.Client.Pages.FAQ
+namespace kTVCSSBlazor.Client.Pages.Common
 {
     public partial class FAQ
     {

@@ -22,7 +22,14 @@
                 <RadzenCard>
                     <RadzenStack>
                         <RadzenFormField Text="Что у вас нового?" Style="width: 100%;">
-                            <RadzenTextBox @bind-Value="@newPostContent" />
+                            @if (newPostContent.Length > 0)
+                            {
+                                <RadzenTextArea Rows="10" @bind-Value="@newPostContent" />
+                            }
+                            else
+                            {
+                                <RadzenTextBox @bind-Value="@newPostContent" />
+                            }
                         </RadzenFormField>
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenButton Click="PostNews" Style="" Text="Опубликовать" Icon="post_add" />
@@ -47,7 +54,7 @@
                                     </RadzenStack>
                                 </RadzenStack>
                                 <div class="post-content">
-                                    <p><RadzenMarkdown Text="@post.Content" /></p>
+                                    <p><RadzenMarkdown AllowHtml Text="@post.Content" /></p>
                                 </div>
                                 @if (!string.IsNullOrEmpty(post.MediaUrl))
                                 {
@@ -179,7 +186,18 @@
 
 @code {
     private List<Post> Posts = [];
-    private string newPostContent;
+    private string _newPostContent = "";
+    private string newPostContent { 
+        get
+        {
+            return _newPostContent;
+        }
+        set
+        {
+            _newPostContent = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
     private string uploadedFilePath;
     private IBrowserFile uploadedFile;
     private Post post;

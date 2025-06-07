@@ -4,7 +4,11 @@
 
 <PageTitle>kTVCSS @@ Вопросы и ответы</PageTitle>
 
-<RadzenText TextStyle="TextStyle.H2" Text="Вопросы и ответы" />
+<RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+    <RadzenText Text="Есть вопросы?" TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
+    <RadzenText Text="У нас есть ответы!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
+    <RadzenText Text="Всё, что вам нужно знать — в одном месте." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+</RadzenStack>
 
 @if (ready)
 {
@@ -29,7 +33,7 @@ else
 {
     <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы" />
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка вопросов и ответов" />
         </RadzenStack>
     </RadzenRow>
 }

@@ -10,7 +10,14 @@
 <CascadingAuthenticationState>
     <AuthorizeView Context="auth">
         <Authorized>
-            <RadzenAlert AlertStyle="AlertStyle.Success">Добро пожаловать, @AuthProvider.CurrentUser.Username. Сейчас вы будете перенаправлены на главную страницу!</RadzenAlert>
+            @if (AuthProvider.CurrentUser is not null)
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Success">Добро пожаловать, @AuthProvider.CurrentUser.Username. Сейчас вы будете перенаправлены на главную страницу!</RadzenAlert>
+            }
+            else
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Success">Добро пожаловать! Сейчас вы будете перенаправлены на главную страницу!</RadzenAlert>
+            }
         </Authorized>
         <NotAuthorized>
             <RadzenRow JustifyContent="JustifyContent.Center">

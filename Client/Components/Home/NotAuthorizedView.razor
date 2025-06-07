@@ -1,14 +1,25 @@
 ﻿@using kTVCSS.Models.Db.Models.Home
 @inject HttpClient http
+@inject NavigationManager NavigationManager
 
 @if (ready)
 {
+    <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-">
+        <RadzenColumn Size="12" Style="height: fit-content">
+            <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                <RadzenText Text="Ваш путь в соревновательный CS:S начинается здесь!" TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
+                <RadzenText Text="Добро пожаловать на kTVCSS" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
+                <RadzenText Text="Присоединяйтесь к нам и получите доступ к турнирам, командным матчам, матчмейкингу и прочему" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" JustifyContent="Radzen.JustifyContent.Center" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-2">
+                    <RadzenButton Size=ButtonSize.Large Text="Присоединиться" Click="@(() => NavigationManager.NavigateTo("/login"))" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+
     <RadzenRow Gap="5" RowGap="5">
         <RadzenColumn Size="12">
-            <RadzenText Text="Добро пожаловать на kTVCSS" TextStyle="Radzen.Blazor.TextStyle.DisplayH2" TagName="Radzen.Blazor.TagName.Auto"></RadzenText>
-            <RadzenText Text="Проект, ориентированный на соревновательный Counter-Strike Source" TextStyle="Radzen.Blazor.TextStyle.H4" TagName="Radzen.Blazor.TagName.H2" class="mt-5"></RadzenText>
-            <RadzenText Text="Присоединяйтесь к нам и получите доступ к турнирам, командным матчам, матчмейкингу и прочему" TextStyle="Radzen.Blazor.TextStyle.Body1" TagName="Radzen.Blazor.TagName.Auto" class="mt-4" Style="font-size: 20px; line-height: 24px"></RadzenText>
-            <RadzenCard Style="margin-top: 40px;">
+            <RadzenCard>
                 <RadzenRow>
                     <RadzenColumn Size="12" SizeMD="4">
                         <RadzenCard Variant="Radzen.Variant.Outlined">
