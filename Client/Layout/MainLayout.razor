@@ -88,10 +88,9 @@
                         @if (AuthProvider.CurrentUser.IsAdmin)
                         {
                             <RadzenPanelMenuItem Expanded=false Text="Админ" Icon="shield_person">
-                                <RadzenPanelMenuItem Expanded=false Text="Новости" Icon="news">
-                                    <RadzenPanelMenuItem Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
-                                </RadzenPanelMenuItem>
+                                <RadzenPanelMenuItem Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
                                 <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
+                                    <RadzenPanelMenuItem Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
                                 </RadzenPanelMenuItem>
                                 <RadzenPanelMenuItem Expanded=false Text="Общее" Icon="settings">
@@ -99,9 +98,7 @@
                                     <RadzenPanelMenuItem Text="Редактор причин репортов" Path="/editreportreasons" Icon="report"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Text="Редактор миксовых карт" Path="/editmixesmaps" Icon="build"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Text="Редактор кв карт" Path="/editmappool" Icon="build"></RadzenPanelMenuItem>
-                                </RadzenPanelMenuItem>
-                                <RadzenPanelMenuItem Expanded=false Text="Игроки" Icon="groups">
-                                    <RadzenPanelMenuItem Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
+                                    <RadzenPanelMenuItem Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
                                 </RadzenPanelMenuItem>
                             </RadzenPanelMenuItem>
                         }

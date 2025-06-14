@@ -1,0 +1,80 @@
+﻿@page "/match/highlights/{MatchID:int}"
+@using System.Text
+@using System.Text.RegularExpressions
+@using System.Globalization
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Highlights
+@using kTVCSSBlazor.Db.Models.Matches
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject StateProvider AuthProvider
+@inject IConfiguration config
+@inject DialogService DialogService
+@inject NotificationService NotifyService
+@inject TooltipService tooltipService
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Хайлайты матча #@MatchID</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                if (AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenStack>
+                        <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4">Хайлайты матча #@MatchID</RadzenText>
+                        <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH5">Для скачивания демо воспользуйтесь <RadzenLink Path="@string.Concat("/match/", MatchID)" Text="предыдущей страницей"></RadzenLink></RadzenText>
+                        <RadzenDataGrid EmptyText="Хайлайты не найдены" AllowSorting AllowVirtualization Style="height: 55svh" Density="Density.Default" Data="@data">
+                            <Columns>
+                                <RadzenDataGridColumn Context="ctx" Title="Ник на демо" Property="Name" />
+                                <RadzenDataGridColumn Context="ctx" Title="Момент" Property="Type" />
+                                <RadzenDataGridColumn Context="ctx" Title="Время (тики)" Property="Ticks" />
+                                <RadzenDataGridColumn Context="ctx" Title="Длительность (сек)" Property="Length" />
+                            </Columns>
+                        </RadzenDataGrid>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы хайлайтов матча" />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    [Parameter]
+    public int MatchID { get; set; }
+
+    List<Result> data = [];
+
+    bool ready = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/GetByMatch?id={MatchID}");
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

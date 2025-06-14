@@ -1,0 +1,92 @@
+﻿@page "/player/highlights/{PlayerID:int}"
+@using System.Text
+@using System.Text.RegularExpressions
+@using System.Globalization
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Highlights
+@using kTVCSSBlazor.Db.Models.Matches
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject StateProvider AuthProvider
+@inject IConfiguration config
+@inject DialogService DialogService
+@inject NotificationService NotifyService
+@inject TooltipService tooltipService
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Хайлайты игрока #@PlayerID</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                if (AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenStack>
+                        <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4">Хайлайты игрока #@PlayerID</RadzenText>
+                        <RadzenStack>
+                            @foreach (var group in results)
+                            {
+                                <RadzenCard Variant="Variant.Outlined">
+                                    <RadzenStack>
+                                        <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH5"><RadzenLink Path="@string.Concat("/match/", group.Key)">Хайлайты с матча #@group.Key</RadzenLink></RadzenText>
+                                        <RadzenDataGrid AllowAlternatingRows=false EmptyText="Хайлайты не найдены" AllowSorting AllowVirtualization Density="Density.Default" Data="@group.ToList()">
+                                            <Columns>
+                                                <RadzenDataGridColumn Context="ctx" Title="Ник на демо" Property="Name" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Момент" Property="Type" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Время (тики)" Property="Ticks" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Длительность (сек)" Property="Length" />
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            }
+                        </RadzenStack>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы хайлайтов игрока. Это может занять время." />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    [Parameter]
+    public int PlayerID { get; set; }
+
+    List<Result> data = [];
+    List<IGrouping<int, Result>> results = [];
+
+    bool ready = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/GetByPlayer?id={PlayerID}");
+
+            results = data.GroupBy(x => x.MatchID).ToList();
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

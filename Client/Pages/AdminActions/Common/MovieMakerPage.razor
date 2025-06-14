@@ -1,0 +1,114 @@
+﻿@page "/moviemaker"
+@using System.Text
+@using System.Text.RegularExpressions
+@using System.Globalization
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Highlights
+@using kTVCSSBlazor.Db.Models.Matches
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject StateProvider AuthProvider
+@inject IConfiguration config
+@inject DialogService DialogService
+@inject NotificationService NotifyService
+@inject TooltipService tooltipService
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ MovieMaker-центр</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                if (AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenStack>
+                        <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4">Мувимейкинг-центр</RadzenText>
+                        <RadzenCard>
+                            <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                                <RadzenLabel Text="Количество дней" />
+                                <RadzenNumeric @bind-Value=days />
+                                <RadzenLabel Text="Минимум в секундах" />
+                                <RadzenNumeric @bind-Value=minsecs />
+                                <RadzenButton Text="Анализ" Click="Analyse" />
+                            </RadzenStack>
+                        </RadzenCard>
+                        <RadzenStack>
+                            @foreach (var group in results)
+                            {
+                                <RadzenCard Variant="Variant.Outlined">
+                                    <RadzenStack>
+                                        <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH5"><RadzenLink Path="@string.Concat("/match/", group.Key)">Хайлайты с матча #@group.Key</RadzenLink></RadzenText>
+                                        <RadzenDataGrid AllowAlternatingRows=false EmptyText="Хайлайты не найдены" AllowSorting AllowVirtualization Density="Density.Default" Data="@group.ToList()">
+                                            <Columns>
+                                                <RadzenDataGridColumn Context="ctx" Title="Ник на демо" Property="Name" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Момент" Property="Type" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Время (тики)" Property="Ticks" />
+                                                <RadzenDataGridColumn Context="ctx" Title="Длительность (сек)" Property="Length" />
+                                            </Columns>
+                                        </RadzenDataGrid>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            }
+                        </RadzenStack>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка данных. Это может занять время." />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    List<Result> data = [];
+    List<IGrouping<int, Result>> results = [];
+    int days = 7;
+    int minsecs = 20;
+
+    bool ready = true;
+
+    private async Task Analyse()
+    {
+        Task.Run(async () =>
+        {
+            ready = false;
+
+            await InvokeAsync(StateHasChanged);
+
+            data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/ForMovieMaker?days={days}&minsecs={minsecs}");
+
+            results = data.GroupBy(x => x.MatchID).ToList();
+
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            ready = true;
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

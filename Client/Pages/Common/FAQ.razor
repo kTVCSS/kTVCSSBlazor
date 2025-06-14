@@ -1,6 +1,10 @@
 ﻿@page "/faq"
+@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
 @inject HttpClient http
+@inject DialogService DialogService
+@inject StateProvider AuthProvider
 
 <PageTitle>kTVCSS @@ Вопросы и ответы</PageTitle>
 
@@ -8,6 +12,17 @@
     <RadzenText Text="Есть вопросы?" TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
     <RadzenText Text="У нас есть ответы!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
     <RadzenText Text="Всё, что вам нужно знать — в одном месте." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.IsAdmin)
+                {
+                    <RadzenButton Click=OpenAdd Variant="Variant.Text" Text="Добавить" />
+                }
+            </Authorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
 </RadzenStack>
 
 @if (ready)
@@ -20,6 +35,16 @@
                     <RadzenAccordionItem Icon="contact_support" Text="@item.Question" ExpandTitle="Нажми, чтобы открыть">
                         <ChildContent>
                             <RadzenText Text="@item.Answer" />
+                            <CascadingAuthenticationState>
+                                <AuthorizeView>
+                                    <Authorized>
+                                        @if (AuthProvider.CurrentUser.IsAdmin)
+                                        {
+                                            <RadzenButton Click=@(() => { Delete(item); }) Variant="Variant.Text" Text="Удалить" />
+                                        }
+                                    </Authorized>
+                                </AuthorizeView>
+                            </CascadingAuthenticationState>
                         </ChildContent>
                     </RadzenAccordionItem>
                 }
@@ -36,4 +61,52 @@ else
             <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка вопросов и ответов" />
         </RadzenStack>
     </RadzenRow>
+}
+
+@code {
+    private async Task Delete(FaqItem item)
+    {
+        await http.DeleteAsync("/api/faq/" + item.Id);
+
+        items = await http.GetFromJsonAsync<List<FaqItem>>("/api/faq");
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Add(string question, string answer)
+    {
+        var faq = new FaqItem()
+        {
+            Question = question,
+            Answer = answer
+        };
+
+        await http.PostAsJsonAsync("/api/faq", faq);
+
+        await OnInitializedAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OpenAdd()
+    {
+        string answer = "";
+        string question = "";
+
+        var result = await DialogService.OpenAsync("Добавление нового вопроса-ответа", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenStack Gap="0px">
+                <RadzenText>Добавление нового вопроса-ответа</RadzenText>
+            </RadzenStack>
+            <RadzenTextBox Placeholder="Вопрос" @bind-Value=@question Style="width: 100%;" />
+            <RadzenTextArea Rows=10 Placeholder="Ответ" @bind-Value=@answer Style="width: 100%;" />
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Text="Добавить" Click=@(() => { ds.Close(true); Add(question, answer); }) />
+                    <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+        );
+    }
 }
