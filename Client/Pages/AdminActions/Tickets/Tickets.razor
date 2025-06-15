@@ -17,88 +17,10 @@
             {
                 @if (AuthProvider.CurrentUser.IsAdmin)
                 {
-                    <RadzenDataGrid EmptyText="Новых тикетов пока что нет" AllowVirtualization Style="height: 81svh; width: 100%; margin-bottom: 50px;" Density="Density.Default" Data="@_tickets" ColumnResizeMode="DataGridColumnResizeMode.NextColumn">
-                        <HeaderTemplate>
-                            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Открытые тикеты"></RadzenText>
-                            </RadzenStack>
-                        </HeaderTemplate>
-                        <Columns>
-                            <RadzenDataGridColumn Width="10%" Context="ctx" Title="ID" Property="TicketId" />
-                            <RadzenDataGridColumn Width="16%" Title="Статус" Context="ctx">
-                                <Template>
-                                    <div style="display: flex; align-items: center; gap: 8px; margin: auto;">
-                                    @switch (ctx.Status)
-                                    {
-                                        case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Created:
-                                            {
-                                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #46ff4e;"></div>
-                                                <RadzenText Style="margin:initial; font-size: 14px;" Text="Открыт" />
-                                                break;
-                                            }
-                                        case kTVCSS.Models.Db.Models.Statuses.TicketStatus.InProcess:
-                                            {
-                                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff9651;"></div>
-                                                    <RadzenText Style="margin:initial; font-size: 14px;" Text="В процессе" />
-                                                break;
-                                            }
-                                    }
-                                    </div>
-                                </Template>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Width="22%" Title="Игрок" Context="ctx">
-                                <Template>
-                                    <RadzenText Style="margin:initial; font-size: 14px;" Text="@ctx.PlayerInfo?.MainInfo.Name" />
-                                </Template>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата создания" Property="CreatedAt" />
-                            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата обновления" Property="UpdatedAt" />
-                            <RadzenDataGridColumn Title="" Context="ctx">
-                                <Template>
-                                    <RadzenButton Text="Перейти" Click="@(() => { NavigationManager.NavigateTo($"/ticket/{ctx.TicketId}"); })" />
-                                </Template>
-                            </RadzenDataGridColumn>
-                        </Columns>
-                    </RadzenDataGrid>
-
-                    <RadzenDataGrid EmptyText="Новых тикетов пока что нет" AllowVirtualization Style="height: 81svh; width: 100%;" Density="Density.Default" Data="@_ticketsclosed" ColumnResizeMode="DataGridColumnResizeMode.NextColumn">
-                        <HeaderTemplate>
-                            <RadzenStack Style="width: 100%;" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Закрытые тикеты"></RadzenText>
-                            </RadzenStack>
-                        </HeaderTemplate>
-                        <Columns>
-                            <RadzenDataGridColumn Width="10%" Context="ctx" Title="ID" Property="TicketId" />
-                            <RadzenDataGridColumn Width="16%" Title="Статус" Context="ctx">
-                                <Template>
-                                    <div style="display: flex; align-items: center; gap: 8px; margin: auto;">
-                                        @switch (ctx.Status)
-                                        {
-                                            case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed:
-                                            {
-                                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff4646;"></div>
-                                                <RadzenText Style="margin:initial; font-size: 14px;" Text="Закрыт" />
-                                                break;
-                                            }
-                                            
-                                        }
-                                    </div>
-                                </Template>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Width="22%" Title="Игрок" Context="ctx">
-                                <Template>
-                                    <RadzenText Style="margin:initial; font-size: 14px;" Text="@ctx.PlayerInfo?.MainInfo.Name" />
-                                </Template>
-                            </RadzenDataGridColumn>
-                            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата создания" Property="CreatedAt" />
-                            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата обновления" Property="UpdatedAt" />
-                            <RadzenDataGridColumn Title="" Context="ctx">
-                                <Template>
-                                    <RadzenButton Text="Перейти" Click="@(() => { NavigationManager.NavigateTo($"/ticket/{ctx.TicketId}"); })" />
-                                </Template>
-                            </RadzenDataGridColumn>
-                        </Columns>
-                    </RadzenDataGrid>
+                    <RadzenStack>
+                        <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_tickets" Title="Открытие тикеты" />
+                        <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_ticketsclosed" Title="Закрытые тикеты" />
+                    </RadzenStack>
                 }
                 else
                 {
