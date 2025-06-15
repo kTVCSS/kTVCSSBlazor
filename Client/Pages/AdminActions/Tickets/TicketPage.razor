@@ -26,7 +26,7 @@
                         <RadzenButton Style="width:150px" Variant="Variant.Text" Icon="arrow_back" Text="Назад" Click="@(() => { NavigationManager.NavigateTo($"/tickets"); })" />
                         <RadzenCard>
                             <RadzenStack Gap="2px">
-                                <RadzenText Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
+                                <RadzenMarkdown AllowHtml Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
                                 @* <RadzenText Text="@string.Concat("Дата регистрации обращения: ", _ticket.CreatedAt.ToShortDateString())" /> *@
 
                                 @switch (_ticket.Status)
@@ -40,10 +40,6 @@
                                     case kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed:
                                         <RadzenText Text="Статус обращения: закрыто" />
                                         break;
-                                }
-                                @if (AuthProvider.CurrentUser.IsAdmin)
-                                {
-                                    <RadzenText>Профиль игрока: <RadzenLink Path="@string.Concat("/player/", _ticket.PlayerId)" Target="_blank" Text="открыть"></RadzenLink></RadzenText>
                                 }
                             </RadzenStack>
                         </RadzenCard>
