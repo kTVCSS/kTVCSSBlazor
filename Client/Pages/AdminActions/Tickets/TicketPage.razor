@@ -23,6 +23,7 @@
                 @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _ticket.PlayerId)
                 {
                     <RadzenStack Gap="8px">
+                        <RadzenButton Style="width:150px" Variant="Variant.Text" Icon="arrow_back" Text="Назад" Click="@(() => { NavigationManager.NavigateTo($"/tickets"); })" />
                         <RadzenCard>
                             <RadzenStack Gap="2px">
                                 <RadzenText Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />

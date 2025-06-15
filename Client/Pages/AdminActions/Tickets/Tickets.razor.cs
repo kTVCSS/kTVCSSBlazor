@@ -7,6 +7,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
     {
         private bool ready = false;
         private List<Ticket> _tickets = [];
+        private List<Ticket> _ticketsclosed = [];
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -15,6 +16,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
                 Task.Run(async () =>
                 {
                     _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
+                    _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
 
                     ready = true;
 
