@@ -1,0 +1,586 @@
+﻿@page "/chat/{DialogueId:int?}"
+@page "/chat"
+@using Microsoft.AspNetCore.SignalR.Client
+@using kTVCSS.Models.Db.Models.Chat.DTOs
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@implements IAsyncDisposable
+@inject StateProvider AuthProvider
+@inject DialogService DialogService
+@inject ChatHubService ChatHub
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <div class="chat-container">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3>Чаты</h3>
+                    <button class="btn btn-primary btn-sm" @onclick="ShowCreateDialogModal">
+                        <i class="fas fa-plus"></i> Новый чат
+                    </button>
+                </div>
+        
+                <div class="dialogs-list">
+                    @if (dialogs != null)
+                    {
+                        @foreach (var dialog in dialogs)
+                        {
+                            <div class="dialog-item @(selectedDialog?.Id == dialog.Id ? "active" : "")"
+                                 @onclick="() => SelectDialog(dialog)">
+                                <div class="dialog-avatar">
+                                    @if (dialog.IsGroup)
+                                    {
+                                        <i class="fas fa-users"></i>
+                                    }
+                                    else if (dialog.Participants.Any())
+                                    {
+                                        <img src="@(dialog.Participants.First().AvatarUrl ?? "/images/default-avatar.png")" 
+                                             alt="Avatar" class="avatar" />
+                                    }
+                                </div>
+                                <div class="dialog-info">
+                                    <div class="dialog-name">
+                                        @if (dialog.IsGroup)
+                                        {
+                                            @dialog.Name
+                                            <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                        }
+                                        else if (dialog.Participants.Any())
+                                        {
+                                            @dialog.Participants.First().Login
+                                            <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                        }
+                                    </div>
+                                    <div class="dialog-last-message">
+                                        @if (dialog.LastMessage != null)
+                                        {
+                                            <span class="last-message-text">@dialog.LastMessage.Content</span>
+                                            
+                                            @if (dialog.UnreadCount > 0)
+                                            {
+                                                <div class="unread-badge">@dialog.UnreadCount</div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                                @if (!dialog.IsGroup && dialog.Participants.Any() && dialog.Participants.First().IsOnline)
+                                {
+                                    <div class="online-indicator"></div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="chat-area">
+                @if (selectedDialog != null)
+                {
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            @if (selectedDialog.IsGroup)
+                            {
+                                <i class="fas fa-users"></i>
+                                <span>@selectedDialog.Name</span>
+                            }
+                            else if (selectedDialog.Participants.Any())
+                            {
+                                <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
+                                     alt="Avatar" class="avatar-small" />
+                                <div>
+                                    <div class="user-name">@selectedDialog.Participants.First().Login</div>
+                                    <div class="user-status">
+                                        @if (selectedDialog.Participants.First().IsOnline)
+                                        {
+                                            <span class="online">в сети</span>
+                                        }
+                                        else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
+                                        {
+                                            <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <div id="msg-cntr" class="messages-container" @ref="messagesContainer">
+                        @if (messages != null)
+                        {
+                            @foreach (var message in messages)
+                            {
+                                <div class="message @(message.Sender.UserId == currentUserId ? "message-own" : "message-other")">
+                                    @if (message.Sender.UserId != currentUserId)
+                                    {
+                                        <img src="@(message.Sender.AvatarUrl ?? "/images/default-avatar.png")" 
+                                             alt="@message.Sender.Login" class="message-avatar" />
+                                    }
+                                    <div class="message-content">
+                                        @if (message.ReplyToMessage != null)
+                                        {
+                                            <div class="reply-message">
+                                                <div class="reply-author">@message.ReplyToMessage.Sender.Login</div>
+                                                <div class="reply-text">@message.ReplyToMessage.Content</div>
+                                            </div>
+                                        }
+                                        <div class="message-text">@message.Content</div>
+                                        <div class="message-meta">
+                                            <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
+                                            @if (message.IsEdited)
+                                            {
+                                                <span class="edited-indicator">изменено</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                
+                        @if (typingUsers.Any())
+                        {
+                            <div class="typing-indicator">
+                                @string.Join(", ", typingUsers.Select(u => u.Login)) печата@(typingUsers.Count > 1 ? "ют" : "ет")...
+                            </div>
+                        }
+                    </div>
+
+                    <div class="message-input-container">
+                        @if (replyToMessage != null)
+                        {
+                            <div class="reply-preview">
+                                <div class="reply-content">
+                                    <strong>@replyToMessage.Sender.Login:</strong>
+                                    <span>@replyToMessage.Content</span>
+                                </div>
+                                <button class="btn-close-reply" @onclick="CancelReply">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        }
+                        <div class="input-area">
+                            <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
+                            <RadzenButton Icon="send" Disabled=@string.IsNullOrWhiteSpace(messageText) Click="SendMessage" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="no-chat-selected">
+                        <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
+                    </div>
+                }
+            </div>
+</div>
+
+<!-- Модальное окно создания диалога -->
+@if (showCreateDialog)
+{
+    <div class="modal-overlay" @onclick="HideCreateDialogModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h4>Создать новый чат</h4>
+                <button class="btn-close" @onclick="HideCreateDialogModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>ID пользователя:</label>
+                    <input type="text" @bind="newDialogUserId" class="form-control" 
+                           placeholder="Введите ID пользователя" />
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" @bind="isGroupDialog" id="isGroup" />
+                    <label for="isGroup">Групповой чат</label>
+                </div>
+                @if (isGroupDialog)
+                {
+                    <div class="form-group">
+                        <label>Название группы:</label>
+                        <input type="text" @bind="groupName" class="form-control" 
+                               placeholder="Введите название группы" />
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" @onclick="HideCreateDialogModal">Отмена</button>
+                <button class="btn btn-primary" @onclick="CreateDialog">Создать</button>
+            </div>
+        </div>
+    </div>
+}
+
+        </Authorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+<script>
+    window.scrollToBottom = (element) => {
+    if (element) {
+        element.scrollTop = element.scrollHeight;
+    }
+};
+
+window.focusElement = (element) => {
+    if (element) {
+        element.focus();
+    }
+};
+
+// Обработка уведомлений
+window.showNotification = (title, message, icon) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body: message,
+            icon: icon || '/images/chat-icon.png',
+            badge: '/images/chat-badge.png'
+        });
+    }
+};
+
+// Запрос разрешения на уведомления
+window.requestNotificationPermission = () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+};
+
+window.setAnimateHook = () => {
+    document.getElementById('msg-cntr').addEventListener('animationend', function() {
+      // Ваш JS-код
+      let element = document.getElementById('msg-cntr');
+      element.scrollTop = element.scrollHeight;
+    });
+}
+
+// Проверка, виден ли элемент в viewport
+window.isElementInViewport = (element) => {
+    if (!element) return false;
+    
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+};
+</script>
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int? DialogueId { get; set; }
+
+    private List<DialogDto>? dialogs;
+    private List<MessageDto>? messages;
+    private DialogDto? selectedDialog;
+    private List<UserDto> typingUsers = new();
+    private MessageDto? replyToMessage;
+
+    private string messageText = string.Empty;
+    private int currentUserId = 0;
+
+    private bool showCreateDialog = false;
+    private int newDialogUserId = 0;
+    private bool isGroupDialog = false;
+    private string groupName = string.Empty;
+
+    private ElementReference messagesContainer;
+    private Timer? typingTimer;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        while (AuthProvider.CurrentUser is null)
+        {
+            await Task.Delay(100);
+        }
+
+        currentUserId = AuthProvider.CurrentUser.Id;
+
+        // Обработчики событий
+        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
+        {
+            if (selectedDialog?.Id == message.DialogId)
+            {
+                messages?.Add(message);
+                await InvokeAsync(StateHasChanged);
+                await ScrollToBottom();
+            }
+            if (selectedDialog?.Id == message.DialogId)
+            {
+                selectedDialog.UnreadCount = 0;
+                ChatHub.Connection.InvokeAsync("MarkAsRead", message.DialogId, AuthProvider.CurrentUser.Id);
+                // Обновляем UI для отображения прочитанных сообщений
+                await InvokeAsync(StateHasChanged);
+            }
+
+            await LoadDialogs(); // Обновляем список диалогов
+        });
+
+        ChatHub.Connection.On<int>("DialogUpdated", async (dialogId) =>
+        {
+            await LoadDialogs();
+            await InvokeAsync(StateHasChanged);
+        });
+
+        ChatHub.Connection.On<int, string>("MessagesRead", async (dialogId, userId) =>
+        {
+            if (selectedDialog?.Id == dialogId)
+            {
+                selectedDialog.UnreadCount = 0;
+                ChatHub.Connection.InvokeAsync("MarkAsRead", dialogId, userId);
+                // Обновляем UI для отображения прочитанных сообщений
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+
+        ChatHub.Connection.On<int, int>("UserStartedTyping", async (dialogId, userId) =>
+        {
+            if (selectedDialog?.Id == dialogId && userId != currentUserId)
+            {
+                var user = await GetUser(userId);
+                if (user != null && !typingUsers.Any(u => u.UserId == userId))
+                {
+                    typingUsers.Add(user);
+                    await InvokeAsync(StateHasChanged);
+                }
+            }
+        });
+
+        ChatHub.Connection.On<int, int>("UserStoppedTyping", async (dialogId, userId) =>
+        {
+            if (selectedDialog?.Id == dialogId)
+            {
+                typingUsers.RemoveAll(u => u.UserId == userId);
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+
+        ChatHub.Connection.On<int, bool>("UserOnlineStatusChanged", async (userId, isOnline) =>
+        {
+            // Обновляем статус пользователей в диалогах
+            if (dialogs != null)
+            {
+                foreach (var dialog in dialogs)
+                {
+                    var participant = dialog.Participants.FirstOrDefault(p => p.UserId == userId);
+                    if (participant != null)
+                    {
+                        participant.IsOnline = isOnline;
+                        if (!isOnline)
+                        {
+                            participant.LastSeenAt = DateTime.Now;
+                        }
+                    }
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+
+        await LoadDialogs();
+
+        if (DialogueId.HasValue)
+        {
+            var dialog = dialogs.FirstOrDefault(x => x.Id == DialogueId.Value);
+            await SelectDialog(dialog);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task LoadDialogs()
+    {
+        try
+        {
+            dialogs = await Http.GetFromJsonAsync<List<DialogDto>>($"http://localhost:4050/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading dialogs: {ex.Message}");
+        }
+    }
+
+    private async Task SelectDialog(DialogDto dialog)
+    {
+        if (selectedDialog?.Id == dialog.Id) return;
+
+        // Покидаем предыдущий диалог
+        if (selectedDialog != null && ChatHub.Connection != null)
+        {
+            await ChatHub.Connection.SendAsync("LeaveDialog", selectedDialog.Id);
+        }
+
+        selectedDialog = dialog;
+        messages = null;
+        replyToMessage = null;
+        typingUsers.Clear();
+
+        await LoadMessages();
+
+        // Присоединяемся к новому диалогу
+        if (ChatHub.Connection != null)
+        {
+            await ChatHub.Connection.SendAsync("JoinDialog", dialog.Id, AuthProvider.CurrentUser.Id);
+            ChatHub.Connection.InvokeAsync("MarkAsRead", dialog.Id, AuthProvider.CurrentUser.Id);
+            selectedDialog.UnreadCount = 0;
+        }
+
+        await JSRuntime.InvokeVoidAsync("setAnimateHook");
+
+        await ScrollToBottom();
+    }
+
+    private async Task LoadMessages()
+    {
+        if (selectedDialog == null) return;
+
+        try
+        {
+            messages = await Http.GetFromJsonAsync<List<MessageDto>>($"http://localhost:4050/api/chat/dialogs/{selectedDialog.Id}/messages/{AuthProvider.CurrentUser.Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading messages: {ex.Message}");
+        }
+
+        await ScrollToBottom();
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(messageText) || selectedDialog == null || ChatHub.Connection == null)
+            return;
+
+        var request = new SendMessageRequest
+        {
+            DialogId = selectedDialog.Id,
+            Content = messageText.Trim(),
+            ReplyToMessageId = replyToMessage?.Id
+        };
+
+        try
+        {
+            await ChatHub.Connection.SendAsync("SendMessage", request, AuthProvider.CurrentUser.Id);
+            messageText = string.Empty;
+            replyToMessage = null;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending message: {ex.Message}");
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !e.ShiftKey)
+        {
+            await SendMessage();
+        }
+    }
+
+    private async Task HandleTyping()
+    {
+        if (selectedDialog == null || ChatHub.Connection == null) return;
+
+        await ChatHub.Connection.SendAsync("StartTyping", selectedDialog.Id, AuthProvider.CurrentUser.Id);
+
+        // Отменяем предыдущий таймер
+        typingTimer?.Dispose();
+
+        // Устанавливаем новый таймер для остановки печати
+        typingTimer = new Timer(async _ =>
+        {
+            if (ChatHub.Connection != null && selectedDialog != null)
+            {
+                await ChatHub.Connection.SendAsync("StopTyping", selectedDialog.Id, AuthProvider.CurrentUser.Id);
+            }
+        }, null, 2000, Timeout.Infinite);
+    }
+
+    private void SetReplyMessage(MessageDto message)
+    {
+        replyToMessage = message;
+    }
+
+    private void CancelReply()
+    {
+        replyToMessage = null;
+    }
+
+    private void ShowCreateDialogModal()
+    {
+        showCreateDialog = true;
+        newDialogUserId = 0;
+        isGroupDialog = false;
+        groupName = string.Empty;
+    }
+
+    private void HideCreateDialogModal()
+    {
+        showCreateDialog = false;
+    }
+
+    private async Task CreateDialog()
+    {
+        if (newDialogUserId == 0)
+            return;
+
+        var request = new CreateDialogRequest
+        {
+            ParticipantUserIds = new List<int> { newDialogUserId },
+            IsGroup = isGroupDialog,
+            Name = isGroupDialog ? groupName : null
+        };
+
+        try
+        {
+            var dialog = await Http.PostAsJsonAsync($"http://localhost:4050/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}", request);
+            if (dialog.IsSuccessStatusCode)
+            {
+                await LoadDialogs();
+                HideCreateDialogModal();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating dialog: {ex.Message}");
+        }
+    }
+
+    private async Task<UserDto?> GetUser(int userId)
+    {
+        try
+        {
+            return await Http.GetFromJsonAsync<UserDto>($"http://localhost:4050/api/chat/users/{userId}");
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task ScrollToBottom()
+    {
+        await Task.Delay(100); // Небольшая задержка для рендеринга
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("scrollToBottom", messagesContainer);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error scrolling to bottom: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        typingTimer?.Dispose();
+    }
+}
+

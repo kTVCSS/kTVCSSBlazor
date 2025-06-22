@@ -1,13 +1,13 @@
+using Blazored.LocalStorage;
+using kTVCSSBlazor.Client;
+using kTVCSSBlazor.Client.Authorization;
+using kTVCSSBlazor.Client.Extensions;
+using kTVCSSBlazor.Client.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Radzen;
-
-using kTVCSSBlazor.Client;
-using Microsoft.AspNetCore.Components.Authorization;
-using kTVCSSBlazor.Client.Authorization;
 using Microsoft.JSInterop;
-using Blazored.LocalStorage;
-using kTVCSSBlazor.Client.Extensions;
+using Radzen;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -47,6 +47,8 @@ builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
+
+builder.Services.AddScoped<ChatHubService>();
 
 var host = builder.Build();
 await host.RunAsync();

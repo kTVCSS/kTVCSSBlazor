@@ -1,7 +1,10 @@
+@using Microsoft.AspNetCore.SignalR.Client
+@using kTVCSS.Models.Db.Models.Chat.DTOs
 @using kTVCSS.Models.Db.Models.Teams
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Players
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
@@ -12,6 +15,7 @@
 @inject NotificationService NotificationService
 @inject HttpClient http
 @inject StateProvider AuthProvider
+@inject ChatHubService ChatHub
 
 <RadzenComponents />
 <RadzenDialog />
@@ -110,7 +114,7 @@
                     <Authorized>
                         <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")">
                             <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
-                            <RadzenPanelMenuItem Text="Мои сообщения" Path="/im" Icon="mail"></RadzenPanelMenuItem>
+                            <RadzenPanelMenuItem Text="Мои сообщения" Path="/chat" Icon="mail"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои матчи" Path="@(string.Concat("/mp/", AuthProvider.CurrentUser.Id))" Icon="filter_list"></RadzenPanelMenuItem>
                         </RadzenPanelMenuItem>
@@ -170,28 +174,51 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        Task.Run(async () =>
+        if (firstRender)
         {
-            await Task.Delay(3000);
-
-            if (AuthProvider.CurrentUser is not null)
+            Task.Run(async () =>
             {
-                if (AuthProvider.CurrentUser.SteamId.ToLower().Contains("undef"))
-                {
-                    string verifyCode = await http.GetStringAsync("/api/players/getregcode?id=" + AuthProvider.CurrentUser.Id);
+                await Task.Delay(3000);
 
-                    var result = await DialogService.OpenAsync("Привязка STEAMID", ds =>
-                        @<RadzenStack Gap="1.5rem">
-                            <RadzenStack Gap="0px">
-                                <RadzenText>Чтобы начать играть или всячески взаимодействовать с сайтом, Вам необходимо зайти на сервер, чтобы зарегистрировать и подтвердить Ваш SteamID.</RadzenText>
-                                <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.ru:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
-                                <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
+                if (AuthProvider.CurrentUser is not null)
+                {
+                    if (AuthProvider.CurrentUser.SteamId.ToLower().Contains("undef"))
+                    {
+                        string verifyCode = await http.GetStringAsync("/api/players/getregcode?id=" + AuthProvider.CurrentUser.Id);
+
+                        var result = await DialogService.OpenAsync("Привязка STEAMID", ds =>
+                            @<RadzenStack Gap="1.5rem">
+                                <RadzenStack Gap="0px">
+                                    <RadzenText>Чтобы начать играть или всячески взаимодействовать с сайтом, Вам необходимо зайти на сервер, чтобы зарегистрировать и подтвердить Ваш SteamID.</RadzenText>
+                                    <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.ru:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
+                                    <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
+                                </RadzenStack>
                             </RadzenStack>
-                        </RadzenStack>
-                    , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
+        , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
+                    }
+                    else
+                    {
+                        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
+                        {
+                            if (!NavigationManager.Uri.ToLower().Contains("/chat"))
+                            {
+                                NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
+                                {
+                                    NavigationManager.NavigateTo("/chat/" + message.DialogId);
+                                });
+                            }
+                        });
+
+                        if (ChatHub.Connection.State != HubConnectionState.Connected)
+                        {
+                            await ChatHub.StartAsync();
+
+                            await ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     void SidebarToggleClick()

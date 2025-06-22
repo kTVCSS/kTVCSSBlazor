@@ -1,10 +1,11 @@
-using Radzen;
-using kTVCSSBlazor.Server.Components;
-using kTVCSSBlazor.Client.Authorization;
-using Microsoft.AspNetCore.Components.Authorization;
 using Blazored.LocalStorage;
-using Microsoft.JSInterop;
+using kTVCSSBlazor.Client.Authorization;
 using kTVCSSBlazor.Client.Extensions;
+using kTVCSSBlazor.Client.Services;
+using kTVCSSBlazor.Server.Components;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
+using Radzen;
 
 var options = new WebApplicationOptions
 {
@@ -28,6 +29,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
+
+builder.Services.AddScoped<ChatHubService>();
 
 var app = builder.Build();
 
