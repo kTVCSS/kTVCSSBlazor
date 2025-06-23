@@ -98,3 +98,27 @@ else
         padding-inline: var(--rz-accordion-content-padding-inline);
     }
 </style>
+
+<script>
+            window.windowSizeInterop = {
+        getWindowSize: function () {
+            return {
+                Width: window.innerWidth,
+                Height: window.innerHeight
+            };
+        },
+        registerResizeCallback: function (dotNetHelper) {
+            function resizeHandler() {
+                dotNetHelper.invokeMethodAsync("OnResize", window.innerWidth, window.innerHeight);
+            }
+            window.addEventListener('resize', resizeHandler);
+
+            // Возвращает функцию для удаления обработчика при необходимости
+            return {
+                dispose: () => {
+                    window.removeEventListener('resize', resizeHandler);
+                }
+            };
+        }
+    };
+</script>

@@ -9,10 +9,19 @@ namespace kTVCSSBlazor.Client.Services
 
         public ChatHubService(NavigationManager navManager)
         {
+#if DEBUG
             Connection = new HubConnectionBuilder()
                 .WithUrl(navManager.ToAbsoluteUri("http://localhost:4050/chathub"))
                 .WithAutomaticReconnect()
                 .Build();
+#endif
+#if RELEASE
+
+            Connection = new HubConnectionBuilder()
+                .WithUrl(navManager.ToAbsoluteUri("https://chat.ktvcss.ru/chathub"))
+                .WithAutomaticReconnect()
+                .Build();
+#endif
         }
 
         public async Task StartAsync()

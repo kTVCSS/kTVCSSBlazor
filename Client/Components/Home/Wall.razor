@@ -8,12 +8,8 @@
 @inject StateProvider AuthProvider
 @inject NotificationService NotificationService
 @implements IDisposable
-
-<Popup @ref=popup Lazy=true class="my-popup">
-    <RadzenStack Style="height: 100%;">
-        <RadzenImage Path="@currentFile" Style="width: 100%; height: 100%" />
-    </RadzenStack>
-</Popup>
+@inject DialogService DialogService
+@inject IJSRuntime js
 
 <RadzenStack>
     <RadzenRow JustifyContent="JustifyContent.Center">
@@ -60,7 +56,7 @@
                                 {
                                     if (post.MediaType == MediaType.Image)
                                     {
-                                        <RadzenImage @ref=image Click=@(() => { currentFile = post.MediaUrl; popup.ToggleAsync(image.Element); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%;max-height: 480px; cursor: pointer;" />
+                                        <RadzenImage @ref=image Click=@(() => { currentFile = post.MediaUrl; ShowImage(); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%;max-height: 480px; cursor: pointer;" />
                                     }
                                     else if (post.MediaType == MediaType.Video)
                                     {
@@ -201,9 +197,47 @@
     private string uploadedFilePath;
     private IBrowserFile uploadedFile;
     private Post post;
-    private Popup popup;
     private string currentFile;
     private RadzenImage image;
+
+    private async Task ShowImage()
+    {
+        await DialogService.OpenAsync("", ds =>
+        @<RadzenStack Style="height: 100%;">
+            <RadzenImage Path="@currentFile" Style="width: 100%; height: 100%;object-fit:contain" />
+        </RadzenStack>
+    , options: new DialogOptions() { Width = windowWidth - 200 + "px", Height = windowHeight - 200 + "px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, ShowClose = true });
+    }
+
+    private int windowWidth = 0;
+    private int windowHeight = 0;
+
+    private DotNetObjectReference<Wall>? objRef;
+
+    public class Window
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
+    [JSInvokable]
+    public void OnResize(int w, int h)
+    {
+        windowWidth = w;
+        windowHeight = h;
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var size = await js.InvokeAsync<Window>("windowSizeInterop.getWindowSize");
+            windowWidth = (int)size.Width;
+            windowHeight = (int)size.Height;
+            await js.InvokeVoidAsync("windowSizeInterop.registerResizeCallback", objRef);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -354,5 +388,6 @@
     public void Dispose()
     {
         Posts = null;
+        objRef?.Dispose();
     }
 }

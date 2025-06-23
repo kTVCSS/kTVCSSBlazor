@@ -46,12 +46,18 @@
                                         @if (dialog.IsGroup)
                                         {
                                             @dialog.Name
-                                            <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                            @if (dialog.LastMessage is not null)
+                                            {
+                                                <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                            }
                                         }
                                         else if (dialog.Participants.Any())
                                         {
                                             @dialog.Participants.First().Login
-                                            <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                            @if (dialog.LastMessage is not null) 
+                                            {
+                                                <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                            }
                                         }
                                     </div>
                                     <div class="dialog-last-message">
@@ -162,7 +168,8 @@
                         }
                         <div class="input-area">
                             <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
-                            <RadzenButton Icon="send" Disabled=@string.IsNullOrWhiteSpace(messageText) Click="SendMessage" />
+                            <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
+                            <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
                         </div>
                     </div>
                 }
@@ -292,6 +299,33 @@ window.isElementInViewport = (element) => {
     private ElementReference messagesContainer;
     private Timer? typingTimer;
 
+    protected override void OnInitialized()
+    {
+        #if DEBUG
+
+        Console.WriteLine("asd");
+
+        #endif
+
+        #if RELEASE
+
+        baseUri = "https://chat.ktvcss.ru";
+
+        #endif
+
+        base.OnInitialized();
+    }
+
+    private string baseUri = "http://localhost:4050";
+
+    void OnSpeechCaptured(string speechValue, bool updateTextArea, string name)
+    {
+        if (updateTextArea)
+        {
+            messageText += speechValue;
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -398,7 +432,7 @@ window.isElementInViewport = (element) => {
     {
         try
         {
-            dialogs = await Http.GetFromJsonAsync<List<DialogDto>>($"http://localhost:4050/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}");
+            dialogs = await Http.GetFromJsonAsync<List<DialogDto>>($"{baseUri}/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}");
         }
         catch (Exception ex)
         {
@@ -442,7 +476,7 @@ window.isElementInViewport = (element) => {
 
         try
         {
-            messages = await Http.GetFromJsonAsync<List<MessageDto>>($"http://localhost:4050/api/chat/dialogs/{selectedDialog.Id}/messages/{AuthProvider.CurrentUser.Id}");
+            messages = await Http.GetFromJsonAsync<List<MessageDto>>($"{baseUri}/api/chat/dialogs/{selectedDialog.Id}/messages/{AuthProvider.CurrentUser.Id}");
         }
         catch (Exception ex)
         {
@@ -452,9 +486,11 @@ window.isElementInViewport = (element) => {
         await ScrollToBottom();
     }
 
+    bool isWaiting = false;
+
     private async Task SendMessage()
     {
-        if (string.IsNullOrWhiteSpace(messageText) || selectedDialog == null || ChatHub.Connection == null)
+        if (string.IsNullOrWhiteSpace(messageText) || selectedDialog == null || ChatHub.Connection == null || isWaiting)
             return;
 
         var request = new SendMessageRequest
@@ -466,7 +502,14 @@ window.isElementInViewport = (element) => {
 
         try
         {
+            isWaiting = true;
             await ChatHub.Connection.SendAsync("SendMessage", request, AuthProvider.CurrentUser.Id);
+            Task.Run(async () =>
+            {
+                await Task.Delay(3000);
+                isWaiting = false;
+                await InvokeAsync(StateHasChanged);
+            });
             messageText = string.Empty;
             replyToMessage = null;
         }
@@ -540,7 +583,7 @@ window.isElementInViewport = (element) => {
 
         try
         {
-            var dialog = await Http.PostAsJsonAsync($"http://localhost:4050/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}", request);
+            var dialog = await Http.PostAsJsonAsync($"{baseUri}/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}", request);
             if (dialog.IsSuccessStatusCode)
             {
                 await LoadDialogs();
@@ -557,7 +600,7 @@ window.isElementInViewport = (element) => {
     {
         try
         {
-            return await Http.GetFromJsonAsync<UserDto>($"http://localhost:4050/api/chat/users/{userId}");
+            return await Http.GetFromJsonAsync<UserDto>($"{baseUri}/api/chat/users/{userId}");
         }
         catch
         {
