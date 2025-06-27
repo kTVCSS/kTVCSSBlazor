@@ -1,4 +1,5 @@
 ﻿@page "/tickets"
+@page "/tickets/{Id:int}"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
 @using kTVCSSBlazor.Db
@@ -7,6 +8,8 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject HttpClient http
+@implements IDisposable
+@inject DialogService DialogService
 
 <PageTitle>kTVCSS @@ Тикеты</PageTitle>
 
@@ -15,16 +18,54 @@
         <Authorized>
             @if (ready)
             {
-                @if (AuthProvider.CurrentUser.IsAdmin)
+                @if (!Id.HasValue)
                 {
-                    <RadzenStack>
-                        <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_tickets" Title="Открытие тикеты" />
-                        <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_ticketsclosed" Title="Закрытые тикеты" />
-                    </RadzenStack>
+                    @if (AuthProvider.CurrentUser is not null)
+                    {
+                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        {
+                            <RadzenStack>
+                                @if (_tickets.Any())
+                                {
+                                    <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_tickets" Title="Открытые тикеты" />
+                                }
+                                <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_ticketsclosed" Title="Закрытые тикеты" />
+                            </RadzenStack>
+                        }
+                        else
+                        {
+                            <NoAccess />
+                        }
+                    }
                 }
                 else
                 {
-                    <NoAccess />
+                    if (AuthProvider.CurrentUser is not null)
+                    {
+                        if (AuthProvider.CurrentUser.Id == Id)
+                        {
+                            <RadzenStack JustifyContent="JustifyContent.Center">
+
+                                @if (_tickets.Any())
+                                {
+                                    <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_tickets" Title="Открытые тикеты" />
+                                }
+                                else
+                                {
+                                    <RadzenButton Click=Open Variant=Variant.Text Text="Открытых тикетов нет. Нажмите сюда, чтобы создать новый." />
+                                }
+
+                                @if (_ticketsclosed.Any())
+                                {
+                                    <kTVCSSBlazor.Client.Pages.AdminActions.Tickets.Components.TicketsDataGrid DataSource="_ticketsclosed" Title="Закрытые тикеты" />
+                                }
+                            </RadzenStack>
+                        }
+                        else
+                        {
+                            <NoAccess />
+                        }
+                    }
                 }
             }
             else
@@ -41,3 +82,21 @@
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
+
+@code {
+    private async Task Open()
+    {
+        var result = await DialogService.OpenAsync("Создание тикета", ds =>
+    @<RadzenStack Gap="1.5rem">
+    <p>Пожалуйста, опишите коротко и ясно суть проблемы</p>
+    <RadzenTextArea Rows="10" @bind-Value=@ticketText Style="width: 100%;" />
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); CreateTicket(); }) />
+            <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+    );
+    }
+}

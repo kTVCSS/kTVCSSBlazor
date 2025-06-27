@@ -452,7 +452,6 @@
                 PlayerName = AuthProvider.CurrentUser.Username
             });
 
-
         try
         {
             var ticket = await response.Content.ReadFromJsonAsync<Ticket?>();

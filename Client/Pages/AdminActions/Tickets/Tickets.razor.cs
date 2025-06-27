@@ -1,13 +1,62 @@
-﻿using kTVCSS.Models.Db.Models.Tickets;
+﻿using kTVCSS.Models.Db.Models.Common;
+using kTVCSS.Models.Db.Models.Tickets;
+using kTVCSS.Models.Models;
+using Microsoft.AspNetCore.Components;
+using Radzen;
+using Radzen.Blazor;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
 {
     public partial class Tickets
     {
+        [SupplyParameterFromQuery]
+        [Parameter]
+        public int? Id { get; set; }
+
         private bool ready = false;
         private List<Ticket> _tickets = [];
         private List<Ticket> _ticketsclosed = [];
+        private bool disposed = false;
+
+        public void Dispose()
+        {
+            disposed = true;
+        }
+
+        private string ticketText = "";
+
+        private async Task CreateTicket()
+        {
+            var response = await http.PostAsJsonAsync("/api/players/unbanrequest", new InitialUnbanRequest()
+            {
+                Message = ticketText,
+                PlayerID = AuthProvider.CurrentUser.Id,
+                PlayerName = AuthProvider.CurrentUser.Username
+            });
+
+            try
+            {
+                var ticket = await response.Content.ReadFromJsonAsync<Ticket?>();
+
+                if (ticket is not null)
+                {
+                    NotificationService.Notify(NotificationSeverity.Success, "Успех", "Ваше обращение зарегистрировано! Сейчас мы Вас перенаправим в созданный тикет", TimeSpan.FromSeconds(3));
+
+                    await Task.Delay(3000);
+
+                    NavigationManager.NavigateTo($"/ticket/{ticket.TicketId}");
+                }
+                else
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько обращений подряд, дождитесь рассмотрения хотя бы одной!");
+                }
+            }
+            catch (Exception)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Нельзя создавать несколько обращений подряд, дождитесь рассмотрения хотя бы одной!");
+            }
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -15,8 +64,26 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             {
                 Task.Run(async () =>
                 {
-                    _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
-                    _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
+                    if (!Id.HasValue)
+                    {
+                        _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
+                        _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
+                    }
+                    else
+                    {
+                        while (AuthProvider.CurrentUser is null)
+                        {
+                            if (disposed)
+                            {
+                                return;
+                            }
+
+                            await Task.Delay(100);
+                        }
+
+                        _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/players/gettickets?id=" + AuthProvider.CurrentUser.Id);
+                        _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/players/getticketsclosed?id=" + AuthProvider.CurrentUser.Id);
+                    }
 
                     ready = true;
 
