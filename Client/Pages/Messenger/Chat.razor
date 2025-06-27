@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using kTVCSS.Models.Db.Models.Chat.DTOs
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
 @using kTVCSSBlazor.Client.Services
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -14,213 +15,185 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            <div class="chat-container">
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <h3>Чаты</h3>
-                    <button class="btn btn-primary btn-sm" @onclick="ShowCreateDialogModal">
-                        <i class="fas fa-plus"></i> Новый чат
-                    </button>
-                </div>
-        
-                <div class="dialogs-list">
-                    @if (dialogs != null)
-                    {
-                        @foreach (var dialog in dialogs)
-                        {
-                            <div class="dialog-item @(selectedDialog?.Id == dialog.Id ? "active" : "")"
-                                 @onclick="() => SelectDialog(dialog)">
-                                <div class="dialog-avatar">
-                                    @if (dialog.IsGroup)
-                                    {
-                                        <i class="fas fa-users"></i>
-                                    }
-                                    else if (dialog.Participants.Any())
-                                    {
-                                        <img src="@(dialog.Participants.First().AvatarUrl ?? "/images/default-avatar.png")" 
-                                             alt="Avatar" class="avatar" />
-                                    }
-                                </div>
-                                <div class="dialog-info">
-                                    <div class="dialog-name">
-                                        @if (dialog.IsGroup)
-                                        {
-                                            @dialog.Name
-                                            @if (dialog.LastMessage is not null)
-                                            {
-                                                <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
-                                            }
-                                        }
-                                        else if (dialog.Participants.Any())
-                                        {
-                                            @dialog.Participants.First().Login
-                                            @if (dialog.LastMessage is not null) 
-                                            {
-                                                <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
-                                            }
-                                        }
-                                    </div>
-                                    <div class="dialog-last-message">
-                                        @if (dialog.LastMessage != null)
-                                        {
-                                            <span class="last-message-text">@dialog.LastMessage.Content</span>
-                                            
-                                            @if (dialog.UnreadCount > 0)
-                                            {
-                                                <div class="unread-badge">@dialog.UnreadCount</div>
-                                            }
-                                        }
-                                    </div>
-                                </div>
-                                @if (!dialog.IsGroup && dialog.Participants.Any() && dialog.Participants.First().IsOnline)
-                                {
-                                    <div class="online-indicator"></div>
-                                }
-                            </div>
-                        }
-                    }
-                </div>
-            </div>
-
-            <div class="chat-area">
-                @if (selectedDialog != null)
-                {
-                    <div class="chat-header">
-                        <div class="chat-info">
-                            @if (selectedDialog.IsGroup)
-                            {
-                                <i class="fas fa-users"></i>
-                                <span>@selectedDialog.Name</span>
-                            }
-                            else if (selectedDialog.Participants.Any())
-                            {
-                                <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
-                                     alt="Avatar" class="avatar-small" />
-                                <div>
-                                    <div class="user-name">@selectedDialog.Participants.First().Login</div>
-                                    <div class="user-status">
-                                        @if (selectedDialog.Participants.First().IsOnline)
-                                        {
-                                            <span class="online">в сети</span>
-                                        }
-                                        else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
-                                        {
-                                            <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
-                                        }
-                                    </div>
-                                </div>
-                            }
+            @if (ready)
+            {
+                <div class="chat-container">
+                    <div class="sidebar">
+                        <div class="sidebar-header">
+                            <h3>Чаты</h3>
                         </div>
-                    </div>
-
-                    <div id="msg-cntr" class="messages-container" @ref="messagesContainer">
-                        @if (messages != null)
-                        {
-                            @foreach (var message in messages)
+        
+                        <div class="dialogs-list">
+                            @if (dialogs != null)
                             {
-                                <div class="message @(message.Sender.UserId == currentUserId ? "message-own" : "message-other")">
-                                    @if (message.Sender.UserId != currentUserId)
-                                    {
-                                        <img src="@(message.Sender.AvatarUrl ?? "/images/default-avatar.png")" 
-                                             alt="@message.Sender.Login" class="message-avatar" />
-                                    }
-                                    <div class="message-content">
-                                        @if (message.ReplyToMessage != null)
-                                        {
-                                            <div class="reply-message">
-                                                <div class="reply-author">@message.ReplyToMessage.Sender.Login</div>
-                                                <div class="reply-text">@message.ReplyToMessage.Content</div>
-                                            </div>
-                                        }
-                                        <div class="message-text">@message.Content</div>
-                                        <div class="message-meta">
-                                            <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
-                                            @if (message.IsEdited)
+                                @foreach (var dialog in dialogs)
+                                {
+                                    <div class="dialog-item @(selectedDialog?.Id == dialog.Id ? "active" : "")"
+                                         @onclick="() => SelectDialog(dialog)">
+                                        <div class="dialog-avatar">
+                                            @if (dialog.IsGroup)
                                             {
-                                                <span class="edited-indicator">изменено</span>
+                                                <i class="fas fa-users"></i>
+                                            }
+                                            else if (dialog.Participants.Any())
+                                            {
+                                                <img src="@(dialog.Participants.First().AvatarUrl ?? "/images/default-avatar.png")" 
+                                                     alt="Avatar" class="avatar" />
                                             }
                                         </div>
+                                        <div class="dialog-info">
+                                            <div class="dialog-name">
+                                                @if (dialog.IsGroup)
+                                                {
+                                                    @dialog.Name
+                                                    @if (dialog.LastMessage is not null)
+                                                    {
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                    }
+                                                }
+                                                else if (dialog.Participants.Any())
+                                                {
+                                                    @dialog.Participants.First().Login
+                                                    @if (dialog.LastMessage is not null) 
+                                                    {
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                    }
+                                                }
+                                            </div>
+                                            <div class="dialog-last-message">
+                                                @if (dialog.LastMessage != null)
+                                                {
+                                                    <span class="last-message-text">@dialog.LastMessage.Content</span>
+                                            
+                                                    @if (dialog.UnreadCount > 0)
+                                                    {
+                                                        <div class="unread-badge">@dialog.UnreadCount</div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (!dialog.IsGroup && dialog.Participants.Any() && dialog.Participants.First().IsOnline)
+                                        {
+                                            <div class="online-indicator"></div>
+                                        }
                                     </div>
-                                </div>
+                                }
                             }
-                        }
-                
-                        @if (typingUsers.Any())
-                        {
-                            <div class="typing-indicator">
-                                @string.Join(", ", typingUsers.Select(u => u.Login)) печата@(typingUsers.Count > 1 ? "ют" : "ет")...
-                            </div>
-                        }
-                    </div>
-
-                    <div class="message-input-container">
-                        @if (replyToMessage != null)
-                        {
-                            <div class="reply-preview">
-                                <div class="reply-content">
-                                    <strong>@replyToMessage.Sender.Login:</strong>
-                                    <span>@replyToMessage.Content</span>
-                                </div>
-                                <button class="btn-close-reply" @onclick="CancelReply">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        }
-                        <div class="input-area">
-                            <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
-                            <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
-                            <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
                         </div>
                     </div>
-                }
-                else
-                {
-                    <div class="no-chat-selected">
-                        <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
-                    </div>
-                }
-            </div>
-</div>
 
-<!-- Модальное окно создания диалога -->
-@if (showCreateDialog)
-{
-    <div class="modal-overlay" @onclick="HideCreateDialogModal">
-        <div class="modal-content" @onclick:stopPropagation="true">
-            <div class="modal-header">
-                <h4>Создать новый чат</h4>
-                <button class="btn-close" @onclick="HideCreateDialogModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>ID пользователя:</label>
-                    <input type="text" @bind="newDialogUserId" class="form-control" 
-                           placeholder="Введите ID пользователя" />
-                </div>
-                <div class="form-group">
-                    <input type="checkbox" @bind="isGroupDialog" id="isGroup" />
-                    <label for="isGroup">Групповой чат</label>
-                </div>
-                @if (isGroupDialog)
-                {
-                    <div class="form-group">
-                        <label>Название группы:</label>
-                        <input type="text" @bind="groupName" class="form-control" 
-                               placeholder="Введите название группы" />
-                    </div>
-                }
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" @onclick="HideCreateDialogModal">Отмена</button>
-                <button class="btn btn-primary" @onclick="CreateDialog">Создать</button>
-            </div>
-        </div>
-    </div>
-}
+                    <div class="chat-area">
+                        @if (selectedDialog != null)
+                        {
+                            <div class="chat-header">
+                                <div class="chat-info">
+                                    @if (selectedDialog.IsGroup)
+                                    {
+                                        <i class="fas fa-users"></i>
+                                        <span>@selectedDialog.Name</span>
+                                    }
+                                    else if (selectedDialog.Participants.Any())
+                                    {
+                                        <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
+                                             alt="Avatar" class="avatar-small" />
+                                        <div>
+                                            <div class="user-name">@selectedDialog.Participants.First().Login</div>
+                                            <div class="user-status">
+                                                @if (selectedDialog.Participants.First().IsOnline)
+                                                {
+                                                    <span class="online">в сети</span>
+                                                }
+                                                else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
+                                                {
+                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
 
+                            <div id="msg-cntr" class="messages-container" @ref="messagesContainer">
+                                @if (messages != null)
+                                {
+                                    @foreach (var message in messages)
+                                    {
+                                        <div class="message @(message.Sender.UserId == currentUserId ? "message-own" : "message-other")">
+                                            @if (message.Sender.UserId != currentUserId)
+                                            {
+                                                <img src="@(message.Sender.AvatarUrl ?? "/images/default-avatar.png")" 
+                                                     alt="@message.Sender.Login" class="message-avatar" />
+                                            }
+                                            <div class="message-content">
+                                                @if (message.ReplyToMessage != null)
+                                                {
+                                                    <div class="reply-message">
+                                                        <div class="reply-author">@message.ReplyToMessage.Sender.Login</div>
+                                                        <div class="reply-text">@message.ReplyToMessage.Content</div>
+                                                    </div>
+                                                }
+                                                <div class="message-text">@message.Content</div>
+                                                <div class="message-meta">
+                                                    <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
+                                                    @if (message.IsEdited)
+                                                    {
+                                                        <span class="edited-indicator">изменено</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                
+                                @if (typingUsers.Any())
+                                {
+                                    <div class="typing-indicator">
+                                        @string.Join(", ", typingUsers.Select(u => u.Login)) печата@(typingUsers.Count > 1 ? "ют" : "ет")...
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="message-input-container">
+                                @if (replyToMessage != null)
+                                {
+                                    <div class="reply-preview">
+                                        <div class="reply-content">
+                                            <strong>@replyToMessage.Sender.Login:</strong>
+                                            <span>@replyToMessage.Content</span>
+                                        </div>
+                                        <button class="btn-close-reply" @onclick="CancelReply">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                }
+                                <div class="input-area">
+                                    <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
+                                    <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
+                                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="no-chat-selected">
+                                <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="@currentLoadText" />
+                    </RadzenStack>
+                </RadzenRow>
+            }
         </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
 
@@ -298,12 +271,15 @@ window.isElementInViewport = (element) => {
 
     private ElementReference messagesContainer;
     private Timer? typingTimer;
+    private bool ready = false;
+    private string currentLoadText = "";
+    private bool disposed = false;
 
     protected override void OnInitialized()
     {
         #if DEBUG
 
-        Console.WriteLine("asd");
+        //Console.WriteLine("asd");
 
         #endif
 
@@ -332,10 +308,22 @@ window.isElementInViewport = (element) => {
 
         while (AuthProvider.CurrentUser is null)
         {
-            await Task.Delay(100);
+            currentLoadText = "Авторизуемся...";
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1000);
         }
 
         currentUserId = AuthProvider.CurrentUser.Id;
+
+        while (ChatHub.Connection.State != HubConnectionState.Connected)
+        {
+            currentLoadText = "Подключаемся к сети проекта...";
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(1000);
+        }
+
+        currentLoadText = "Загружаем чат...";
+        await InvokeAsync(StateHasChanged);
 
         // Обработчики событий
         ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
@@ -424,6 +412,8 @@ window.isElementInViewport = (element) => {
             var dialog = dialogs.FirstOrDefault(x => x.Id == DialogueId.Value);
             await SelectDialog(dialog);
         }
+
+        ready = true;
 
         await InvokeAsync(StateHasChanged);
     }

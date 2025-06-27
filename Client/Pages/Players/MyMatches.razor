@@ -8,7 +8,7 @@
 
 @if (ready)
 {
-    <RadzenDataGrid AllowVirtualization RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {dataGridHeight}svh"))">
+    <RadzenDataGrid AllowVirtualization EmptyText="Вы пока не сыграли ни одного матча" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {dataGridHeight}svh"))">
         <Columns>
             <RadzenDataGridColumn TItem="TotalMatch" Visible="true">
                 <Template Context="match">
