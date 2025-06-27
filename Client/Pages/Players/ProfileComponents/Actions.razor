@@ -1,3 +1,4 @@
+@using kTVCSS.Models.Db.Models.Chat.DTOs
 @using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Statuses
 @using kTVCSS.Models.Db.Models.Teams
@@ -42,7 +43,7 @@
 
 @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
 {
-    <RadzenButton Click=SendMessage Icon="message" Text="Написать"></RadzenButton>
+    <RadzenButton Disabled=sndMsgButton Click=SendMessage Icon="message" Text="Написать"></RadzenButton>
 
     <RadzenButton Click=MakeReport Icon="warning" Text="Репорт"></RadzenButton>
 
@@ -215,9 +216,65 @@
         fullClrBtn.Disabled = false;
     }
 
-    private void SendMessage()
-    {
+    bool sndMsgButton = false;
 
+    private async Task SendMessage()
+    {
+        sndMsgButton = true;
+
+        string baseUri = "http://localhost:4050";
+
+#if DEBUG
+
+        //Console.WriteLine("asd");
+
+#endif
+
+#if RELEASE
+
+        baseUri = "https://chat.ktvcss.ru";
+
+#endif
+
+        ns.Notify(NotificationSeverity.Info, "Проверяем наличие диалога...", payload: new Random().Next(0, int.MaxValue));
+
+        var dialogId = await http.GetFromJsonAsync<int>($"{baseUri}/api/chat/dialogexist?from={AuthProvider.CurrentUser.Id}&to={player.MainInfo.Id}");
+
+        if (dialogId == -1)
+        {
+            // диалога нет, создаем
+
+            ns.Notify(NotificationSeverity.Info, "Создаем диалог...", payload: new Random().Next(0, int.MaxValue));
+
+            var request = new CreateDialogRequest
+            {
+                ParticipantUserIds = new List<int> { player.MainInfo.Id },
+                IsGroup = false,
+                Name = null
+            };
+
+            try
+            {
+                var dialog = await http.PostAsJsonAsync($"{baseUri}/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}", request);
+                if (dialog.IsSuccessStatusCode)
+                {
+                    ns.Notify(NotificationSeverity.Success, "Направляем в мессенджер...", payload: new Random().Next(0, int.MaxValue));
+
+                    var newDialog = await dialog.Content.ReadFromJsonAsync<DialogDto>();
+
+                    nm.NavigateTo("/chat/" + newDialog.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating dialog: {ex.Message}");
+            }
+        }
+        else
+        {
+            ns.Notify(NotificationSeverity.Success, "Направляем в мессенджер...", payload: new Random().Next(0, int.MaxValue));
+            nm.NavigateTo("/chat/" + dialogId);
+        }
     }
 
     private async Task CancelFriendRequest()

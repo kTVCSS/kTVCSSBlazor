@@ -15,9 +15,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            @if (ready)
-            {
-                <div class="chat-container">
+            <div class="chat-container">
                     <div class="sidebar">
                         <div class="sidebar-header">
                             <h3>Чаты</h3>
@@ -97,7 +95,7 @@
                                         <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
                                              alt="Avatar" class="avatar-small" />
                                         <div>
-                                            <div class="user-name">@selectedDialog.Participants.First().Login</div>
+                                            <div class="user-name"><RadzenLink Target="_blank" Path="@string.Concat("/player/", selectedDialog.Participants.First().UserId)"><RadzenText>@selectedDialog.Participants.First().Login</RadzenText></RadzenLink></div>
                                             <div class="user-status">
                                                 @if (selectedDialog.Participants.First().IsOnline)
                                                 {
@@ -175,21 +173,23 @@
                         }
                         else
                         {
-                            <div class="no-chat-selected">
-                                <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
-                            </div>
+                            @if (!ready)
+                            {
+                                <RadzenRow class="rz-mt-8" JustifyContent="JustifyContent.Center">
+                                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                                        <Loader Size="ProgressBarCircularSize.Medium" Text="@currentLoadText" />
+                                    </RadzenStack>
+                                </RadzenRow>
+                            }
+                            else
+                            {
+                                <div class="no-chat-selected">
+                                    <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
+                                </div>
+                            }
                         }
                     </div>
                 </div>
-            }
-            else
-            {
-                <RadzenRow JustifyContent="JustifyContent.Center">
-                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                        <Loader Size="ProgressBarCircularSize.Medium" Text="@currentLoadText" />
-                    </RadzenStack>
-                </RadzenRow>
-            }
         </Authorized>
         <NotAuthorized>
             <NoAccess />
@@ -228,7 +228,11 @@ window.requestNotificationPermission = () => {
     }
 };
 
-window.setAnimateHook = () => {
+window.setAnimateHook = async () => {
+    while (document.getElementById('msg-cntr') == null) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     document.getElementById('msg-cntr').addEventListener('animationend', function() {
       // Ваш JS-код
       let element = document.getElementById('msg-cntr');
@@ -310,7 +314,7 @@ window.isElementInViewport = (element) => {
         {
             currentLoadText = "Авторизуемся...";
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1000);
+            await Task.Delay(100);
         }
 
         currentUserId = AuthProvider.CurrentUser.Id;
@@ -319,7 +323,7 @@ window.isElementInViewport = (element) => {
         {
             currentLoadText = "Подключаемся к сети проекта...";
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(1000);
+            await Task.Delay(100);
         }
 
         currentLoadText = "Загружаем чат...";
@@ -407,15 +411,17 @@ window.isElementInViewport = (element) => {
 
         await LoadDialogs();
 
+        await InvokeAsync(StateHasChanged);
+
+        ready = true;
+
+        await InvokeAsync(StateHasChanged);
+
         if (DialogueId.HasValue)
         {
             var dialog = dialogs.FirstOrDefault(x => x.Id == DialogueId.Value);
             await SelectDialog(dialog);
         }
-
-        ready = true;
-
-        await InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadDialogs()
@@ -447,6 +453,8 @@ window.isElementInViewport = (element) => {
 
         await LoadMessages();
 
+        await InvokeAsync(StateHasChanged);
+
         // Присоединяемся к новому диалогу
         if (ChatHub.Connection != null)
         {
@@ -458,6 +466,8 @@ window.isElementInViewport = (element) => {
         await JSRuntime.InvokeVoidAsync("setAnimateHook");
 
         await ScrollToBottom();
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadMessages()
