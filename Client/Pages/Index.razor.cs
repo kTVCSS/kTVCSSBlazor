@@ -1,4 +1,5 @@
-﻿using kTVCSS.Models.Models;
+﻿using kTVCSS.Models.Db.Models.Common;
+using kTVCSS.Models.Models;
 using kTVCSSBlazor.Db.Models.Arcticles;
 using kTVCSSBlazor.Db.Models.Home;
 using kTVCSSBlazor.Db.Models.UserFeed;
@@ -12,6 +13,7 @@ namespace kTVCSSBlazor.Client.Pages
     {
         private bool ready = false;
         private int _selectedIndex = 0;
+
         private int selectedIndex
         {
             get

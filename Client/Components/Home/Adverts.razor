@@ -1,0 +1,20 @@
+﻿@using kTVCSS.Models.Db.Models.Common
+@inject HttpClient http
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-w-100">
+    @foreach (var adv in adverts)
+    {
+        <RadzenLink Target="_blank" Path="@adv.Link">
+            @((MarkupString)adv.Html)
+        </RadzenLink>
+    }
+</RadzenStack>
+
+@code {
+    private List<Advert> adverts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        adverts = await http.GetFromJsonAsync<List<Advert>>($"api/guest/adverts");
+    }
+}

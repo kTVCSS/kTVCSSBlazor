@@ -1,4 +1,5 @@
 @using Radzen.Blazor.Rendering
+@using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
@@ -199,7 +200,7 @@
     private Post post;
     private string currentFile;
     private RadzenImage image;
-
+    
     private async Task ShowImage()
     {
         await DialogService.OpenAsync("", ds =>
