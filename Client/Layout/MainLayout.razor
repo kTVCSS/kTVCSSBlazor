@@ -219,7 +219,7 @@
                                     <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
                                 </RadzenStack>
                             </RadzenStack>
-        , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
+    , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
                     }
                     else
                     {
@@ -238,7 +238,7 @@
                         {
                             await ChatHub.StartAsync();
 
-                            await ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
+                            ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
                         }
                     }
                 }

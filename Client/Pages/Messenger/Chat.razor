@@ -420,7 +420,11 @@ window.isElementInViewport = (element) => {
         if (DialogueId.HasValue)
         {
             var dialog = dialogs.FirstOrDefault(x => x.Id == DialogueId.Value);
-            await SelectDialog(dialog);
+
+            if (dialog is not null)
+            {
+                await SelectDialog(dialog);
+            }
         }
     }
 
@@ -439,6 +443,8 @@ window.isElementInViewport = (element) => {
     private async Task SelectDialog(DialogDto dialog)
     {
         if (selectedDialog?.Id == dialog.Id) return;
+
+        Console.WriteLine(dialog.Id);
 
         // Покидаем предыдущий диалог
         if (selectedDialog != null && ChatHub.Connection != null)

@@ -15,6 +15,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
         private PlayerInfo player;
 
         private bool ready = false;
+        private bool disposed = false;
 
         private bool isOnline = false;
 
@@ -42,6 +43,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
         public void Dispose()
         {
             ready = false;
+            disposed = true;
             player = null;
             NavigationManager.LocationChanged -= HandleLocationChanged;
             StateHasChanged();
@@ -55,22 +57,6 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 NavigationManager.LocationChanged += HandleLocationChanged;
 
                 player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={Id}");
-
-                isMeAFriend = await http.GetFromJsonAsync<bool>($"/api/friendsengine/ismefriend?playerid={AuthProvider.CurrentUser.Id}&friendid={Id}");
-
-                try
-                {
-                    var tst = await http.GetFromJsonAsync<kTVCSS.Models.Db.Models.Players.FriendRequest?>($"/api/friendsengine/GetFriendRequest?requesterId={AuthProvider.CurrentUser.Id}&addresseeId={Id}");
-
-                    if (tst is not null)
-                    {
-                        FriendRequest = tst;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message.ToString());
-                }
 
                 foreach (var map in player.LastTwentyMatches.DistinctBy(x => x.MapName))
                 {
@@ -92,13 +78,42 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
                 await InvokeAsync(StateHasChanged);
 
-                if (FriendRequest is not null)
+                Task.Run(async () =>
                 {
-                    if (FriendRequest.Requester.PlayerID != AuthProvider.CurrentUser.Id)
+                    while (AuthProvider.CurrentUser is null)
                     {
-                        NotificationService.Notify(Radzen.NotificationSeverity.Info, "Заявка в друзья", "Вас хотят добавить в друзья! Принять или отклонить заявку можно в меню действий под шапкой игрока.");
+                        if (disposed)
+                        {
+                            return;
+                        }
+
+                        await Task.Delay(500);
                     }
-                }
+
+                    isMeAFriend = await http.GetFromJsonAsync<bool>($"/api/friendsengine/ismefriend?playerid={AuthProvider.CurrentUser.Id}&friendid={Id}");
+
+                    try
+                    {
+                        var tst = await http.GetFromJsonAsync<kTVCSS.Models.Db.Models.Players.FriendRequest?>($"/api/friendsengine/GetFriendRequest?requesterId={AuthProvider.CurrentUser.Id}&addresseeId={Id}");
+
+                        if (tst is not null)
+                        {
+                            FriendRequest = tst;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message.ToString());
+                    }
+
+                    if (FriendRequest is not null)
+                    {
+                        if (FriendRequest.Requester.PlayerID != AuthProvider.CurrentUser.Id)
+                        {
+                            NotificationService.Notify(Radzen.NotificationSeverity.Info, "Заявка в друзья", "Вас хотят добавить в друзья! Принять или отклонить заявку можно в меню действий под шапкой игрока.");
+                        }
+                    }
+                });
             });
         }
 
