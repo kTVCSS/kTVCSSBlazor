@@ -210,24 +210,6 @@ window.focusElement = (element) => {
     }
 };
 
-// Обработка уведомлений
-window.showNotification = (title, message, icon) => {
-    if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(title, {
-            body: message,
-            icon: icon || '/images/chat-icon.png',
-            badge: '/images/chat-badge.png'
-        });
-    }
-};
-
-// Запрос разрешения на уведомления
-window.requestNotificationPermission = () => {
-    if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
-    }
-};
-
 window.setAnimateHook = async () => {
     while (document.getElementById('msg-cntr') == null) {
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -306,6 +288,8 @@ window.isElementInViewport = (element) => {
         }
     }
 
+    List<IDisposable> disposables = [];
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -330,32 +314,47 @@ window.isElementInViewport = (element) => {
         await InvokeAsync(StateHasChanged);
 
         // Обработчики событий
-        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
+        var rm = ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
         {
-            if (selectedDialog?.Id == message.DialogId)
+            try 
             {
-                messages?.Add(message);
+                await LoadDialogs(); // Обновляем список диалогов
                 await InvokeAsync(StateHasChanged);
-                await ScrollToBottom();
+                Console.WriteLine(message.DialogId);
+                if (selectedDialog?.Id != message.DialogId)
+                {
+                    var needed = dialogs.FirstOrDefault(x => x.Id == message.DialogId);
+                    if (needed is not null)
+                    {
+                        needed.UnreadCount += 1;
+                    }
+                    JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+                    await InvokeAsync(StateHasChanged);
+                }
+                if (selectedDialog?.Id == message.DialogId)
+                {
+                    messages?.Add(message);
+                    selectedDialog.UnreadCount = 0;
+                    ChatHub.Connection.InvokeAsync("MarkAsRead", message.DialogId, AuthProvider.CurrentUser.Id);
+                    // Обновляем UI для отображения прочитанных сообщений
+                    await InvokeAsync(StateHasChanged);
+                    await ScrollToBottom();
+                }
             }
-            if (selectedDialog?.Id == message.DialogId)
+            catch (Exception ex)
             {
-                selectedDialog.UnreadCount = 0;
-                ChatHub.Connection.InvokeAsync("MarkAsRead", message.DialogId, AuthProvider.CurrentUser.Id);
-                // Обновляем UI для отображения прочитанных сообщений
-                await InvokeAsync(StateHasChanged);
+                Console.Error.WriteLine(ex.ToString());
             }
-
-            await LoadDialogs(); // Обновляем список диалогов
         });
 
-        ChatHub.Connection.On<int>("DialogUpdated", async (dialogId) =>
+        var du = ChatHub.Connection.On<int>("DialogUpdated", async (dialogId) =>
         {
+            Console.WriteLine(dialogId);
             await LoadDialogs();
             await InvokeAsync(StateHasChanged);
         });
 
-        ChatHub.Connection.On<int, string>("MessagesRead", async (dialogId, userId) =>
+        var dr = ChatHub.Connection.On<int, string>("MessagesRead", async (dialogId, userId) =>
         {
             if (selectedDialog?.Id == dialogId)
             {
@@ -366,7 +365,7 @@ window.isElementInViewport = (element) => {
             }
         });
 
-        ChatHub.Connection.On<int, int>("UserStartedTyping", async (dialogId, userId) =>
+        var ust = ChatHub.Connection.On<int, int>("UserStartedTyping", async (dialogId, userId) =>
         {
             if (selectedDialog?.Id == dialogId && userId != currentUserId)
             {
@@ -379,7 +378,7 @@ window.isElementInViewport = (element) => {
             }
         });
 
-        ChatHub.Connection.On<int, int>("UserStoppedTyping", async (dialogId, userId) =>
+        var ustt = ChatHub.Connection.On<int, int>("UserStoppedTyping", async (dialogId, userId) =>
         {
             if (selectedDialog?.Id == dialogId)
             {
@@ -388,7 +387,7 @@ window.isElementInViewport = (element) => {
             }
         });
 
-        ChatHub.Connection.On<int, bool>("UserOnlineStatusChanged", async (userId, isOnline) =>
+        var uosc = ChatHub.Connection.On<int, bool>("UserOnlineStatusChanged", async (userId, isOnline) =>
         {
             // Обновляем статус пользователей в диалогах
             if (dialogs != null)
@@ -408,6 +407,13 @@ window.isElementInViewport = (element) => {
                 await InvokeAsync(StateHasChanged);
             }
         });
+
+        disposables.Add(rm);
+        disposables.Add(du);
+        disposables.Add(dr);
+        disposables.Add(ust);
+        disposables.Add(ustt);
+        disposables.Add(uosc);
 
         await LoadDialogs();
 
@@ -629,6 +635,10 @@ window.isElementInViewport = (element) => {
 
     public async ValueTask DisposeAsync()
     {
+        foreach (var item in disposables)
+        {
+            item.Dispose();
+        }
         typingTimer?.Dispose();
     }
 }

@@ -177,6 +177,32 @@
     }
 </style>
 
+<script>
+    window.showNotification = (title, message, icon) => {
+    let audio = new Audio('/sounds/new-msg-v1.mp3')
+    audio.volume = 0.5
+    audio.play();
+    if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, {
+            body: message,
+            icon: icon || '/images/chat-icon.png',
+            badge: '/images/chat-badge.png'
+        });
+    }
+};
+
+window.getPermission = () => {
+    return Notification.permission === 'default'
+}
+
+// Запрос разрешения на уведомления
+window.requestNotificationPermission = () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+    }
+};
+</script>
+
 @code {
     bool sidebarExpanded = true;
     private bool disposed = false;
@@ -190,6 +216,19 @@
     {
         if (firstRender)
         {
+            var nt = await JSRuntime.InvokeAsync<bool>("getPermission");
+
+            if (nt)
+            {
+                await DialogService.OpenAsync("Подключение уведомлений", ds =>
+                            @<RadzenStack Gap="1.5rem">
+                                <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
+                            </RadzenStack>
+                , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+
+                JSRuntime.InvokeVoidAsync("requestNotificationPermission");
+            }
+
             // таска для проверки, надо чуваку подтверждать регу или нет
             Task.Run(async () =>
             {
@@ -227,6 +266,8 @@
                         {
                             if (!NavigationManager.Uri.ToLower().Contains("/chat"))
                             {
+                                JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+
                                 NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
                                 {
                                     NavigationManager.NavigateTo("/chat/" + message.DialogId);

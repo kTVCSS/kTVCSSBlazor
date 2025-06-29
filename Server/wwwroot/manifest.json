@@ -1,14 +1,14 @@
 {
-  "name": "kTVCSSBlazor",
-  "short_name": "kTVCSSBlazor",
+  "name": "kTVCSS",
+  "short_name": "kTVCSS",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#222529",
   "theme_color": "#03173d",
   "icons": [
     {
-      "src": "icon-512.png",
-      "type": "image/png",
+      "src": "/images/logo_ktv.png",
+      "type": "image/jpeg",
       "sizes": "512x512"
     }
   ]
