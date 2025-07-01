@@ -104,6 +104,10 @@
                                     <RadzenPanelMenuItem Text="Редактор миксовых карт" Path="/editmixesmaps" Icon="build"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Text="Редактор кв карт" Path="/editmappool" Icon="build"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
+                                    @if (AuthProvider.CurrentUser.Username == "kurwanator1337" || AuthProvider.CurrentUser.Username == "phenom" || AuthProvider.CurrentUser.Username == "raxzerax")
+                                    {
+                                        <RadzenPanelMenuItem Text="Управление миксом #1" Path="/mixconsole" Icon="folder"></RadzenPanelMenuItem>
+                                    }
                                 </RadzenPanelMenuItem>
                             </RadzenPanelMenuItem>
                         }

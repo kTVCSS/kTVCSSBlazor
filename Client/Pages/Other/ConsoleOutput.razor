@@ -161,7 +161,15 @@
             {
                 access = true;
                 objRef = DotNetObjectReference.Create(this);
-                var wsUrl = baseUri.Replace("http://", "ws://").TrimEnd('/') + "/ws/console";
+                string wsUrl = string.Empty;
+                if (baseUri.StartsWith("https"))
+                {
+                    wsUrl = baseUri.Replace("https://", "wss://").TrimEnd('/') + "/ws/console";
+                }
+                else
+                {
+                    wsUrl = baseUri.Replace("http://", "ws://").TrimEnd('/') + "/ws/console";
+                }
                 await JS.InvokeVoidAsync("connectConsole", objRef, wsUrl);
             }
         }
