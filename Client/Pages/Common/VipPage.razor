@@ -1,0 +1,173 @@
+﻿@page "/vip-features"
+@using kTVCSSBlazor.Client.Authorization
+@inject StateProvider AuthProvider
+@inject NavigationManager nm
+@inject DialogService DialogService
+@inject IJSRuntime js
+
+<PageTitle>kTVCSS @@ VIP</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <RadzenRow class="rz-w-75 rz-mx-auto">
+                <RadzenColumn Size="12">
+                    <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                        <RadzenText Text="VIP услуги" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" />
+                        <RadzenText Text="Приобретите один из вариантов подписки для доступа к большему функционалу проекта" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                        <RadzenRow Gap="1rem" RowGap="1rem" AlignItems="Radzen.AlignItems.Center" class="rz-mt-12 rz-w-100 rz-w-md-75">
+                            <RadzenColumn Size="12" SizeSM="6" Style="height: fit-content; z-index: 1;">
+                                <RadzenCard class="rz-pt-6" Style="flex: 1;">
+                                    <RadzenStack Style="height: 440px" class="rz-p-6" Gap="0">
+                                        <RadzenText Text="GAME VIP" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H3" />
+                                        <RadzenText Text="Базовый вариант подписки" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color" />
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" class="rz-my-6" JustifyContent="Radzen.JustifyContent.Center">
+                                            <RadzenText Text="₽200" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" class="rz-m-0" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="/ месяц" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                        </RadzenStack>
+                                        <RadzenButton Click=Click Text="Купить" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-my-3" />
+                                        <RadzenStack Gap="0.5rem" class="rz-mt-6">
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Обнуление статистики" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Автоматический поиск хайлайтов матча/игрока" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Изменение логина (игрового ника)" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Управление дизайном сайта с помощью редактора HTML/CSS" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeSM="6" Style="height: fit-content; z-index: 1;">
+                                <RadzenCard class="rz-pt-6" Style="flex: 1;">
+                                    <RadzenStack Style="height: 440px" class="rz-p-6" Gap="0">
+                                        <RadzenText Text="PREMIUM VIP" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-color-primary" TagName="Radzen.Blazor.TagName.H3" />
+                                        <RadzenText Text="Расширенный вариант подписки" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color" />
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" class="rz-my-6" JustifyContent="Radzen.JustifyContent.Center">
+                                            <RadzenText Text="₽450" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" class="rz-m-0" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="/ месяц" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                        </RadzenStack>
+                                        <RadzenButton Click=Click Text="Купить" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-my-3" />
+                                        <RadzenStack Gap="0.5rem" class="rz-mt-6">
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Функционал базовой подписки" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Полное обнуление статистики, включая обнуление ранга" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Доступ к капитанскому поиска микса" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow class="rz-w-75 rz-mx-auto rz-background-color-">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-">
+                    <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-">
+                        <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-2 rz-p-sm-12">
+                            <RadzenRow Gap="2rem" class="rz-my-sm-12">
+                                <RadzenColumn Size="12" SizeXS="4">
+                                    <RadzenStack Gap="0">
+                                        <RadzenText Text="Что делать после покупки?" TextStyle="Radzen.Blazor.TextStyle.DisplayH4" class="rz-m-0 " />
+                                        <RadzenText Text="Мы собрали все популярные вопросы и проблемы" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                                    </RadzenStack>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeXS="8">
+                                    <RadzenText Text="Что стоит сделать сразу?" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                    <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-mb-8 rz-text-secondary-color">
+                                        Вам необходимо перейти в <a target="_blank" href="https://t.me/boosty_to_bot">бота Boosty</a> и нажать на кнопку "Доступные группы" и выбрать все имеющиеся группы от проекта kTVCSS. Вас должно пригласить в чат(-ы) и после этого обновите страницу - VIP будет доступна.
+                                    </RadzenText>
+                                    <RadzenText Text="Я всё сделал, но випки нет, что делать?" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                    <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-mb-8 rz-text-secondary-color">
+                                        Вероятнее всего, у Вас привязан не Ваш телеграм. Отвязать телеграм аккаунт от профиля можно через <a href="/tickets/@AuthProvider.CurrentUser.Id">систему тикетов</a>.
+                                    </RadzenText>
+                                    <RadzenText Text="Я хочу отменить подписку, но забыл данные от Boosty" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                    <RadzenText Text="К сожалению, мы не владеем доступом к управлению сервисом Boosty, поэтому Вам необходимо обращаться к самому Boosty за помощью - мы отменить подписку не можем." TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-mb-8 rz-text-secondary-color" />
+                                    <RadzenText Text="Как подарить VIP другому игроку?" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                    <RadzenText Text="Мы не рассматривали и не будем рассматривать в ближайшем времени такую возможность, поэтому, если сильно хочется, то поступайте на Ваш страх и риск." TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-text-secondary-color" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenRow>
+            </RadzenRow>
+        </Authorized>
+        <NotAuthorized>
+            <kTVCSSBlazor.Client.Components.NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+<script>
+    window.toBoosty = () => {
+        window.open('https://boosty.to/ktvcss_vip', '_blank')
+    }
+</script>
+
+@code {
+    public async Task Click()
+    {
+        DateTime now = DateTime.Now;
+
+        if (string.IsNullOrEmpty(AuthProvider.CurrentUser.TelegramId))
+        {
+            await DialogService.OpenAsync("Не привязан телеграм к проекту", ds =>
+                @<RadzenStack Gap="0rem">
+    <RadzenText>Мы обнаружили, что у Вас не привязан телеграм к нашему проекту.</RadzenText>
+    <RadzenText>Это необходимо для того, чтобы Boosty понимал, что у Вас есть подписка на проект.</RadzenText>
+    <RadzenText>Сейчас мы Вас перенаправим на страницу редактирования профиля.</RadzenText>
+    <RadzenText>Вам необходимо обратить внимание на третье поле (<b>Telegram</b>) на странице.</RadzenText>
+    <RadzenText>Там нужно заполнить Ваш ID телеграма <b style="color:red">(не логин и не телефон)</b>, который можно узнать по кнопке ниже.</RadzenText>
+    <RadzenText>После этого вернитесь на эту страницу и нажмите на кнопку покупки повторно.</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenButton Text="ОК" Click=@(() => { ds.Close(true); Navigate(now); }) />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+    );
+        }
+        else
+        {
+            await js.InvokeVoidAsync("toBoosty");
+        }
+    }
+
+    public async Task Navigate(DateTime clickDateTime)
+    {
+        if (DateTime.Now.Subtract(clickDateTime).TotalSeconds < 5)
+        {
+            await DialogService.OpenAsync("Not so fast", ds =>
+                @<RadzenStack Gap="1.5rem">
+    <RadzenText>Пожалуйста, прочтите всё из предыдущего диалога, чтобы всем было удобно.</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenButton Text="Хорошо, я прочту внимательно" Click=@(() => { ds.Close(true); Click(); }) />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+    );
+        }
+        else
+        {
+            nm.NavigateTo($"/editprofile/{AuthProvider.CurrentUser.Id}");
+        }
+    }
+}

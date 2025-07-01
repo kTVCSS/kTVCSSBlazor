@@ -64,6 +64,7 @@
                                                     </div>
                                                 }
                                             }
+                                            <RadzenProfileMenuItem Path="/vip-features" Text="VIP" Icon="diamond"></RadzenProfileMenuItem>
                                             <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
                                                 <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
                                             </div>
@@ -178,6 +179,24 @@
 <style>
     .rz-dialog-wrapper {
         backdrop-filter: blur(3px) !important;
+    }
+
+    .rz-link-text {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .rz-link {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .rz-fileupload-content {
+        display: none;
     }
 </style>
 
@@ -368,23 +387,3 @@ window.requestNotificationPermission = () => {
         }
     }
 }
-
-<style>
-    .rz-link-text {
-        box-sizing: border-box;
-        color: #e0e4e9 !important;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .rz-link {
-        box-sizing: border-box;
-        color: #e0e4e9 !important;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .rz-fileupload-content {
-        display: none;
-    }
-</style>
