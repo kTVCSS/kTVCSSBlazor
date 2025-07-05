@@ -84,9 +84,9 @@ namespace kTVCSSBlazor.Client.Pages.Matches
                 using var ms = new MemoryStream(bytes);
                 var streamRef = new DotNetStreamReference(stream: ms);
 
-                JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef);
-
                 NotifyService.Notify(NotificationSeverity.Success, "Демо найдено и мы отправили его Вам на скачивание!");
+
+                await JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef);
             }
             catch (Exception ex)
             {
