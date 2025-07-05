@@ -1,13 +1,14 @@
-﻿using kTVCSSBlazor.Db.Models.Matches;
-using Microsoft.AspNetCore.Components.Routing;
+﻿using kTVCSS.Models.Db.Models.Matches;
+using kTVCSSBlazor.Db.Models.Matches;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using Radzen;
-using System.Text.RegularExpressions;
-using System.Text;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using kTVCSS.Models.Db.Models.Matches;
+using static System.Net.WebRequestMethods;
 
 namespace kTVCSSBlazor.Client.Pages.Matches
 {
@@ -72,25 +73,24 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
         private async Task DemoDownload()
         {
-            var filePath = Path.Combine("wwwroot", "demos", match.DemoUrl + ".dem.zip");
-
-            if (File.Exists(filePath))
+            try
             {
                 demoDownloadButtonDisabled = true;
 
                 NotifyService.Notify(summary: "Скачивание демо-записи", detail: "Подождите, мы готовим файл к загрузке...");
 
-                byte[] fileBytes = File.ReadAllBytes(filePath);
+                var bytes = await http.GetByteArrayAsync($"api/matches/getdemo?id={MatchID}");
 
-                using (var outputStream = new MemoryStream(fileBytes))
-                {
-                    using var streamRef = new DotNetStreamReference(stream: outputStream);
+                using var ms = new MemoryStream(bytes);
+                var streamRef = new DotNetStreamReference(stream: ms);
 
-                    await JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef);
-                }
+                JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef);
+
+                NotifyService.Notify(NotificationSeverity.Success, "Демо найдено и мы отправили его Вам на скачивание!");
             }
-            else
+            catch (Exception ex)
             {
+                Console.Error.WriteLine(ex.ToString());
                 NotifyService.Notify(NotificationSeverity.Error, "Ошибка", "Извините, мы не смогли найти демо-запись этого матча 😭");
             }
         }
