@@ -1,0 +1,337 @@
+﻿@page "/tournament-bracket"
+@using Radzen
+@using Radzen.Blazor
+@using kTVCSS.Models.Db.Models.BattleCup
+@using kTVCSS.Models.Db.Models.BattleCup.Enums
+@inject HttpClient http
+
+<RadzenStack Gap="20px">
+    <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H3">Турнирная сетка</RadzenText>
+
+    <div class="tournament-bracket">
+        <div class="stage quarter-finals">
+            <RadzenText TextStyle="TextStyle.H5" class="stage-title">Четверть-финалы</RadzenText>
+
+            @foreach (var match in GetMatchesByStage(MatchStage.QuarterFinal))
+            {
+                <div class="match-container">
+                    <RadzenCard class="match-card">
+                        <div class="match-header">
+                            <RadzenText TextStyle="TextStyle.Caption">@match.StartTime.ToString("dd.MM.yyyy HH:mm")</RadzenText>
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@GetMatchStatusText(match.Status)" />
+                        </div>
+
+                        <div class="teams-container">
+                            <div class="team @(IsWinner(match, match.TeamA) ? "winner" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamA?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamA?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamA?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreA?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+
+                            <div class="team @(IsWinner(match, match.TeamB) ? "winner" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamB?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamB?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamB?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreB?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+                        </div>
+                    </RadzenCard>
+                </div>
+            }
+        </div>
+
+        <div class="stage semi-finals">
+            <RadzenText TextStyle="TextStyle.H5" class="stage-title">Полуфиналы</RadzenText>
+
+            @foreach (var match in GetMatchesByStage(MatchStage.SemiFinal))
+            {
+                <div class="match-container">
+                    <RadzenCard class="match-card">
+                        <div class="match-header">
+                            <RadzenText TextStyle="TextStyle.Caption">@match.StartTime.ToString("dd.MM.yyyy HH:mm")</RadzenText>
+                            <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@GetMatchStatusText(match.Status)" />
+                        </div>
+
+                        <div class="teams-container">
+                            <div class="team @(IsWinner(match, match.TeamA) ? "winner" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamA?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamA?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamA?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreA?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+
+                            <div class="team @(IsWinner(match, match.TeamB) ? "winner" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamB?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamB?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamB?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreB?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+                        </div>
+                    </RadzenCard>
+                </div>
+            }
+        </div>
+
+        <div class="stage final">
+            <RadzenText TextStyle="TextStyle.H5" class="stage-title">Финал</RadzenText>
+
+            @foreach (var match in GetMatchesByStage(MatchStage.Final))
+            {
+                <div class="match-container">
+                    <RadzenCard class="match-card final-match">
+                        <div class="match-header">
+                            <RadzenText TextStyle="TextStyle.Caption">@match.StartTime.ToString("dd.MM.yyyy HH:mm")</RadzenText>
+                            <RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="@GetMatchStatusText(match.Status)" />
+                        </div>
+
+                        <div class="teams-container">
+                            <div class="team @(IsWinner(match, match.TeamA) ? "winner champion" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamA?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamA?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamA?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreA?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+
+                            <div class="team @(IsWinner(match, match.TeamB) ? "winner champion" : "")">
+                                <div class="team-info">
+                                    <RadzenImage Path="@(match.TeamB?.AvatarUrl ?? "/images/default-team.png")"
+                                                 class="team-avatar" AlternateText="@(match.TeamB?.Name ?? "TBD")" />
+                                    <RadzenText TextStyle="TextStyle.Body1">@(match.TeamB?.Name ?? "TBD")</RadzenText>
+                                </div>
+                                <div class="score">
+                                    <RadzenText TextStyle="TextStyle.H6">@(match.ScoreB?.ToString() ?? "-")</RadzenText>
+                                </div>
+                            </div>
+                        </div>
+                    </RadzenCard>
+                </div>
+            }
+        </div>
+    </div>
+</RadzenStack>
+
+<style>
+    .tournament-bracket {
+        display: flex;
+        gap: 40px;
+        overflow-x: auto;
+        min-height: 600px;
+    }
+
+    .stage {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 300px;
+    }
+
+    .stage-title {
+        text-align: center;
+        color: var(--rz-primary);
+    }
+
+    .quarter-finals {
+        justify-content: space-between;
+    }
+
+    .semi-finals {
+        justify-content: center;
+        padding-top: 0px;
+    }
+
+    .final {
+        justify-content: center;
+        padding-top: 0px;
+    }
+
+    .match-container {
+        position: relative;
+    }
+
+    .match-card {
+        min-width: 280px;
+        padding: 10px;
+        border: 2px solid var(--rz-border-color);
+        transition: all 0.3s ease;
+    }
+
+        .match-card:hover {
+            border-color: var(--rz-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    .semi-final-match {
+        border-color: var(--rz-warning);
+        background: linear-gradient(135deg, #0a2333 0%, #222831 100%);
+    }
+
+    .final-match {
+        border-color: var(--rz-warning);
+        background: linear-gradient(135deg, #0a2333 0%, #222831 100%);
+    }
+
+    .match-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .teams-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .team {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+    }
+
+        .team.winner {
+            background-color: var(--rz-success-lighter);
+            border-color: var(--rz-success);
+            font-weight: 600;
+        }
+
+        .team.champion {
+            background: linear-gradient(135deg, #121518 0%, #37330f 100%);
+            border-color: #d4af37;
+        }
+
+    .team-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .team-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--rz-border-color);
+    }
+
+    .score {
+        font-weight: bold;
+        min-width: 24px;
+        text-align: center;
+        align-self: self-end;
+    }
+
+    .vs-divider {
+        text-align: center;
+        color: var(--rz-text-secondary-color);
+        margin: 4px 0;
+    }
+
+    /* Линии соединения между матчами */
+    .quarter-finals .match-container::after,
+    .semi-finals .match-container::after {
+        content: '';
+        position: absolute;
+        right: -20px;
+        top: 50%;
+        width: 20px;
+        height: 2px;
+        background-color: var(--rz-border-color);
+    }
+
+    .quarter-finals .match-container:nth-child(even)::after {
+        right: -40px;
+        width: 40px;
+    }
+
+    .quarter-finals .match-container:nth-child(2)::after,
+    .quarter-finals .match-container:nth-child(3)::after {
+        height: 80px;
+        width: 2px;
+        right: -40px;
+    }
+
+    .quarter-finals .match-container:nth-child(2)::after {
+        top: 50%;
+    }
+
+    .quarter-finals .match-container:nth-child(3)::after {
+        top: -30px;
+    }
+
+    @@media (max-width: 768px) {
+        .tournament-bracket
+
+    {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .stage {
+        min-width: auto;
+    }
+
+    .match-card {
+        min-width: auto;
+    }
+
+    }
+</style>
+
+@code {
+    public Cup Cup { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cup = await http.GetFromJsonAsync<Cup>("/api/battlecup");
+    }
+
+    private List<Match> GetMatchesByStage(MatchStage stage)
+    {
+        return Cup?.Matches?.Where(m => m.Stage == stage).ToList() ?? new List<Match>();
+    }
+
+    private string GetMatchStatusText(MatchStatus status)
+    {
+        return status switch
+        {
+            MatchStatus.Pending => "Ожидание",
+            MatchStatus.InProgress => "В процессе",
+            MatchStatus.Completed => "Завершён",
+            _ => "Неизвестно"
+        };
+    }
+
+    private bool IsWinner(Match match, Team team)
+    {
+        if (match.Status != MatchStatus.Completed || team == null) return false;
+
+        if (match.TeamA?.Id == team.Id && match.ScoreA > match.ScoreB) return true;
+        if (match.TeamB?.Id == team.Id && match.ScoreB > match.ScoreA) return true;
+
+        return false;
+    }
+}

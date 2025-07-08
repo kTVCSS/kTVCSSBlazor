@@ -120,6 +120,10 @@
                     <Authorized>
                         <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")">
                             <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
+                            @if (!string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
+                            {
+                                <RadzenPanelMenuItem Text="Моя команда" Path="@(string.Concat("/team/", AuthProvider.CurrentUser.TeamID))" Icon="groups"></RadzenPanelMenuItem>
+                            }
                             <RadzenPanelMenuItem Text="Мои сообщения" Path="/chat" Icon="mail"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
                             <RadzenPanelMenuItem Text="Мои матчи" Path="@(string.Concat("/mp/", AuthProvider.CurrentUser.Id))" Icon="filter_list"></RadzenPanelMenuItem>
