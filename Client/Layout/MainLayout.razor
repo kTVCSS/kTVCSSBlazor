@@ -91,21 +91,30 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
                         {
                             <RadzenPanelMenuItem Expanded=false Text="Админ" Icon="shield_person">
                                 <RadzenPanelMenuItem Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
-                                <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
-                                    <RadzenPanelMenuItem Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
-                                    <RadzenPanelMenuItem Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
-                                </RadzenPanelMenuItem>
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
+                                {
+                                    <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
+                                        <RadzenPanelMenuItem Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
+                                        <RadzenPanelMenuItem Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
+                                    </RadzenPanelMenuItem>
+                                }
                                 <RadzenPanelMenuItem Expanded=false Text="Общее" Icon="settings">
-                                    <RadzenPanelMenuItem Text="Редактор причин бана" Path="/editbanreasons" Icon="no_accounts"></RadzenPanelMenuItem>
-                                    <RadzenPanelMenuItem Text="Редактор причин репортов" Path="/editreportreasons" Icon="report"></RadzenPanelMenuItem>
-                                    <RadzenPanelMenuItem Text="Редактор миксовых карт" Path="/editmixesmaps" Icon="build"></RadzenPanelMenuItem>
-                                    <RadzenPanelMenuItem Text="Редактор кв карт" Path="/editmappool" Icon="build"></RadzenPanelMenuItem>
-                                    <RadzenPanelMenuItem Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
-                                    @if (AuthProvider.CurrentUser.Username == "kurwanator1337" || AuthProvider.CurrentUser.Username == "phenom" || AuthProvider.CurrentUser.Username == "raxzerax")
+                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
+                                    {
+                                        <RadzenPanelMenuItem Text="Редактор причин бана" Path="/editbanreasons" Icon="no_accounts"></RadzenPanelMenuItem>
+                                        <RadzenPanelMenuItem Text="Редактор причин репортов" Path="/editreportreasons" Icon="report"></RadzenPanelMenuItem>
+                                        <RadzenPanelMenuItem Text="Редактор миксовых карт" Path="/editmixesmaps" Icon="build"></RadzenPanelMenuItem>
+                                        <RadzenPanelMenuItem Text="Редактор кв карт" Path="/editmappool" Icon="build"></RadzenPanelMenuItem>
+                                    }
+                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.MovieMaker)
+                                    {
+                                        <RadzenPanelMenuItem Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
+                                    }
+                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Developer)
                                     {
                                         <RadzenPanelMenuItem Text="Управление миксом #1" Path="/mixconsole" Icon="folder"></RadzenPanelMenuItem>
                                     }

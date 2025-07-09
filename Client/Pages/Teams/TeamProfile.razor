@@ -113,11 +113,11 @@
         <CascadingAuthenticationState>
             <AuthorizeView Context="ctx">
                 <Authorized>
-                    @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
                     {
                         <RadzenCard>
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     if (data.Info.BlockEdit == 0)
                                     {
@@ -140,7 +140,7 @@
                                         <RadzenButton Click="async () => { await LeaveTeam(); }" Icon="exit_to_app" Text="Покинуть команду"></RadzenButton>
                                     }
                                 }
-                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
                                 }
@@ -205,7 +205,7 @@
                 <CascadingAuthenticationState>
                     <AuthorizeView Context="context">
                         <Authorized>
-                            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
                             {
                                 <RadzenDataGridColumn Width="50px" Title="" Context="ctx">
                                     <Template>

@@ -68,7 +68,7 @@
                                     <RadzenStack Gap="8px" Orientation="Orientation.Horizontal">
                                         <RadzenButton Icon="thumb_up" Text="@post.LikesCount.ToString()" Click="() => LikePost(post)" />
                                         <RadzenButton Icon="thumb_down" Text="@post.DislikesCount.ToString()" Click="() => DislikePost(post)" />
-                                        @if (AuthProvider.CurrentUser.IsAdmin || post.AuthorId == AuthProvider.CurrentUser.Id)
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || post.AuthorId == AuthProvider.CurrentUser.Id)
                                         {
                                             <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="Удалить"></RadzenButton>
                                         }
@@ -271,7 +271,7 @@
                 post.IsVip = true;
             }
 
-            if (AuthProvider.CurrentUser.IsAdmin)
+            if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
             {
                 post.IsVip = false;
                 post.IsAdmin = true;
@@ -337,7 +337,7 @@
                 com.IsVip = true;
             }
 
-            if (AuthProvider.CurrentUser.IsAdmin)
+            if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
             {
                 com.IsVip = false;
                 com.IsAdmin = true;

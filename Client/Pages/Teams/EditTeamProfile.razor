@@ -15,7 +15,7 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.SteamId == team.Info.CapSteamID)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.SteamId == team.Info.CapSteamID)
                 {
                     <RadzenStack JustifyContent="JustifyContent.Center">
                         <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование команды" />
@@ -30,7 +30,7 @@
                         InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
                         <RadzenButton Click="SetDefaultAvatar" Text="Сбросить аватар команды" />
 
-                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                         {
                             <RadzenStack JustifyContent="JustifyContent.Center">
                                 <RadzenLabel Text="Достижения команды" />

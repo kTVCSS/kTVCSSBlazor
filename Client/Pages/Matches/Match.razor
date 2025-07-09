@@ -75,7 +75,7 @@
                             <CascadingAuthenticationState>
                                 <AuthorizeView>
                                     <Authorized>
-                                        @if (AuthProvider.CurrentUser.IsAdmin)
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Developer)
                                         {
                                             <RadzenButton MouseEnter="@(args => ShowTooltip(args, "Остановить матч"))" Click="@(() => { })" Style="font-size: 0.8em;" Icon="cancel"></RadzenButton>
                                         }

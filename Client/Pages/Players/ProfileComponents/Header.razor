@@ -4,9 +4,9 @@
 <RadzenStack>
     <RadzenStack JustifyContent=JustifyContent.SpaceBetween AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
         <RadzenText Text=@(string.Concat("#", player.MainInfo.Position)) />
-        @if (player.IsAdmin)
+        @if (player.RoleType > kTVCSS.Models.Db.Models.Roles.RoleType.None)
         {
-            <RadzenText TextAlign=TextAlign.End Text="Администратор" />
+            <RadzenText TextAlign=TextAlign.End Text="@player.RoleType.ToString()" />
         }
         else if (player.Vip)
         {

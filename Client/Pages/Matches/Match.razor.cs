@@ -468,7 +468,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
                 if (AuthProvider.CurrentUser is not null)
                 {
-                    if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip)
+                    if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip)
                     {
                         ParseMatchLogAsTicks(isMobile);
                     }
@@ -556,7 +556,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
                     if (AuthProvider.CurrentUser is not null)
                     {
-                        if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip)
+                        if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip)
                         {
                             ParseMatchLogAsTicks(isMobile);
                         }

@@ -14,7 +14,7 @@
 @inject NotificationService ns
 @inject DialogService DialogService
 
-@if (AuthProvider.CurrentUser.Id == player.MainInfo.Id || AuthProvider.CurrentUser.IsAdmin)
+@if (AuthProvider.CurrentUser.Id == player.MainInfo.Id || AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
 {
     <RadzenButton Click=OpenEditProfile Icon="edit" Text="Редактировать профиль"></RadzenButton>
 }
@@ -80,7 +80,7 @@
     }
 }
 
-@if (!AuthProvider.CurrentUser.IsAdmin)
+@if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.MovieMaker))
 {
     @if (player.Vip)
     {

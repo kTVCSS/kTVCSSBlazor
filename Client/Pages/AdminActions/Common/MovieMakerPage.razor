@@ -23,7 +23,7 @@
         <Authorized>
             @if (ready)
             {
-                if (AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip || AuthProvider.CurrentUser.IsAdmin)
+                if (AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip || AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.MovieMaker)
                 {
                     <RadzenStack>
                         <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4">Мувимейкинг-центр</RadzenText>

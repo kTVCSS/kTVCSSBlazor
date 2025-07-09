@@ -22,7 +22,7 @@
                 {
                     @if (AuthProvider.CurrentUser is not null)
                     {
-                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
                         {
                             <RadzenStack>
                                 @if (_tickets.Any())

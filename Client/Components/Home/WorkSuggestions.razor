@@ -23,7 +23,7 @@
                         <CascadingAuthenticationState>
                             <AuthorizeView>
                                 <Authorized Context="ctx">
-                                    @if (AuthProvider.CurrentUser.IsAdmin)
+                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                     {
                                         <RadzenButton Click=@(async () => { await DeleteWorkEntry(work); }) Style="width: 250px" Text="Удалить" />
                                     }

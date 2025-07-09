@@ -13,7 +13,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            @if (AuthProvider.CurrentUser.IsAdmin)
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Info" Text="Для редактирования имеющейся карты нужно удалить ее, а потом добавить заного с новым именем" />
 

@@ -13,7 +13,7 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.IsAdmin)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                 {
                     <RadzenStack>
                         <RadzenText TextStyle="TextStyle.DisplayH4" Text="Создание новости" />

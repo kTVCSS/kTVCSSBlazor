@@ -22,7 +22,7 @@
                     <CascadingAuthenticationState>
                         <AuthorizeView>
                             <Authorized>
-                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
                                         <RadzenButton Click="OpenEdit" Size="ButtonSize.Small" Variant="Variant.Text" Text="Редактировать" />

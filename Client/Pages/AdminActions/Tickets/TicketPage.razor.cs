@@ -44,7 +44,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
                 Ticket = _ticket,
                 MessageText = text,
                 CreatedAt = DateTime.Now,
-                SenderType = AuthProvider.CurrentUser.IsAdmin ? SenderType.Admin : SenderType.Player,
+                SenderType = AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator ? SenderType.Admin : SenderType.Player,
                 UserName = AuthProvider.CurrentUser.Username
             };
 

@@ -43,7 +43,7 @@
         <CascadingAuthenticationState>
             <AuthorizeView>
                 <Authorized>
-                    @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == video.AuthorId)
+                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.Id == video.AuthorId)
                     {
                         <RadzenStack JustifyContent=JustifyContent.End Gap="4px" Orientation="Orientation.Horizontal">
                             <RadzenButton Icon="edit" Text="Изменить" Variant="Variant.Text" Click="@(() => { NavigationManager.NavigateTo($"/editvideo/{Id}"); })" />

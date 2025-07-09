@@ -11,7 +11,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            @if (AuthProvider.CurrentUser.IsAdmin)
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
             {
                 <RadzenCard>
                     <RadzenStack JustifyContent="JustifyContent.Center">

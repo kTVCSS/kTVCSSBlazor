@@ -20,7 +20,7 @@
         <Authorized>
             @if (ready)
             {
-                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _ticket.PlayerId)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || AuthProvider.CurrentUser.Id == _ticket.PlayerId)
                 {
                     <RadzenStack Gap="8px">
                         <RadzenButton Style="width:150px" Variant="Variant.Text" Icon="arrow_back" Text="Назад" Click="@(() => { JSRuntime.InvokeVoidAsync("history.back()"); })" />
@@ -66,7 +66,7 @@
                                                 <div class="content">
                                                     @if (msg.SenderType == kTVCSS.Models.Db.Models.Tickets.SenderType.Admin)
                                                     {
-                                                        @if (AuthProvider.CurrentUser.IsAdmin)
+                                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
                                                         {
                                                             <div>@msg.UserName</div>
                                                         }
@@ -101,7 +101,7 @@
                                         <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="width: 70%;flex:1; min-height:50px;" />
                                         <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Text="Отправить" Style="width: 175px;height: 10px;margin-left:10px;" Click="@SendMessage" />
                                     </RadzenStack>
-                                    @if (!AuthProvider.CurrentUser.IsAdmin)
+                                    @if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator))
                                     {
                                         <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Если у Вас больше нет вопросов, то Вы можете закрыть обращение" Click="Close" />
                                     }

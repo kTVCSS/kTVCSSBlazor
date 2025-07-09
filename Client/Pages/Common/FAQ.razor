@@ -16,7 +16,7 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.IsAdmin)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                 {
                     <RadzenButton Click=OpenAdd Variant="Variant.Text" Text="Добавить" />
                 }
@@ -38,7 +38,7 @@
                             <CascadingAuthenticationState>
                                 <AuthorizeView>
                                     <Authorized>
-                                        @if (AuthProvider.CurrentUser.IsAdmin)
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                         {
                                             <RadzenButton Click=@(() => { Delete(item); }) Variant="Variant.Text" Text="Удалить" />
                                         }

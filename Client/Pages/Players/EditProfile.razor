@@ -15,12 +15,12 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == Id)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.Id == Id)
                 {
                     <RadzenStack JustifyContent="JustifyContent.Center">
                         <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование профиля" />
 
-                        @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.IsVip)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.IsVip)
                         {
                             <RadzenFormField Text="Ник" Style="width: 100%;">
                                 <RadzenTextBox @bind-Value="@profile.Login" />
@@ -39,7 +39,7 @@
 
                         @if (profile.Telegram.HasValue)
                         {
-                            @if (AuthProvider.CurrentUser.IsAdmin && profile.Telegram.Value > 0)
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin && profile.Telegram.Value > 0)
                             {
                                 <RadzenFormField Text="Telegram" Style="width: 100%;">
                                     <ChildContent>
@@ -84,7 +84,7 @@
                             </RadzenColumn>
                         </RadzenRow>
 
-                        @if (AuthProvider.CurrentUser.IsAdmin)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                         {
                             <RadzenStack JustifyContent="JustifyContent.Center">
                                 <RadzenLabel Text="Достижения игрока" />

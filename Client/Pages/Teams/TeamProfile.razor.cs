@@ -43,7 +43,7 @@ namespace kTVCSSBlazor.Client.Pages.Teams
         {
             if (data.Info.BlockEdit == 1)
             {
-                if (!AuthProvider.CurrentUser.IsAdmin)
+                if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin))
                 {
                     ShowError("Редактирование команды в данный момент запрещено");
 

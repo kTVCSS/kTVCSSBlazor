@@ -20,7 +20,7 @@
                 <CascadingAuthenticationState>
                     <AuthorizeView>
                         <Authorized>
-                            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == config.AuthorId)
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.Id == config.AuthorId)
                             {
                                 <RadzenButton Variant=Variant.Text Text="Редактировать" Icon="edit" Click="@(() => { NavigationManager.NavigateTo("/editconfig/" + Id); })" />
                                 <RadzenButton Variant=Variant.Text Text="Удалить" Icon="remove_circle" Click="() => Remove()" />

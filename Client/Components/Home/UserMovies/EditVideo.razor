@@ -13,7 +13,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            @if (AuthProvider.CurrentUser.IsAdmin || AuthProvider.CurrentUser.Id == _video.AuthorId)
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.Id == _video.AuthorId)
             {
                 <RadzenStack>
                     <RadzenStack>

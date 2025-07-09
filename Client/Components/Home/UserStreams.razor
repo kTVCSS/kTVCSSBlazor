@@ -9,7 +9,7 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.IsAdmin)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                 {
                     <RadzenButton Variant="Variant.Text" Click="OpenStreamAddition" Text="Добавить новый стрим" />
                 }
@@ -33,7 +33,7 @@
                     <CascadingAuthenticationState>
                         <AuthorizeView>
                             <Authorized>
-                                @if (AuthProvider.CurrentUser.IsAdmin)
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     <RadzenButton Variant="Variant.Text" Click="@(() => { RemoveStream(stream.Id); })" Text="Удалить" />
                                 }
