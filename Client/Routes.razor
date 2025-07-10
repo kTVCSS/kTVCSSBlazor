@@ -28,11 +28,50 @@ else
                 <RadzenText Text="Backend не работает" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
                 <RadzenText Text="Извините, в данный момент служба ktvcss-backend не доступна, поэтому сайт не может получить какие-либо данные." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
                 <RadzenText Text="Администрация уже в курсе этой проблемы и занимается ее решением." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenText Text="Пока мы чиним сайт, можете потренировать Ваш аим, лопая шарики!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
+                    <div id="score">Очки: 0</div>
+                    <div id="game-area"></div>
+                    <script src="game.js"></script>
+                </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
     </LayoutView>
 }
 
+<style>
+    #score {
+        color: #fff;
+        font-size: 2em;
+        margin: 6px 0;
+        font-family: Arial, sans-serif;
+        z-index: 2;
+    }
+
+    #game-area {
+        position: relative;
+        width: 1280px;
+        height: 540px;
+        background: #1f2226;
+        border: 1px solid #555555;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .ball {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ff4fad 0%, #a6006e 100%);
+        box-shadow: 0 4px 20px #ff69ca65;
+        cursor: pointer;
+        transition: box-shadow 0.1s;
+    }
+
+        .ball:hover {
+            box-shadow: 0 0 40px #fff0;
+            filter: brightness(1.2);
+        }
+</style>
 
 @code {
     private bool isApiWorking = true;
