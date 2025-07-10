@@ -1,5 +1,49 @@
 ﻿@page "/contacts"
+@using kTVCSS.Models.Db.Models.Roles
+@using kTVCSSBlazor.Client.Components
+@inject HttpClient http
 
 <PageTitle>kTVCSS @@ Контакты</PageTitle>
 
 <RadzenText TextStyle="TextStyle.DisplayH3" TextAlign="TextAlign.Center" Text="Контакты" />
+
+@if (admins.Any())
+{
+    <RadzenStack Gap="2px">
+        @foreach (var group in admins)
+        {
+            <RadzenText TextStyle="TextStyle.DisplayH4" Text="@group.Key" />
+
+            <RadzenStack Gap="0px">
+                @foreach (var admin in group)
+                {
+                    <RadzenText><RadzenLink Target="_blank" Path="@admin.Link">@admin.Name</RadzenLink> - @admin.Description</RadzenText>
+                }
+            </RadzenStack>
+        }
+    </RadzenStack>
+}
+else
+{
+    <RadzenRow JustifyContent="JustifyContent.Center">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет списка контактов" />
+        </RadzenStack>
+    </RadzenRow>
+}
+
+@code {
+    List<IGrouping<string, Role>> admins = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Task.Run(async () =>
+        {
+            var items = await http.GetFromJsonAsync<List<Role>>("/api/admins/getadmins");
+
+            admins = items.OrderBy(x => x.Type).GroupBy(x => x.GroupName).ToList();
+
+            await InvokeAsync(StateHasChanged);
+        });
+    }
+}

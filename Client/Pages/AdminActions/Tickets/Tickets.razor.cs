@@ -64,23 +64,40 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             {
                 Task.Run(async () =>
                 {
+                    int retries = 0;
+                    int max = 50;
+
+                    while (AuthProvider.CurrentUser is null)
+                    {
+                        if (disposed)
+                        {
+                            return;
+                        }
+
+                        if (retries > max)
+                        {
+                            ready = true;
+
+                            await InvokeAsync(StateHasChanged);
+
+                            return;
+                        }
+
+                        retries += 1;
+
+                        await Task.Delay(100);
+                    }
+
                     if (!Id.HasValue)
                     {
-                        _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
-                        _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
+                        if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                        {
+                            _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
+                            _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
+                        }
                     }
                     else
                     {
-                        while (AuthProvider.CurrentUser is null)
-                        {
-                            if (disposed)
-                            {
-                                return;
-                            }
-
-                            await Task.Delay(100);
-                        }
-
                         _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/players/gettickets?id=" + AuthProvider.CurrentUser.Id);
                         _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/players/getticketsclosed?id=" + AuthProvider.CurrentUser.Id);
                     }
