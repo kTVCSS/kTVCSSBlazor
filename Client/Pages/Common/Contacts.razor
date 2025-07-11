@@ -15,10 +15,12 @@
             <RadzenText TextStyle="TextStyle.DisplayH4" Text="@group.Key" />
 
             <RadzenStack Gap="0px">
-                @foreach (var admin in group)
-                {
-                    <RadzenText><RadzenLink Target="_blank" Path="@admin.Link">@admin.Name</RadzenLink> - @admin.Description</RadzenText>
-                }
+                <ul>
+                    @foreach (var admin in group)
+                    {
+                        <li><RadzenText><RadzenLink Target="_blank" Path="@admin.Link">@admin.Name</RadzenLink> - @admin.Description</RadzenText></li>
+                    }
+                </ul>
             </RadzenStack>
         }
     </RadzenStack>
