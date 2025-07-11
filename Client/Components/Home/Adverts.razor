@@ -9,12 +9,3 @@
         </RadzenLink>
     }
 </RadzenStack>
-
-@code {
-    private List<Advert> adverts = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        adverts = await http.GetFromJsonAsync<List<Advert>>($"api/guest/adverts");
-    }
-}

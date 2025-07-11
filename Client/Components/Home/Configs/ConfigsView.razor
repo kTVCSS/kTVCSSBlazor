@@ -46,20 +46,3 @@ else
         </RadzenStack>
     </RadzenRow>
 }
-
-@code {
-    List<GameConfig> _configs = [];
-    bool ready = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        Task.Run(async () =>
-        {
-            _configs = await http.GetFromJsonAsync<List<GameConfig>>("/api/gameconfigs");
-
-            ready = true;
-
-            await InvokeAsync(StateHasChanged);
-        });
-    }
-}

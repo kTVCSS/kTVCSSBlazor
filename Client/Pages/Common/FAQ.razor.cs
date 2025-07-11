@@ -11,6 +11,30 @@ namespace kTVCSSBlazor.Client.Pages.Common
         private List<FaqItem> items;
         private bool ready = false;
 
+        private async Task Delete(FaqItem item)
+        {
+            await http.DeleteAsync("/api/faq/" + item.Id);
+
+            items = await http.GetFromJsonAsync<List<FaqItem>>("/api/faq");
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task Add(string question, string answer)
+        {
+            var faq = new FaqItem()
+            {
+                Question = question,
+                Answer = answer
+            };
+
+            await http.PostAsJsonAsync("/api/faq", faq);
+
+            await OnInitializedAsync();
+
+            await InvokeAsync(StateHasChanged);
+        }
+
         protected override async Task OnInitializedAsync()
         {
             Task.Run(async () =>

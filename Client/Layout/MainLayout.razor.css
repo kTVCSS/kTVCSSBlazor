@@ -1,0 +1,21 @@
+﻿.rz-dialog-wrapper {
+    backdrop-filter: blur(3px) !important;
+}
+
+.rz-link-text {
+    box-sizing: border-box;
+    color: #e0e4e9 !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.rz-link {
+    box-sizing: border-box;
+    color: #e0e4e9 !important;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.rz-fileupload-content {
+    display: none;
+}

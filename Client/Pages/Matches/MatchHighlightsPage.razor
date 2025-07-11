@@ -57,24 +57,3 @@
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
-
-@code {
-    [Parameter]
-    public int MatchID { get; set; }
-
-    List<Result> data = [];
-
-    bool ready = false;
-
-    protected override async Task OnInitializedAsync()
-    {
-        Task.Run(async () =>
-        {
-            data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/GetByMatch?id={MatchID}");
-
-            ready = true;
-
-            await InvokeAsync(StateHasChanged);
-        });
-    }
-}

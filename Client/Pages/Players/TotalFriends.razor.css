@@ -1,0 +1,8 @@
+﻿.rz-custom-header {
+    width: 100% !important;
+}
+
+a {
+    color: var(--rz-text-color) !important;
+    text-decoration: initial !important;
+}

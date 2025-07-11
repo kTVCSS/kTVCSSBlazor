@@ -1,0 +1,21 @@
+﻿.rz-dialog-content {
+    height: 100%
+}
+
+.my-popup {
+    display: none;
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    max-height: calc(100% - 120px) !important;
+    max-width: calc(100% - 120px) !important;
+    border: var(--rz-panel-border);
+    background-color: var(--rz-panel-background-color);
+    box-shadow: var(--rz-panel-shadow);
+    border-radius: var(--rz-border-radius);
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
