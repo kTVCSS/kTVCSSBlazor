@@ -127,16 +127,24 @@
             <CascadingAuthenticationState>
                 <AuthorizeView>
                     <Authorized>
-                        <RadzenPanelMenuItem Expanded=false Text="@AuthProvider.CurrentUser.Username" Image="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")">
-                            <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
-                            @if (!string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
-                            {
-                                <RadzenPanelMenuItem Text="Моя команда" Path="@(string.Concat("/team/", AuthProvider.CurrentUser.TeamID))" Icon="groups"></RadzenPanelMenuItem>
-                            }
-                            <RadzenPanelMenuItem Text="Мои сообщения" Path="/chat" Icon="mail"></RadzenPanelMenuItem>
-                            <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
-                            <RadzenPanelMenuItem Text="Мои матчи" Path="@(string.Concat("/mp/", AuthProvider.CurrentUser.Id))" Icon="filter_list"></RadzenPanelMenuItem>
-                            <RadzenPanelMenuItem Text="Мои обращения" Path="@(string.Concat("/tickets/", AuthProvider.CurrentUser.Id))" Icon="support_agent"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Expanded=false>
+                            <ChildContent>
+                                <RadzenPanelMenuItem Text="Мой профиль" Path="@(string.Concat("/player/", AuthProvider.CurrentUser.Id))" Icon="account_circle"></RadzenPanelMenuItem>
+                                @if (!string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
+                                {
+                                    <RadzenPanelMenuItem Text="Моя команда" Path="@(string.Concat("/team/", AuthProvider.CurrentUser.TeamID))" Icon="groups"></RadzenPanelMenuItem>
+                                }
+                                <RadzenPanelMenuItem Text="Мои сообщения" Path="/chat" Icon="mail"></RadzenPanelMenuItem>
+                                <RadzenPanelMenuItem Text="Мои друзья" Path="/friends" Icon="group"></RadzenPanelMenuItem>
+                                <RadzenPanelMenuItem Text="Мои матчи" Path="@(string.Concat("/mp/", AuthProvider.CurrentUser.Id))" Icon="filter_list"></RadzenPanelMenuItem>
+                                <RadzenPanelMenuItem Text="Мои обращения" Path="@(string.Concat("/tickets/", AuthProvider.CurrentUser.Id))" Icon="support_agent"></RadzenPanelMenuItem>
+                            </ChildContent>
+                            <Template>
+                                <RadzenStack Gap="2px" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                    <img class="ktvcss-avatar-small" src="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")" />
+                                    <div class="rz-navigation-item-text">@AuthProvider.CurrentUser.Username</div>
+                                </RadzenStack>
+                            </Template>
                         </RadzenPanelMenuItem>
                     </Authorized>
                 </AuthorizeView>
@@ -194,6 +202,14 @@
 *@
 
 <style>
+    .ktvcss-avatar-small {
+        border-radius: 50%;
+        width: 28px;
+        height: 28px;
+        border: 1px solid #121518;
+    }
+
+
     .rz-dialog-wrapper {
         backdrop-filter: blur(3px) !important;
     }
