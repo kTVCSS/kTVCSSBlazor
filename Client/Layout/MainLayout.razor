@@ -140,7 +140,7 @@
                                 <RadzenPanelMenuItem Text="Мои обращения" Path="@(string.Concat("/tickets/", AuthProvider.CurrentUser.Id))" Icon="support_agent"></RadzenPanelMenuItem>
                             </ChildContent>
                             <Template>
-                                <RadzenStack Gap="2px" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                <RadzenStack Gap="12px" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                     <img class="ktvcss-avatar-small" src="@(AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png")" />
                                     <div class="rz-navigation-item-text">@AuthProvider.CurrentUser.Username</div>
                                 </RadzenStack>
