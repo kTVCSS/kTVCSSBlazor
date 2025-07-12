@@ -188,6 +188,35 @@
 	</RadzenFooter> *@
 </RadzenLayout>
 
+@*
+    определение стилей здесь из-за ограничений архитектуры Blazor из-за недоступности 
+    переопределения Scoped CSS файлов для дочерних элементов DOM дерева и рендера элементов вне Blazor
+*@
+
+<style>
+    .rz-dialog-wrapper {
+        backdrop-filter: blur(3px) !important;
+    }
+
+    .rz-link-text {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .rz-link {
+        box-sizing: border-box;
+        color: #e0e4e9 !important;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .rz-fileupload-content {
+        display: none;
+    }
+</style>
+
 @code {
     bool sidebarExpanded = true;
     private bool disposed = false;
@@ -195,6 +224,13 @@
     public void Dispose()
     {
         disposed = true;
+    }
+
+    protected override bool ShouldRender()
+    {
+        Console.WriteLine($"ShouldRender returns {base.ShouldRender()}");
+
+        return base.ShouldRender();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

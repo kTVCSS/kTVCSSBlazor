@@ -71,3 +71,14 @@ else
         </RadzenStack>
     </RadzenRow>
 }
+
+@*
+    определение стилей здесь из-за ограничений архитектуры Blazor из-за недоступности 
+    переопределения Scoped CSS файлов для дочерних элементов DOM дерева и рендера элементов вне Blazor
+*@
+
+<style>
+    .rz-custom-header {
+        width: 100% !important;
+    }
+</style>
