@@ -1,5 +1,6 @@
 ﻿using kTVCSS.Models.Db.Models.Common;
 using Microsoft.AspNetCore.Components.Routing;
+using Radzen;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Components
@@ -10,6 +11,7 @@ namespace kTVCSSBlazor.Client.Components
         private int unreadCount;
         private List<Notification> notifications;
         private bool _disposed = false;
+        private bool firstLoad = true;
 
         public void Dispose()
         {
@@ -39,7 +41,30 @@ namespace kTVCSSBlazor.Client.Components
                 {
                     await LoadNotifications();
 
-                    await Task.Delay(60000);
+                    if (firstLoad)
+                    {
+                        firstLoad = false;
+                        if (unreadCount > 0)
+                        {
+                            string notifyText = "";
+
+                            if (unreadCount == 1)
+                            {
+                                notifyText = "У Вас 1 не прочитанное уведомление.";
+                            }
+                            else
+                            {
+                                notifyText = $"У Вас {unreadCount} не прочитанных уведомлений.";
+                            }
+
+                            NotifyService.Notify(NotificationSeverity.Info, "Уведомления", $"{notifyText} Нажмите на колокольчик сверху, чтобы посмотреть их!", duration: 5000, click: (NotificationMessage) =>
+                            {
+                                ToggleDrawer();
+                            }, closeOnClick: true);
+                        }
+                    }
+
+                    await Task.Delay(TimeSpan.FromMinutes(10));
                 }
             });
 

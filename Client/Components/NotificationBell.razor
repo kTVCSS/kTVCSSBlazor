@@ -4,43 +4,41 @@
 @inject NavigationManager nm
 @inject StateProvider AuthProvider
 @implements IDisposable
+@inject NotificationService NotifyService
 
 <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
 
-@if (drawerVisible)
-{
-    <div class="drawer-overlay" @onclick="ToggleDrawer"></div>
+<div class="drawer-overlay" style="@(drawerVisible ? "display:block" : "display:none")" @onclick="ToggleDrawer"></div>
 
-    <div class="notification-drawer">
-        <div class="notification-header">
-            <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-                <RadzenButton IconColor="white" Variant=Variant.Text Icon="arrow_back" Click="ToggleDrawer" />
-                Уведомления (@unreadCount)
-                <RadzenButton Style="color: white" Variant="Variant.Text" Text="Скрыть все" Icon="close" Click="CloseAll" />
-            </RadzenStack>
-        </div>
-
-        @if (notifications == null)
-        {
-            <div style="padding:16px;">Загрузка...</div>
-        }
-        else if (!notifications.Any())
-        {
-            <div style="padding:16px;">Новых уведомлений нет.</div>
-        }
-        else
-        {
-            @foreach (var n in notifications)
-            {
-                <div class="notification-item @(n.IsRead ? "" : "unread")"
-                     @onclick="@(() => OnNotificationClick(n))">
-                    <div><strong>@n.Title</strong></div>
-                    <div style="font-size:0.9em; color:#8b8b8b;overflow-wrap: anywhere;">@n.Message</div>
-                    <div style="font-size:0.8em; color:#999; margin-top:4px;">
-                        @n.CreatedAt.ToLocalTime().ToString("g")
-                    </div>
-                </div>
-            }
-        }
+<div class="notification-drawer @(drawerVisible ? "open" : "")">
+    <div class="notification-header">
+        <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton IconColor="white" Variant=Variant.Text Icon="arrow_back" Click="ToggleDrawer" />
+            Уведомления (@unreadCount)
+            <RadzenButton Style="color: white" Variant="Variant.Text" Text="Скрыть все" Icon="close" Click="CloseAll" />
+        </RadzenStack>
     </div>
-}
+
+    @if (notifications == null)
+    {
+        <div style="padding:16px;">Загрузка...</div>
+    }
+    else if (!notifications.Any())
+    {
+        <div style="padding:16px;">Новых уведомлений нет.</div>
+    }
+    else
+    {
+        @foreach (var n in notifications)
+        {
+            <div class="notification-item @(n.IsRead ? "" : "unread")"
+                 @onclick="@(() => OnNotificationClick(n))">
+                <div><strong>@n.Title</strong></div>
+                <div style="font-size:0.9em; color:#8b8b8b;overflow-wrap: anywhere;">@n.Message</div>
+                <div style="font-size:0.8em; color:#999; margin-top:4px;">
+                    @n.CreatedAt.ToLocalTime().ToString("g")
+                </div>
+            </div>
+        }
+    }
+</div>
