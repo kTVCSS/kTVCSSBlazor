@@ -1,0 +1,134 @@
+﻿@page "/battlecups"
+@using Radzen
+@using Radzen.Blazor
+@using kTVCSS.Models.Db.Models.BattleCup
+@using kTVCSS.Models.Db.Models.BattleCup.Enums
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@inject HttpClient http
+@inject StateProvider AuthProvider
+@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<PageTitle>kTVCSS @@ Боевые кубки</PageTitle>
+
+<RadzenStack>
+    <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевые кубки</RadzenText>
+
+    <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Left TagName="TagName.H6">Боевые кубки - это ежедневные турниры на 8 команд, проходящие в рамках одного дня. Турнир начинается со стадии четверть-финалов в 20:00 в формате bo1 и заканчивается финалом в 22:00. Команде-победительнице вручается VIP доступ к возможностям проекта на 7 суток. Регистрация начинается ежедневно в 12:00 и заканчивается в 18:00. Присоединяйтесь к команде или создавайте свою, чтобы принять участие в серии данных турниров!</RadzenText>
+
+    @if (ready)
+    {
+        @if (DateTime.Now.Date == cup.Date.Date)
+        {
+            if (cup.Status == CupStatus.OpenForRegistration)
+            {
+                <RadzenStack Gap="0px">
+                    <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Регистрация на Боевой кубок #@cup.Id</RadzenText>
+                    <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Center TagName="TagName.H6">До окончания регистрации: @formattedTime</RadzenText>
+                </RadzenStack>
+                @if (cup.Teams.Any())
+                {
+                    <RadzenStack JustifyContent=JustifyContent.Center Gap="4px">
+                        <RadzenText TextStyle="TextStyle.H5" TextAlign=TextAlign.Center TagName="TagName.H5">Команды, участвующие в турнире:</RadzenText>
+                        @foreach (var team in cup.Teams)
+                        {
+                            <RadzenStack Gap="16px" Style="width: 200px;margin:auto" JustifyContent=JustifyContent.SpaceBetween Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <img style="width: 32px; height: 32px; border-radius: 50%" src="@(team.AvatarUrl ?? "/images/logo_ktv.png")" />
+                                <RadzenText TextAlign=TextAlign.Left Style="margin-block: 0 !important;width: 100%;"><RadzenLink Path="@(string.Concat("/team/", team.Id))">@team.Name</RadzenLink></RadzenText>
+                            </RadzenStack>
+                        }
+                    </RadzenStack>
+                }
+                else
+                {
+                    <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Center TagName="TagName.H6">Пока никто не зарегистрировался. Будьте первыми!</RadzenText>
+                }
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (cup.Teams.Count < 8)
+                            {
+                                @if (!string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
+                                {
+                                    if (AuthProvider.CurrentUser.IsCaptain)
+                                    {
+                                        if (cup.Teams.Any(x => x.Id == Convert.ToInt32(AuthProvider.CurrentUser.TeamID)))
+                                        {
+                                            <RadzenButton Click=RemoveEntry Style="width: 250px; margin:auto" Text="Убрать заявку" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenButton Click=Participate Style="width: 250px; margin:auto" Text="Зарегистрировать команду" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (cup.Teams.Any(x => x.Id == Convert.ToInt32(AuthProvider.CurrentUser.TeamID)))
+                                        {
+                                            <RadzenText TextAlign=TextAlign.Center>Вы участвуете в турнире!</RadzenText>
+                                        }
+                                        else
+                                        {
+                                            <RadzenText TextAlign=TextAlign.Center>Только капитан может зарегистрировать команду в турнире!</RadzenText>
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    <RadzenText TextAlign=TextAlign.Center>У Вас нет команды - Вы не можете зарегистрироваться!</RadzenText>
+                                }
+                            }
+                            else
+                            {
+                                <RadzenText TextAlign=TextAlign.Center>Для участия в турнире набралось достаточное количество команд - ждем окончания регистрации в 18:00!</RadzenText>
+
+                                @if (!string.IsNullOrEmpty(AuthProvider.CurrentUser.TeamName))
+                                {
+                                    if (AuthProvider.CurrentUser.IsCaptain)
+                                    {
+                                        if (cup.Teams.Any(x => x.Id == Convert.ToInt32(AuthProvider.CurrentUser.TeamID)))
+                                        {
+                                            <RadzenButton Click=RemoveEntry Style="width: 250px; margin:auto" Text="Убрать заявку" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenButton Click=Participate Style="width: 250px; margin:auto" Text="Зарегистрировать команду" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (cup.Teams.Any(x => x.Id == Convert.ToInt32(AuthProvider.CurrentUser.TeamID)))
+                                        {
+                                            <RadzenText TextAlign=TextAlign.Center>Вы участвуете в турнире!</RadzenText>
+                                        }
+                                        else
+                                        {
+                                            <RadzenText TextAlign=TextAlign.Center>Только капитан может зарегистрировать команду в турнире!</RadzenText>
+                                        }
+                                    }
+                                }
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+            }
+            else if (cup.Status > CupStatus.OpenForRegistration && cup.Status <= CupStatus.Canceled)
+            {
+
+            }
+        }
+        else
+        {
+            <RadzenText TextStyle="TextStyle.H4" TextAlign=TextAlign.Center TagName="TagName.H4">На данный момент нет активных боевых кубков. Регистрация начнется в 12:00!</RadzenText>
+        }
+    }
+    else
+    {
+        <RadzenRow JustifyContent="JustifyContent.Center">
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка страницы боевых кубков" />
+            </RadzenStack>
+        </RadzenRow>
+    }
+</RadzenStack>
