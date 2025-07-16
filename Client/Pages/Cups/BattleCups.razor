@@ -13,16 +13,16 @@
 <PageTitle>kTVCSS @@ Боевые кубки</PageTitle>
 
 <RadzenStack>
-    <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевые кубки</RadzenText>
-
-    <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Left TagName="TagName.H6">Боевые кубки - это ежедневные турниры на 8 команд, проходящие в рамках одного дня. Турнир начинается со стадии четверть-финалов в 20:00 в формате bo1 и заканчивается финалом в 22:00. Команде-победительнице вручается VIP доступ к возможностям проекта на 7 суток. Регистрация начинается ежедневно в 12:00 и заканчивается в 18:00. Присоединяйтесь к команде или создавайте свою, чтобы принять участие в серии данных турниров!</RadzenText>
-
     @if (ready)
     {
         @if (DateTime.Now.Date == cup.Date.Date)
         {
             if (cup.Status == CupStatus.OpenForRegistration)
             {
+                <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевые кубки</RadzenText>
+
+                <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Left TagName="TagName.H6">Боевые кубки - это ежедневные турниры на 8 команд, проходящие в рамках одного дня. Турнир начинается со стадии четверть-финалов в 20:00 в формате bo1 и заканчивается финалом в 22:00. Команде-победительнице вручается VIP доступ к возможностям проекта на 7 суток. Регистрация начинается ежедневно в 12:00 и заканчивается в 18:00. Присоединяйтесь к команде или создавайте свою, чтобы принять участие в серии данных турниров!</RadzenText>
+
                 <RadzenStack Gap="0px">
                     <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Регистрация на Боевой кубок #@cup.Id</RadzenText>
                     <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Center TagName="TagName.H6">До окончания регистрации: @formattedTime</RadzenText>
@@ -113,13 +113,39 @@
                     </AuthorizeView>
                 </CascadingAuthenticationState>
             }
-            else if (cup.Status > CupStatus.OpenForRegistration && cup.Status <= CupStatus.Canceled)
+            else if (cup.Status > CupStatus.OpenForRegistration && cup.Status < CupStatus.Canceled)
             {
+                <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевой кубок #@cup.Id</RadzenText>
 
+                <RadzenTabs TabPosition="TabPosition.Top" RenderMode="TabRenderMode.Server">
+                    <Tabs>
+                        <RadzenTabsItem Icon="grid_on" Text="Турнирная сетка">
+                            <BattleCupBracket Cup="cup" />
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Icon="schedule" Text="Расписание">
+                            <BattleCupSchedule Cup="cup" GameServers="gameServers" />
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Icon="groups" Text="Участники">
+                            <BattleCupTeams Ids="@(cup.Teams.Select(x => x.Id).ToList())" />
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            }
+            else
+            {
+                <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевые кубки</RadzenText>
+
+                <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Left TagName="TagName.H6">Боевые кубки - это ежедневные турниры на 8 команд, проходящие в рамках одного дня. Турнир начинается со стадии четверть-финалов в 20:00 в формате bo1 и заканчивается финалом в 22:00. Команде-победительнице вручается VIP доступ к возможностям проекта на 7 суток. Регистрация начинается ежедневно в 12:00 и заканчивается в 18:00. Присоединяйтесь к команде или создавайте свою, чтобы принять участие в серии данных турниров!</RadzenText>
+
+                <RadzenText TextStyle="TextStyle.H4" TextAlign=TextAlign.Center TagName="TagName.H4">Сегодняшний боевой кубок был отменен. Регистрация начнется завтра в 12:00!</RadzenText>
             }
         }
         else
         {
+            <RadzenText TextStyle="TextStyle.H3" TextAlign=TextAlign.Center TagName="TagName.H3">Боевые кубки</RadzenText>
+
+            <RadzenText TextStyle="TextStyle.H6" TextAlign=TextAlign.Left TagName="TagName.H6">Боевые кубки - это ежедневные турниры на 8 команд, проходящие в рамках одного дня. Турнир начинается со стадии четверть-финалов в 20:00 в формате bo1 и заканчивается финалом в 22:00. Команде-победительнице вручается VIP доступ к возможностям проекта на 7 суток. Регистрация начинается ежедневно в 12:00 и заканчивается в 18:00. Присоединяйтесь к команде или создавайте свою, чтобы принять участие в серии данных турниров!</RadzenText>
+
             <RadzenText TextStyle="TextStyle.H4" TextAlign=TextAlign.Center TagName="TagName.H4">На данный момент нет активных боевых кубков. Регистрация начнется в 12:00!</RadzenText>
         }
     }

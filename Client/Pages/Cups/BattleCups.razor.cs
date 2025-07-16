@@ -1,4 +1,7 @@
-﻿using kTVCSS.Models.Db.Models.BattleCup.DTOs;
+﻿using kTVCSS.Models.Db.Models.BattleCup;
+using kTVCSS.Models.Db.Models.BattleCup.DTOs;
+using kTVCSS.Models.Db.Models.BattleCup.Enums;
+using kTVCSS.Models.Models;
 using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 using System.Timers;
@@ -8,6 +11,7 @@ namespace kTVCSSBlazor.Client.Pages.Cups
     public partial class BattleCups
     {
         private CupDto cup;
+        private List<GameServer> gameServers = [];
 
         private bool ready = false;
 
@@ -20,8 +24,9 @@ namespace kTVCSSBlazor.Client.Pages.Cups
             Task.Run(async () =>
             {
                 cup = await http.GetFromJsonAsync<CupDto>("/api/battlecup");
+                gameServers = await http.GetFromJsonAsync<List<GameServer>>("/api/gameservers");
 
-                if (cup.Status == kTVCSS.Models.Db.Models.BattleCup.Enums.CupStatus.OpenForRegistration)
+                if (cup.Status == CupStatus.OpenForRegistration)
                 {
                     CalculateTimeLeft();
                     timer = new System.Timers.Timer(1000);

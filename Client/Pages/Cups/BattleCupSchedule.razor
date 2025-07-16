@@ -1,0 +1,28 @@
+﻿@using kTVCSS.Models.Db.Models.BattleCup.DTOs
+@using kTVCSS.Models.Db.Models.BattleCup.Enums
+@using kTVCSS.Models.Models
+@inject HttpClient http
+
+<RadzenStack>
+    @if (Cup is not null)
+    {
+        if (GameServers is not null)
+        {
+            <RadzenText TextStyle="TextStyle.DisplayH4">Четверть-финалы:</RadzenText>
+
+            @foreach (var match in GetMatchesByStage(MatchStage.QuarterFinal))
+            {
+                <RadzenText>20:00 - @(match?.TeamA?.Name ?? "TBD") vs @(match?.TeamB?.Name ?? "TBD") [@GameServers[GetMatchesByStage(MatchStage.QuarterFinal).IndexOf(match)].Ip:@GameServers[GetMatchesByStage(MatchStage.QuarterFinal).IndexOf(match)].Port]</RadzenText>
+            }
+
+            <RadzenText TextStyle="TextStyle.DisplayH4">Полуфиналы:</RadzenText>
+
+            <RadzenText>21:00 - @(GetMatchesByStage(MatchStage.SemiFinal).FirstOrDefault()?.TeamA?.Name ?? "TBD") vs @(GetMatchesByStage(MatchStage.SemiFinal).FirstOrDefault()?.TeamB?.Name ?? "TBD") [@GameServers[0].Ip:@GameServers[0].Port]</RadzenText>
+            <RadzenText>21:00 - @(GetMatchesByStage(MatchStage.SemiFinal).LastOrDefault()?.TeamA?.Name ?? "TBD") vs @(GetMatchesByStage(MatchStage.SemiFinal).LastOrDefault()?.TeamB?.Name ?? "TBD") [@GameServers[1].Ip:@GameServers[1].Port]</RadzenText>
+
+            <RadzenText TextStyle="TextStyle.DisplayH4">Финал:</RadzenText>
+
+            <RadzenText>22:00 - @(GetMatchesByStage(MatchStage.Final).FirstOrDefault()?.TeamA?.Name ?? "TBD") vs @(GetMatchesByStage(MatchStage.Final).FirstOrDefault()?.TeamB?.Name ?? "TBD") [@GameServers[0].Ip:@GameServers[0].Port]</RadzenText>
+        }
+    }
+</RadzenStack>

@@ -1,0 +1,50 @@
+﻿@using kTVCSSBlazor.Db.Models.Teams
+@inject HttpClient http
+
+@if (dataSource.Any())
+{
+    <RadzenDataGrid AllowVirtualization Density="Density.Default" Data="@dataSource">
+        <HeaderTemplate>
+            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
+                <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список участников турнира"></RadzenText>
+            </RadzenStack>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                <Template>
+                    <RadzenStack JustifyContent="JustifyContent.Center" AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                        <div style="margin:auto">@ctx.Position</div>
+                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="200px" Title="Команда" Context="ctx">
+                <Template>
+                    <RadzenLink Path="@string.Concat("/team/", ctx.Id)">@ctx.Name</RadzenLink>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Context="ctx" Title="Сыграно" Property="MatchesPlayed" />
+            <RadzenDataGridColumn Context="ctx" Title="Победы" Property="MatchesWins" />
+            <RadzenDataGridColumn Context="ctx" Title="Поражения" Property="MatchesLosts" />
+            <RadzenDataGridColumn Context="ctx" Title="Рейтинг" Property="Rating" />
+            <RadzenDataGridColumn Context="ctx" Title="Игроки" Property="PlayersCount" />
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    private List<Team> dataSource = new List<Team>();
+
+    [Parameter]
+    public List<int> Ids { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await http.PostAsJsonAsync("/api/teams/getteamsofbc", Ids.ToArray());
+
+        if (response.IsSuccessStatusCode)
+        {
+            dataSource = await response.Content.ReadFromJsonAsync<List<Team>>();
+        }
+    }
+}
