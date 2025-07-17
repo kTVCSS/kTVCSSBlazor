@@ -164,6 +164,9 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
                 // Обновляем статус пользователей в диалогах
                 if (dialogs != null)
                 {
+                    TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+                    DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+
                     foreach (var dialog in dialogs)
                     {
                         var participant = dialog.Participants.FirstOrDefault(p => p.UserId == userId);
@@ -172,7 +175,7 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
                             participant.IsOnline = isOnline;
                             if (!isOnline)
                             {
-                                participant.LastSeenAt = DateTime.Now;
+                                participant.LastSeenAt = now;
                             }
                         }
                     }

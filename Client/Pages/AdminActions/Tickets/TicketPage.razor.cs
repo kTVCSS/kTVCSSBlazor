@@ -42,12 +42,15 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             if (string.IsNullOrEmpty(text))
                 return;
 
+            TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+            DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+
             var msg = new TicketMessage
             {
                 TicketId = Id,
                 Ticket = _ticket,
                 MessageText = text,
-                CreatedAt = DateTime.Now,
+                CreatedAt = now,
                 SenderType = AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator ? SenderType.Admin : SenderType.Player,
                 UserName = AuthProvider.CurrentUser.Username
             };

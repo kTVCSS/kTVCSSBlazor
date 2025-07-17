@@ -60,6 +60,9 @@ namespace kTVCSSBlazor.Client.Components.Home
         {
             if (!string.IsNullOrWhiteSpace(newPostContent))
             {
+                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
+                DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+
                 post = new Post()
                 {
                     AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl ?? "/images/logo_ktv.png",
@@ -68,7 +71,7 @@ namespace kTVCSSBlazor.Client.Components.Home
                     Content = newPostContent,
                     MediaType = uploadedFile?.ContentType == "video/mp4" ? MediaType.Video : MediaType.Image,
                     MediaUrl = uploadedFile != null ? $"{uploadedFilePath}" : null,
-                    PostDate = DateTime.Now,
+                    PostDate = now,
                 };
 
                 Console.Write(post);
