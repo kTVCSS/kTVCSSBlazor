@@ -80,25 +80,25 @@ else
     {
         if (firstRender)
         {
-            Task.Run(async () =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        await http.GetAsync("/api/ping");
-                        isApiWorking = true;
-                        InvokeAsync(StateHasChanged);
-                    }
-                    catch (Exception)
-                    {
-                        isApiWorking = false;
-                        InvokeAsync(StateHasChanged);
-                    }
+            // Task.Run(async () =>
+            // {
+            //     while (true)
+            //     {
+            //         try
+            //         {
+            //             await http.GetAsync("/api/ping");
+            //             isApiWorking = true;
+            //             InvokeAsync(StateHasChanged);
+            //         }
+            //         catch (Exception)
+            //         {
+            //             isApiWorking = false;
+            //             InvokeAsync(StateHasChanged);
+            //         }
 
-                    await Task.Delay(TimeSpan.FromMinutes(1));
-                }
-            });
+            //         await Task.Delay(TimeSpan.FromMinutes(1));
+            //     }
+            // });
         }
     }
 }

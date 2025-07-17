@@ -3,6 +3,7 @@
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Arcticles
 @using kTVCSSBlazor.Db.Models.UserFeed
 @inject HttpClient http
@@ -11,6 +12,7 @@
 @implements IDisposable
 @inject DialogService DialogService
 @inject IJSRuntime js
+@inject WindowSizeService WindowSize
 
 <RadzenStack>
     <RadzenRow JustifyContent="JustifyContent.Center">
@@ -57,7 +59,7 @@
                                 {
                                     if (post.MediaType == MediaType.Image)
                                     {
-                                        <RadzenImage @ref=image Click=@(() => { currentFile = post.MediaUrl; ShowImage(); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%;max-height: 480px; cursor: pointer;" />
+                                        <RadzenImage Click=@(() => { currentFile = post.MediaUrl; ShowImage(); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%;max-height: 480px; cursor: pointer;" />
                                     }
                                     else if (post.MediaType == MediaType.Video)
                                     {

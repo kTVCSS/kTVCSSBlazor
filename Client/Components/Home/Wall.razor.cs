@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Radzen;
 using Radzen.Blazor;
+using System.Drawing;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Components.Home
@@ -28,34 +29,21 @@ namespace kTVCSSBlazor.Client.Components.Home
         private IBrowserFile uploadedFile;
         private Post post;
         private string currentFile;
-        private RadzenImage image;
         private int windowWidth = 0;
         private int windowHeight = 0;
-
-        private DotNetObjectReference<Wall>? objRef;
-
-        public class Window
-        {
-            public int Width { get; set; }
-            public int Height { get; set; }
-        }
-
-        [JSInvokable]
-        public void OnResize(int w, int h)
-        {
-            windowWidth = w;
-            windowHeight = h;
-            InvokeAsync(StateHasChanged);
-        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                var size = await js.InvokeAsync<Window>("windowSizeInterop.getWindowSize");
-                windowWidth = (int)size.Width;
-                windowHeight = (int)size.Height;
-                await js.InvokeVoidAsync("windowSizeInterop.registerResizeCallback", objRef);
+                await WindowSize.InitializeAsync();
+
+                WindowSize.OnResized += (w, h) =>
+                {
+                    windowWidth = w;
+                    windowHeight = h;
+                    InvokeAsync(StateHasChanged);
+                };
             }
         }
 
@@ -208,7 +196,7 @@ namespace kTVCSSBlazor.Client.Components.Home
         public void Dispose()
         {
             Posts = null;
-            objRef?.Dispose();
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged);
         }
     }
 }

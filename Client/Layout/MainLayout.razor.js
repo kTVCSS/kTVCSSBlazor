@@ -137,24 +137,3 @@ window.saveFileFromStream = async (filename, contentStreamReference) => {
     document.body.removeChild(anchorElement);
     URL.revokeObjectURL(url);
 };
-
-window.windowSizeInterop = {
-    getWindowSize: function () {
-        return {
-            Width: window.innerWidth,
-            Height: window.innerHeight
-        };
-    },
-    registerResizeCallback: function (dotNetHelper) {
-        function resizeHandler() {
-            dotNetHelper.invokeMethodAsync("OnResize", window.innerWidth, window.innerHeight);
-        }
-        window.addEventListener('resize', resizeHandler);
-
-        return {
-            dispose: () => {
-                window.removeEventListener('resize', resizeHandler);
-            }
-        };
-    }
-};
