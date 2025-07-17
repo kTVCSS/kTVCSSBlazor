@@ -28,6 +28,7 @@
                         <RadzenButton Style="width:150px" Variant="Variant.Text" Icon="arrow_back" Text="Назад" Click="@(() => { JSRuntime.InvokeVoidAsync("goBack"); })" />
                         <RadzenCard>
                             <RadzenStack Gap="2px">
+                                <RadzenText>Источник: <RadzenLink Target="_blank" Path="@($"/player/{_ticket.PlayerId}")" Text="@_ticket.PlayerInfo.MainInfo.Name"></RadzenLink></RadzenText>
                                 <RadzenMarkdown AllowHtml Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
                                 @* <RadzenText Text="@string.Concat("Дата регистрации обращения: ", _ticket.CreatedAt.ToShortDateString())" /> *@
 

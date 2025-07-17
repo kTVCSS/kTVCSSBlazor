@@ -44,7 +44,8 @@ namespace kTVCSSBlazor.Client.Components.Home
                     InvokeAsync(StateHasChanged);
                 };
 
-                //await WindowSize.InitializeAsync();
+                windowWidth = WindowSize.GetWidth();
+                windowHeight = WindowSize.GetHeight();
 
                 isMobile = await mds.IsMobileDeviceAsync();
             }
