@@ -3,7 +3,7 @@
 
 @if (dataSource.Any())
 {
-    <RadzenDataGrid AllowVirtualization Density="Density.Default" Data="@dataSource">
+    <RadzenDataGrid Responsive AllowVirtualization Density="Density.Default" Data="@dataSource">
         <HeaderTemplate>
             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список участников турнира"></RadzenText>

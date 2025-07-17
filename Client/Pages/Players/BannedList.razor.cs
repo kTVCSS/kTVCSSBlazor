@@ -11,6 +11,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
         private bool ready = false;
         private string _searchString;
         private bool unbanning = false;
+        private int windowHeight = 0;
+        private bool isMobile = false;
 
         private string SearchString
         {
@@ -76,6 +78,24 @@ namespace kTVCSSBlazor.Client.Pages.Players
             {
                 Task.Run(async () =>
                 {
+                    isMobile = await mds.IsMobileDeviceAsync();
+                    WindowSize.OnResized += (w, h) =>
+                    {
+                        Console.WriteLine(h);
+
+                        if (isMobile)
+                        {
+                            windowHeight = h - 118;
+                        }
+                        else
+                        {
+                            windowHeight = h - 208;
+                        }
+
+                        InvokeAsync(StateHasChanged);
+                    };
+
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
                     dataSource = await http.GetFromJsonAsync<List<BannedUser>>("/api/players/getbannedlist");
                     _filtered.AddRange(dataSource);
                     ready = true;

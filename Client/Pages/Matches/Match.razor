@@ -4,6 +4,7 @@
 @using System.Globalization
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Matches
 @using kTVCSSBlazor.Db.Models.Players
 @inject IJSRuntime JS
@@ -13,8 +14,10 @@
 @inject DialogService DialogService
 @inject NotificationService NotifyService
 @inject TooltipService tooltipService
-@implements IDisposable
+@implements IAsyncDisposable
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ @match.AName vs @match.BName</PageTitle>
 
@@ -145,16 +148,19 @@
             </RadzenRow>
         }
 
-        <RadzenDataGrid Density="Density.Compact" Data="@match.ATeamGrid">
+        <RadzenDataGrid Responsive Density="Density.Compact" Data="@match.ATeamGrid">
             <Columns>
-                <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
-                    <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
-                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
-                        </RadzenStack>
-                    </Template>
-                </RadzenDataGridColumn>
+                @if (!isMobile)
+                {
+                    <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
+                                <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
                 <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
                     <Template>
                         @if (ctx.SteamID == match.MVP)
@@ -182,16 +188,19 @@
             </Columns>
         </RadzenDataGrid>
 
-        <RadzenDataGrid Density="Density.Compact" Data="@match.BTeamGrid">
+        <RadzenDataGrid Responsive Density="Density.Compact" Data="@match.BTeamGrid">
             <Columns>
-                <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
-                    <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
-                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
-                        </RadzenStack>
-                    </Template>
-                </RadzenDataGridColumn>
+                @if (!isMobile)
+                {
+                    <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
+                                <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
                 <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
                     <Template>
                         @if (ctx.SteamID == match.MVP)

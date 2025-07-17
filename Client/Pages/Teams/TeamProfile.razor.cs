@@ -19,6 +19,8 @@ namespace kTVCSSBlazor.Client.Pages.Teams
         private int memberCardHeight = 100;
 
         private bool ready = false;
+        private int windowHeight = 0;
+        private bool isMobile = false;
 
         // Пример данных для карт с винрейтом
         public List<MapWinrate> MapsWinrate = [];
@@ -174,6 +176,8 @@ namespace kTVCSSBlazor.Client.Pages.Teams
             {
                 Task.Run(async () =>
                 {
+                    isMobile = await mds.IsMobileDeviceAsync();
+
                     var team = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}");
 
                     foreach (var map in team.Matches.DistinctBy(x => x.MapName))

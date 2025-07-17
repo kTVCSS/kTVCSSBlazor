@@ -1,12 +1,15 @@
 @page "/banslist"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Players
 @inject IJSRuntime JS
 @inject StateProvider AuthProvider
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Банлист</PageTitle>
 
@@ -14,9 +17,9 @@
 {
     @if (!unbanning)
     {
-        <RadzenDataGrid AllowVirtualization Style="height: 77svh" Density="Density.Default" Data="@_filtered">
+        <RadzenDataGrid Responsive AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@_filtered">
             <HeaderTemplate>
-                <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
                     <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список заблокированных игроков проекта"></RadzenText>
                     <CascadingAuthenticationState>
                         <AuthorizeView>
@@ -34,14 +37,17 @@
                 </RadzenStack>
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
-                    <Template>
-                        <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
-                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
-                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
-                        </RadzenStack>
-                    </Template>
-                </RadzenDataGridColumn>
+                @if (!isMobile)
+                {
+                    <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                        <Template>
+                            <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                                <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                                <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                }
                 <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
                     <Template>
                         <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
@@ -80,5 +86,9 @@ else
 <style>
     .rz-custom-header {
         width: 100% !important;
+    }
+
+    .rz-body {
+        overflow: hidden !important;
     }
 </style>

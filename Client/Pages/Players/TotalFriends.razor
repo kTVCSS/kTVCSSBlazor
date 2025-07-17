@@ -1,12 +1,15 @@
 @page "/friends"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models;
 @using kTVCSSBlazor.Db.Models.Players
 @inject IJSRuntime JS
 @inject StateProvider kTVCSSAuthenticationStateProvider
 @implements IDisposable
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Мои друзья</PageTitle>
 
@@ -15,7 +18,7 @@
         <Authorized>
             @if (ready)
             {
-                <RadzenDataGrid EmptyText="У Вас пока нет друзей" AllowSorting AllowVirtualization Style="height: 77svh" Density="Density.Default" Data="@_filtered">
+                <RadzenDataGrid Responsive EmptyText="У Вас пока нет друзей" AllowSorting AllowVirtualization Style="height: 77svh" Density="Density.Default" Data="@_filtered">
                     <HeaderTemplate>
                         <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
                             <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Мои друзья"></RadzenText>

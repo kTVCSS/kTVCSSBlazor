@@ -49,7 +49,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
 
 builder.Services.AddScoped<ChatHubService>();
-builder.Services.AddScoped<WindowSizeService>(); // @inject WindowSizeService WindowSize
+builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize
 builder.Services.AddScoped<IMobileDetectionService, MobileDetectionService>(); //@inject IMobileDetectionService MobileDetectionService
 
 var host = builder.Build();

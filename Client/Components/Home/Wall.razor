@@ -9,10 +9,11 @@
 @inject HttpClient http
 @inject StateProvider AuthProvider
 @inject NotificationService NotificationService
-@implements IDisposable
+@implements IAsyncDisposable
 @inject DialogService DialogService
 @inject IJSRuntime js
 @inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <RadzenStack>
     <RadzenRow JustifyContent="JustifyContent.Center">
@@ -30,11 +31,14 @@
                                 <RadzenTextBox @bind-Value="@newPostContent" />
                             }
                         </RadzenFormField>
-                        <RadzenStack Orientation="Orientation.Horizontal">
-                            <RadzenButton Click="PostNews" Style="" Text="Опубликовать" Icon="post_add" />
-                            <RadzenUpload ChooseText="Прикрепить вложение" Multiple="false" Auto Change=@OnClientChange
-                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
-                        </RadzenStack>
+                        @if (Posts.Any())
+                        {
+                            <RadzenStack Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
+                                <RadzenButton Click="PostNews" Style="" Text="Опубликовать" Icon="post_add" />
+                                <RadzenUpload ChooseText="Прикрепить вложение" Multiple="false" Auto Change=@OnClientChange
+                                              InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                            </RadzenStack>
+                        }
                     </RadzenStack>
                 </RadzenCard>
                 <RadzenStack>
@@ -67,7 +71,7 @@
                                     }
                                 }
                                 <div class="rz-my-2">
-                                    <RadzenStack Gap="8px" Orientation="Orientation.Horizontal">
+                                    <RadzenStack Gap="8px" Orientation="@(isMobile? Orientation.Vertical : Orientation.Horizontal)">
                                         <RadzenButton Icon="thumb_up" Text="@post.LikesCount.ToString()" Click="() => LikePost(post)" />
                                         <RadzenButton Icon="thumb_down" Text="@post.DislikesCount.ToString()" Click="() => DislikePost(post)" />
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || post.AuthorId == AuthProvider.CurrentUser.Id)
@@ -162,6 +166,17 @@
         </RadzenColumn>
     </RadzenRow>
 </RadzenStack>
+
+<style>
+    .rz-fileupload-choose:not(.rz-state-disabled) {
+        background-color: var(--rz-upload-choose-background-color);
+        color: var(--rz-upload-choose-color);
+        margin: auto;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+</style>
 
 @code {
     private async Task ShowImage()

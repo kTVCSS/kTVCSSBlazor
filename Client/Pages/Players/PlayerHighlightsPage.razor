@@ -4,6 +4,7 @@
 @using System.Globalization
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Highlights
 @using kTVCSSBlazor.Db.Models.Matches
 @using kTVCSSBlazor.Db.Models.Players
@@ -15,6 +16,8 @@
 @inject NotificationService NotifyService
 @inject TooltipService tooltipService
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Хайлайты игрока #@PlayerID</PageTitle>
 
@@ -33,7 +36,7 @@
                                 <RadzenCard Variant="Variant.Outlined">
                                     <RadzenStack>
                                         <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH5"><RadzenLink Path="@string.Concat("/match/", group.Key)">Хайлайты с матча #@group.Key</RadzenLink></RadzenText>
-                                        <RadzenDataGrid AllowAlternatingRows=false EmptyText="Хайлайты не найдены" AllowSorting AllowVirtualization Density="Density.Default" Data="@group.ToList()">
+                                        <RadzenDataGrid Responsive AllowAlternatingRows=false EmptyText="Хайлайты не найдены" AllowSorting AllowVirtualization Density="Density.Default" Data="@group.ToList()">
                                             <Columns>
                                                 <RadzenDataGridColumn Context="ctx" Title="Ник на демо" Property="Name" />
                                                 <RadzenDataGridColumn Context="ctx" Title="Момент" Property="Type" />

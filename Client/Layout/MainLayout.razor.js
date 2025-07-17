@@ -80,22 +80,6 @@ window.isElementInViewport = (element) => {
     );
 };
 
-window.resizeInterop = {
-    initResizeListener: function (dotNetObjectReference) {
-        function onResize() {
-            dotNetObjectReference.invokeMethodAsync('OnResize', window.innerWidth, window.innerHeight);
-        }
-
-        window.addEventListener('resize', onResize);
-
-        onResize();
-    },
-
-    removeResizeListener: function () {
-        window.removeEventListener('resize', this.onResize);
-    }
-};
-
 window.downloadFileFromStream = async (fileName, contentStreamReference) => {
     const arrayBuffer = await contentStreamReference.arrayBuffer();
     const blob = new Blob([arrayBuffer]);

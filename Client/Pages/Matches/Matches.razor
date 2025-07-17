@@ -1,23 +1,26 @@
 @page "/matches"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Matches
 @inject NavigationManager NavigationManager
 @inject StateProvider AuthProvider
 @inject IJSRuntime JSRuntime
-@implements IDisposable
+@implements IAsyncDisposable
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 @if (ready)
 {
     <PageTitle>kTVCSS @@ Матчи</PageTitle>
 
-    <RadzenDataGrid AllowVirtualization RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {dataGridHeight}svh"))">
+    <RadzenDataGrid Responsive AllowVirtualization RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {windowHeight}px"))">
         <Columns>
             <RadzenDataGridColumn TItem="TotalMatch" Visible="true">
                 <Template Context="match">
                     <a href="@(string.Concat("/match/", match.Id))">
-                        <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;">
+                        <div style="@($"display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;")">
                             @if (match.MatchDate == "LIVE")
                             {
                                 <div class="rz-text-display-h5" style="color: red;font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
@@ -26,11 +29,22 @@
                             {
                                 <div class="rz-text-display-h5" style="font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
                             }
-                            <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
-                                <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>
-                                <div class="rz-text-display-h5" style="font-weight: 600;display:flex;text-align:center;">@match.Score</div>
-                                <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.BTeam</div>
-                            </div>
+                            @if (!isMobile)
+                            {
+                                <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
+                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>
+                                    <div class="rz-text-display-h5" style="font-weight: 600;display:flex;text-align:center;">@match.Score</div>
+                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.BTeam</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="display: flex;flex-direction:column;width: 100%;align-items: center;justify-content: space-between;">
+                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>
+                                    <div class="rz-text-display-h5" style="font-weight: 600;display:flex;text-align:center;">@match.Score</div>
+                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.BTeam</div>
+                                </div>
+                            }
                             <div style="font-weight: 600;" class="rz-text-display-h5">@match.MapName</div>
                         </div>
                     </a>

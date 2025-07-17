@@ -1,11 +1,14 @@
 ﻿@page "/mixconsole"
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
 @implements IAsyncDisposable
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 @inject HttpClient http
 @inject StateProvider AuthProvider
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Управление миксом #1</PageTitle>
 
@@ -15,7 +18,7 @@
             @if (access)
             {
                 <RadzenStack>
-                    <div @ref="window" style="height: 50svh; overflow:auto">
+                    <div @ref="window" style="height: @(windowHeight)px; overflow:auto">
                         <pre>@output</pre>
                     </div>
                     <RadzenStack Orientation="Orientation.Horizontal">

@@ -1,11 +1,13 @@
 ﻿@page "/config/{Id:int}"
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Home
 @using kTVCSSBlazor.Db.Models.Players
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject StateProvider AuthProvider
 @inject NotificationService ns
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ @config.Name</PageTitle>
 
@@ -14,7 +16,7 @@
     <RadzenStack>
         <RadzenStack Gap="0px">
             <RadzenText TextStyle="TextStyle.DisplayH3" Text="@config.Name" />
-            <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenStack Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)">
                 <RadzenButton Variant=Variant.Text Text="К конфигам" Icon="arrow_back" Click="@(() => { NavigationManager.NavigateTo("/#configs"); })" />
                 <RadzenButton Variant=Variant.Text Text="Скачать ZIP" Icon="download" Click="() => DownloadZip()" />
                 <CascadingAuthenticationState>

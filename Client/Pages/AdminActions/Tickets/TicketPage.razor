@@ -2,6 +2,7 @@
 @using kTVCSS.Models.Models
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Arcticles
 @using kTVCSSBlazor.Db.Models.UserFeed
 @inject IJSRuntime JSRuntime
@@ -12,6 +13,7 @@
 @inject NotificationService NotificationService
 @inject HttpClient http
 @inject StateProvider AuthProvider
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Обращение #@Id</PageTitle>
 
@@ -97,9 +99,9 @@
 
                             <div class="chat-input">
                                 <RadzenStack Style="width: 100%;">
-                                    <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
-                                        <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="width: 70%;flex:1; min-height:50px;" />
-                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Text="Отправить" Style="width: 175px;height: 10px;margin-left:10px;" Click="@SendMessage" />
+                                    <RadzenStack AlignItems=AlignItems.Center Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
+                                        <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="@(isMobile ? "width: 100%;flex:1; min-height:100px;" : "width: 70%;flex:1; min-height:50px;")" />
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Text="Отправить" Style="@(isMobile ? "width: 100%;height: 40px;" : "width: 175px;height: 10px;margin-left:10px;")" Click="@SendMessage" />
                                     </RadzenStack>
                                     @if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator))
                                     {
@@ -142,8 +144,8 @@
     }
 
     .avatar {
-        margin: 0 8px;
-        align-self: center;
+        margin: 2px 8px;
+        align-self: flex-start;
     }
 
     .message {

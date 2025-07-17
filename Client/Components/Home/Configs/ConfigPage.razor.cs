@@ -16,6 +16,7 @@ namespace kTVCSSBlazor.Client.Components.Home.Configs
         private GameConfig config = new();
         private PlayerInfo player = new();
         private string text = "";
+        private bool isMobile = false;
 
         private async Task Remove()
         {
@@ -32,6 +33,7 @@ namespace kTVCSSBlazor.Client.Components.Home.Configs
         {
             Task.Run(async () =>
             {
+                isMobile = await mds.IsMobileDeviceAsync();
                 config = await Http.GetFromJsonAsync<GameConfig>($"api/gameconfigs/{Id}");
                 player = await Http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={config.AuthorId}");
                 ready = true;

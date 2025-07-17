@@ -7,35 +7,54 @@ namespace kTVCSSBlazor.Client.Pages.Matches
     public partial class Matches
     {
         List<TotalMatch> matches = [];
-        double dataGridHeight = 77;
         bool ready = false;
+        private int windowHeight = 0;
+        private bool isMobile = false;
 
         void RowRender(RowRenderEventArgs<TotalMatch> args)
         {
             var x = args.Data;
 
             args.Attributes.Add("class", "row-ktv");
-            args.Attributes.Add("Style", "display: grid;margin-bottom: 5px;background-image: url(/images/mapsbackgrs/" + x.MapName + ".jpg);height: 130px;background-size: 100% auto; background-position: center; background-blend-mode: multiply");
+            args.Attributes.Add("Style", "display: grid;margin-bottom: 5px;background-image: url(/images/mapsbackgrs/" + x.MapName + ".jpg);height: " + (isMobile ? "175" : "130") + "px;background-size: 100% auto; background-position: center; background-blend-mode: multiply");
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
             matches = null;
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
+            Task.Run(async () =>
             {
-                Task.Run(async () =>
+                isMobile = await mds.IsMobileDeviceAsync();
+                WindowSize.OnResized += (w, h) =>
                 {
-                    matches = await http.GetFromJsonAsync<List<TotalMatch>>("/api/matches/getmatches");
+                    Console.WriteLine(h);
 
-                    ready = true;
+                    if (isMobile)
+                    {
+                        windowHeight = h - 118;
+                    }
+                    else
+                    {
+                        windowHeight = h - 208;
+                    }
 
-                    await InvokeAsync(StateHasChanged);
-                });
-            }
+                    InvokeAsync(StateHasChanged);
+                };
+
+                windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+
+                matches = await http.GetFromJsonAsync<List<TotalMatch>>("/api/matches/getmatches");
+
+                ready = true;
+
+                await InvokeAsync(StateHasChanged);
+            });
         }
     }
 }

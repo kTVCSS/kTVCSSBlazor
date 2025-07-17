@@ -31,19 +31,22 @@ namespace kTVCSSBlazor.Client.Components.Home
         private string currentFile;
         private int windowWidth = 0;
         private int windowHeight = 0;
+        private bool isMobile = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
-                await WindowSize.InitializeAsync();
-
                 WindowSize.OnResized += (w, h) =>
                 {
                     windowWidth = w;
                     windowHeight = h;
                     InvokeAsync(StateHasChanged);
                 };
+
+                //await WindowSize.InitializeAsync();
+
+                isMobile = await mds.IsMobileDeviceAsync();
             }
         }
 
@@ -193,10 +196,11 @@ namespace kTVCSSBlazor.Client.Components.Home
             Posts.RemoveAll(x => x.PostId == postId);
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             Posts = null;
-            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged);
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
         }
     }
 }

@@ -31,7 +31,7 @@ builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 
 builder.Services.AddScoped<ChatHubService>();
-builder.Services.AddScoped<WindowSizeService>(); // @inject WindowSizeService WindowSize
+builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize
 builder.Services.AddScoped<IMobileDetectionService, MobileDetectionService>(); //@inject IMobileDetectionService MobileDetectionService
 
 var app = builder.Build();

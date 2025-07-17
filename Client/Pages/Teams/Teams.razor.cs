@@ -7,9 +7,13 @@ namespace kTVCSSBlazor.Client.Pages.Teams
     {
         private List<Team> dataSource = new List<Team>();
         private bool ready = false;
+        private int windowHeight = 0;
+        private bool isMobile = false;
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
             dataSource = null;
         }
 
@@ -19,6 +23,25 @@ namespace kTVCSSBlazor.Client.Pages.Teams
             {
                 Task.Run(async () =>
                 {
+                    isMobile = await mds.IsMobileDeviceAsync();
+                    WindowSize.OnResized += (w, h) =>
+                    {
+                        Console.WriteLine(h);
+
+                        if (isMobile)
+                        {
+                            windowHeight = h - 118;
+                        }
+                        else
+                        {
+                            windowHeight = h - 208;
+                        }
+
+                        InvokeAsync(StateHasChanged);
+                    };
+
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+
                     dataSource = await http.GetFromJsonAsync<List<Team>>("/api/teams/getteams");
 
                     ready = true;

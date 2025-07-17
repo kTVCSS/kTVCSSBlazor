@@ -7,17 +7,23 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
     {
         private List<Video> _videos = [];
         private bool ready = false;
+        private bool isMobile = false;
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Task.Run(async () =>
+            if (firstRender)
             {
-                _videos = await http.GetFromJsonAsync<List<Video>>("/api/uservideos");
+                Task.Run(async () =>
+                {
+                    isMobile = await mds.IsMobileDeviceAsync();
 
-                ready = true;
+                    _videos = await http.GetFromJsonAsync<List<Video>>("/api/uservideos");
 
-                await InvokeAsync(StateHasChanged);
-            });
+                    ready = true;
+
+                    await InvokeAsync(StateHasChanged);
+                });
+            }
         }
 
         private async Task OnVideoClick(int id)

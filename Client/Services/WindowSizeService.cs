@@ -4,7 +4,6 @@ namespace kTVCSSBlazor.Client.Services
 {
     public class WindowSizeService : IAsyncDisposable
     {
-        private readonly IJSRuntime _js;
         private IJSObjectReference _module;
         private DotNetObjectReference<WindowSizeService> _dotNetRef;
         private IJSObjectReference _resizer;
@@ -13,15 +12,10 @@ namespace kTVCSSBlazor.Client.Services
         public int Height { get; private set; }
         public event Action<int, int> OnResized;
 
-        public WindowSizeService(IJSRuntime js)
-        {
-            _js = js;
-        }
-
-        public async ValueTask InitializeAsync()
+        public async ValueTask InitializeAsync(IJSRuntime js)
         {
             if (_module != null) return;
-            _module = await _js.InvokeAsync<IJSObjectReference>("import", "/js/windowSize.js");
+            _module = await js.InvokeAsync<IJSObjectReference>("import", "/js/windowSize.js");
             _dotNetRef = DotNetObjectReference.Create(this);
             _resizer = await _module.InvokeAsync<IJSObjectReference>(
               "registerResizeCallback",
@@ -37,6 +31,9 @@ namespace kTVCSSBlazor.Client.Services
             Height = height;
             OnResized?.Invoke(width, height);
         }
+
+        public int GetWidth() => Width;
+        public int GetHeight() => Height;
 
         public async ValueTask DisposeAsync()
         {

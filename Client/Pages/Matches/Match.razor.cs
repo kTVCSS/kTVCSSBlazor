@@ -102,7 +102,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
         private void ParseMatchLogAsTicks(bool mobile)
         {
             StringBuilder sb = new StringBuilder();
-            string rowStyle = mobile ? "display: flex;height: 60px;text-wrap: wrap;text-align: center;align-items: center;" : "display: flex;height:40px";
+            string rowStyle = mobile ? "font-size: 11px;display: flex;height: 24px;text-wrap: wrap;text-align: center;align-items: center;text-wrap-mode: nowrap;" : "display: flex;height:40px;text-wrap-mode: nowrap;";
             string weaponStyle = mobile ? "display: flex;align-items: center;" : "";
             string weaponHeight = mobile ? "16px" : "24px";
 
@@ -277,7 +277,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
         private void ParseMatchLog(bool mobile)
         {
             StringBuilder sb = new StringBuilder();
-            string rowStyle = mobile ? "display: flex;height: 60px;text-wrap: wrap;text-align: center;align-items: center;" : "display: flex;height:40px";
+            string rowStyle = mobile ? "font-size: 11px;display: flex;height: 24px;text-wrap: wrap;text-align: center;align-items: center;text-wrap-mode: nowrap;" : "display: flex;height:40px"; 
             string weaponStyle = mobile ? "display: flex;align-items: center;" : "";
             string weaponHeight = mobile ? "16px" : "24px";
 
@@ -501,10 +501,13 @@ namespace kTVCSSBlazor.Client.Pages.Matches
             await InvokeAsync(StateHasChanged);
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
+
             // Удаляем обработчик через JS
-            JS.InvokeVoidAsync("resizeInterop.removeResizeListener");
+            //JS.InvokeVoidAsync("resizeInterop.removeResizeListener");
 
             // Уничтожаем ссылку на объект .NET
             dotNetRef?.Dispose();
@@ -513,16 +516,46 @@ namespace kTVCSSBlazor.Client.Pages.Matches
             matchLog = null;
         }
 
+        private int windowHeight = 0;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
                 Task.Run(async () =>
                 {
+                    isMobile = await mds.IsMobileDeviceAsync();
+                    WindowSize.OnResized += (w, h) =>
+                    {
+                        Console.WriteLine(h);
+
+                        if (w < 1800)
+                        {
+                            isTeamStuffsVisible = false;
+                        }
+                        else
+                        {
+                            isTeamStuffsVisible = true;
+                        }
+
+                        if (isMobile)
+                        {
+                            windowHeight = h - 118;
+                        }
+                        else
+                        {
+                            windowHeight = h - 208;
+                        }
+
+                        InvokeAsync(StateHasChanged);
+                    };
+
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+
                     dotNetRef = DotNetObjectReference.Create(this);
 
                     // Вызываем JS-функцию для инициализации
-                    await JS.InvokeVoidAsync("resizeInterop.initResizeListener", dotNetRef);
+                    //await JS.InvokeVoidAsync("resizeInterop.initResizeListener", dotNetRef);
 
                     match = await http.GetFromJsonAsync<MatchInfo>($"/api/matches/getmatch?id={MatchID}");
 

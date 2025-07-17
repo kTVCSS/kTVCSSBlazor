@@ -1,6 +1,6 @@
 @using kTVCSSBlazor.Db.Models.Players
 
-<RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@player.Weapons">
+<RadzenDataGrid Responsive AllowVirtualization="false" Density="Density.Default" Data="@player.Weapons">
     <Columns>
         <RadzenDataGridColumn Width="200px" Title="Результат" Context="ctx">
             <Template>

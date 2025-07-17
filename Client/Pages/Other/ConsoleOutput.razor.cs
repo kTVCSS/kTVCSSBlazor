@@ -8,14 +8,16 @@ namespace kTVCSSBlazor.Client.Pages.Other
 {
     public partial class ConsoleOutput
     {
-        string output = "";
-        string cmd = "";
-        bool disabled = false;
-        DotNetObjectReference<ConsoleOutput>? objRef;
+        private string output = "";
+        private string cmd = "";
+        private bool disabled = false;
+        private DotNetObjectReference<ConsoleOutput>? objRef;
         private ElementReference window;
-        bool access = false;
+        private bool access = false;
+        private int windowHeight = 0;
+        private bool isMobile = false;
 
-        string baseUri = "http://localhost:3000";
+        private string baseUri = "http://localhost:3000";
 
         public enum ActionType
         {
@@ -120,6 +122,27 @@ namespace kTVCSSBlazor.Client.Pages.Other
                         wsUrl = baseUri.Replace("http://", "ws://").TrimEnd('/') + "/ws/console";
                     }
                     await JS.InvokeVoidAsync("connectConsole", objRef, wsUrl);
+
+                    isMobile = await mds.IsMobileDeviceAsync();
+                    WindowSize.OnResized += (w, h) =>
+                    {
+                        Console.WriteLine(h);
+
+                        if (isMobile)
+                        {
+                            windowHeight = h - 256;
+                        }
+                        else
+                        {
+                            windowHeight = h - 324;
+                        }
+
+                        InvokeAsync(StateHasChanged);
+                    };
+
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 256 : 324);
+
+                    InvokeAsync(StateHasChanged);
                 }
             }
         }
@@ -140,10 +163,11 @@ namespace kTVCSSBlazor.Client.Pages.Other
             await ScrollToBottom();
         }
 
-        public ValueTask DisposeAsync()
+        public async ValueTask DisposeAsync()
         {
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
             objRef?.Dispose();
-            return ValueTask.CompletedTask;
         }
 
         private async Task ScrollToBottom()

@@ -1,12 +1,15 @@
 ﻿@page "/editprofile/{Id:int}"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db
 @using kTVCSSBlazor.Db.Models.Teams
 @inject StateProvider AuthProvider
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Редактирования профиля игрока</PageTitle>
 

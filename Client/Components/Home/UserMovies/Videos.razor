@@ -1,14 +1,16 @@
-﻿@using kTVCSSBlazor.Db.Models.Home
+﻿@using kTVCSSBlazor.Client.Services
+@using kTVCSSBlazor.Db.Models.Home
 @inject HttpClient http
 @inject NavigationManager nm
-
-<RadzenStack Style="padding-bottom: 8px" Orientation=Orientation.Horizontal JustifyContent="JustifyContent.SpaceBetween">
-    <RadzenText TextStyle=TextStyle.DisplayH4 Text="Хайлайты игроков проекта" />
-    <RadzenLink Text="Добавить новое видео" Path="/uploadvideo" />
-</RadzenStack>
+@inject IMobileDetectionService mds
 
 @if (ready)
 {
+    <RadzenStack Style="padding-bottom: 8px" Orientation=@(isMobile? Orientation.Vertical: Orientation.Horizontal) JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle=TextStyle.DisplayH4 Text="Хайлайты игроков проекта" />
+        <RadzenLink Text="Добавить новое видео" Path="/uploadvideo" />
+    </RadzenStack>
+
     <RadzenRow JustifyContent=JustifyContent.Start Gap="20px">
         @if (_videos.Any())
         {
@@ -47,3 +49,60 @@ else
         </RadzenStack>
     </RadzenRow>
 }
+
+<style>
+    .video-card {
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        cursor: pointer;
+        /*         max-height: 260px;
+            min-width: 360px; */
+        overflow: hidden;
+    }
+
+    .thumbnail {
+        width: 100%;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        object-fit: cover;
+        max-height: 200px;
+        min-width: 360px;
+    }
+
+    .duration-badge {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .card-content {
+        padding-top: 8px;
+        margin: 4px;
+    }
+
+    .channel-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 8px;
+        object-fit: cover;
+    }
+
+    .channel-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .video-meta {
+        font-size: 13px;
+        color: #aaa;
+    }
+
+</style>

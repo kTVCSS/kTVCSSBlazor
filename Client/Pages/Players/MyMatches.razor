@@ -1,14 +1,17 @@
 ﻿@page "/mp/{Id:int}"
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Matches
 @inject HttpClient http
 @implements IDisposable
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Мои матчи</PageTitle>
 
 @if (ready)
 {
-    <RadzenDataGrid AllowVirtualization EmptyText="Вы пока не сыграли ни одного матча" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {dataGridHeight}svh"))">
+    <RadzenDataGrid Responsive AllowVirtualization EmptyText="Вы пока не сыграли ни одного матча" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@matches" TItem="TotalMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;", $"height: {dataGridHeight}svh"))">
         <Columns>
             <RadzenDataGridColumn TItem="TotalMatch" Visible="true">
                 <Template Context="match">

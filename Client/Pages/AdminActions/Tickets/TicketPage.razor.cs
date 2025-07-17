@@ -15,10 +15,14 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
 
         private Ticket _ticket = new();
 
+        private bool isMobile = false;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
+                isMobile = await mds.IsMobileDeviceAsync();
+
                 Task.Run(async () =>
                 {
                     _ticket = await http.GetFromJsonAsync<Ticket>("/api/players/getticket?id=" + Id);

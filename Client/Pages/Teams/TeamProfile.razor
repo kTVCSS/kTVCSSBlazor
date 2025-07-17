@@ -1,6 +1,7 @@
 @page "/team/{Id:int}"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Matches
 @using kTVCSSBlazor.Db.Models.Teams
 @inject StateProvider AuthProvider
@@ -9,12 +10,14 @@
 @inject NotificationService NotificationService
 @inject HttpClient http
 @inject DialogService DialogService
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 @if (ready)
 {
     <PageTitle>kTVCSS @@ Профиль команды @data.Info.Name</PageTitle>
 
-    <RadzenStack>
+    <RadzenStack class="rz-mb-12">
         <RadzenCard>
             <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                 <RadzenImage Style="width: 128px;height: 128px;border-radius: 64px;" Path="@data.AvatarUrl" />
@@ -116,7 +119,7 @@
                     @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
                     {
                         <RadzenCard>
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                            <RadzenStack Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                                 @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     if (data.Info.BlockEdit == 0)
@@ -195,7 +198,7 @@
             </RadzenRow>
         }
 
-        <RadzenDataGrid AllowVirtualization="false" Density="Density.Default" Data="@data.Members">
+        <RadzenDataGrid Responsive AllowVirtualization="false" Density="Density.Default" Data="@data.Members">
             <HeaderTemplate>
                 <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
                     <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Состав команды"></RadzenText>
@@ -207,20 +210,34 @@
                         <Authorized>
                             @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
                             {
-                                <RadzenDataGridColumn Width="50px" Title="" Context="ctx">
+                                @if (!isMobile)
+                                {
+                                    <RadzenDataGridColumn Width="50px" Title="" Context="ctx">
+                                        <Template>
+                                            <RadzenButton Disabled="data.Info.CapSteamID == ctx.SteamID" Size="ButtonSize.Small" Variant="Variant.Flat" Icon="close" Click="@(async () => { await KickPlayer(ctx.SteamID); })" />
+                                        </Template>
+                                    </RadzenDataGridColumn>
+                                }
+                                else
+                                {
+                                    <RadzenDataGridColumn Title="" Context="ctx">
+                                        <Template>
+                                            <RadzenButton class="rz-w-100 rz-m-auto" Text="Выгнать" Disabled="data.Info.CapSteamID == ctx.SteamID" Size="ButtonSize.Small" Variant="Variant.Flat" Icon="close" Click="@(async () => { await KickPlayer(ctx.SteamID); })" />
+                                        </Template>
+                                    </RadzenDataGridColumn>
+                                }
+                            }
+                            @if (!isMobile)
+                            {
+                                <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
                                     <Template>
-                                        <RadzenButton Disabled="data.Info.CapSteamID == ctx.SteamID" Size="ButtonSize.Small" Variant="Variant.Flat" Icon="close" Click="@(async () => { await KickPlayer(ctx.SteamID); })" />
+                                        <RadzenStack Orientation="Orientation.Horizontal">
+                                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                                        </RadzenStack>
                                     </Template>
                                 </RadzenDataGridColumn>
                             }
-                            <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
-                                <Template>
-                                    <RadzenStack Orientation="Orientation.Horizontal">
-                                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
-                                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
-                                    </RadzenStack>
-                                </Template>
-                            </RadzenDataGridColumn>
                             <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
                                 <Template>
                                     <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
@@ -268,7 +285,7 @@
         @if (data.Matches.Any())
         {
             <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" Text="Последние 20 матчей команды" />
-            <RadzenDataGrid id="ktv-matches-grid" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@data.Matches" TItem="TeamMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;"))">
+            <RadzenDataGrid Responsive id="ktv-matches-grid" RowRender="RowRender" ShowColumnTitleAsTooltip ShowHeader="false" Data="@data.Matches" TItem="TeamMatch" RowCssClass="match-row" Style="@(string.Concat("width: 100%; border: none;"))">
                 <Columns>
                     <RadzenDataGridColumn TItem="TeamMatch" Visible="true">
                         <Template Context="ctx">

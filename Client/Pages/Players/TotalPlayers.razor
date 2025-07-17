@@ -1,20 +1,23 @@
 @page "/players"
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models;
 @using kTVCSSBlazor.Db.Models.Players
 @inject IJSRuntime JS
 @inject StateProvider kTVCSSAuthenticationStateProvider
-@implements IDisposable
+@implements IAsyncDisposable
 @inject HttpClient http
+@inject WindowSizeService WindowSize
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Игроки</PageTitle>
 
 @if (ready)
 {
-    <RadzenDataGrid AllowSorting AllowVirtualization Style="height: 77svh" Density="Density.Default" Data="@_filtered">
+    <RadzenDataGrid Responsive AllowSorting AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@_filtered">
         <HeaderTemplate>
-            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+            <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список игроков проекта"></RadzenText>
                 <div class="rz-pr-2">
                     <RadzenTextBox Style="width: 300px" Placeholder="Например, ник или стим" @bind-Value="@SearchString" />
@@ -22,15 +25,18 @@
             </RadzenStack>
         </HeaderTemplate>
         <Columns>
-            <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
-                <Template>
-                    <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
-                        <div style="margin: auto;">@ctx.Position</div>
-                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
-                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
+            @if (!isMobile)
+            {
+                <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                    <Template>
+                        <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                            <div style="margin: auto;">@ctx.Position</div>
+                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            }
             <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
                 <Template>
                     <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
@@ -66,5 +72,9 @@ else
 <style>
     .rz-custom-header {
         width: 100% !important;
+    }
+
+    .rz-body {
+        overflow: hidden !important;
     }
 </style>

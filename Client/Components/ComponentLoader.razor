@@ -1,0 +1,10 @@
+﻿<RadzenRow JustifyContent="JustifyContent.Center">
+    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+        <Loader Size="@Size" Text="@Text" />
+    </RadzenStack>
+</RadzenRow>
+
+@code {
+    [Parameter] public string Text { get; set; }
+    [Parameter] public ProgressBarCircularSize Size { get; set; } = ProgressBarCircularSize.Medium;
+}

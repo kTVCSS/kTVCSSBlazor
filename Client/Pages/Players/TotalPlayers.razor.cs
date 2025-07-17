@@ -7,6 +7,10 @@ namespace kTVCSSBlazor.Client.Pages.Players
     {
         private List<TotalPlayer> dataSource = new List<TotalPlayer>();
         private List<TotalPlayer> _filtered = new List<TotalPlayer>();
+
+        private int windowHeight = 0;
+        private bool isMobile = false;
+
         private string _searchString;
         private string SearchString
         {
@@ -21,7 +25,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 _filtered = dataSource.Where(QuickFilter).ToList();
             }
         }
-        private bool isMobile = false;
+
         private bool isModerator = false;
         private bool ready = false;
 
@@ -31,6 +35,25 @@ namespace kTVCSSBlazor.Client.Pages.Players
             {
                 Task.Run(async () =>
                 {
+                    isMobile = await mds.IsMobileDeviceAsync();
+                    WindowSize.OnResized += (w, h) =>
+                    {
+                        Console.WriteLine(h);
+
+                        if (isMobile)
+                        {
+                            windowHeight = h - 118;
+                        }
+                        else
+                        {
+                            windowHeight = h - 208;
+                        }
+
+                        InvokeAsync(StateHasChanged);
+                    };
+
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+
                     dataSource = await http.GetFromJsonAsync<List<TotalPlayer>>("/api/players/gettotalplayers");
 
                     _filtered.AddRange(dataSource);
@@ -42,8 +65,10 @@ namespace kTVCSSBlazor.Client.Pages.Players
             }
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            //await WindowSize.DisposeAsync();
             dataSource = null;
             _filtered = null;
         }

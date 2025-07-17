@@ -10,6 +10,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
         int days = 7;
         int minsecs = 20;
 
+        bool isMobile = false;
         bool ready = true;
 
         private async Task Analyse()
@@ -30,14 +31,19 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
             });
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            Task.Run(async () =>
+            if (firstRender)
             {
-                ready = true;
+                Task.Run(async () =>
+                {
+                    isMobile = await mds.IsMobileDeviceAsync();
 
-                await InvokeAsync(StateHasChanged);
-            });
+                    ready = true;
+
+                    await InvokeAsync(StateHasChanged);
+                });
+            }
         }
     }
 }

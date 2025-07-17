@@ -17,7 +17,7 @@
             {
                 <RadzenAlert AlertStyle="AlertStyle.Info" Text="Для редактирования имеющейся карты нужно удалить ее, а потом добавить заного с новым именем" />
 
-                <RadzenDataGrid @ref="itemsGrid" AllowAlternatingRows="true" AllowVirtualization EditMode="@editMode"
+                <RadzenDataGrid Responsive @ref="itemsGrid" AllowAlternatingRows="true" AllowVirtualization EditMode="@editMode"
                                 Data="@items" TItem="Map" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
                     <HeaderTemplate>
                         <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Добавить" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && itemsToInsert.Count() > 0)" />
