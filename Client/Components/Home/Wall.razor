@@ -63,11 +63,11 @@
                                 {
                                     if (post.MediaType == MediaType.Image)
                                     {
-                                        <RadzenImage Click=@(() => { currentFile = post.MediaUrl; ShowImage(); }) Path="@post.MediaUrl" Style="max-width: 640px;width: 100%;max-height: 480px; cursor: pointer;" />
+                                        <RadzenImage Click=@(() => { currentFile = post.MediaUrl; ShowImage(); }) Path="@post.MediaUrl" Style="width: 100%;max-height: 380px; cursor: pointer;display: flex; margin:auto" />
                                     }
                                     else if (post.MediaType == MediaType.Video)
                                     {
-                                        <video controls style="width: 100%;max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
+                                        <video controls style="display: flex; margin:auto;width: 100%;max-width: 640px; max-height: 360px" src="@post.MediaUrl" />
                                     }
                                 }
                                 <div class="rz-my-2">
