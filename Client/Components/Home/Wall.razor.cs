@@ -60,8 +60,7 @@ namespace kTVCSSBlazor.Client.Components.Home
         {
             if (!string.IsNullOrWhiteSpace(newPostContent))
             {
-                TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
-                DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+                DateTime now = DateTime.UtcNow.AddHours(3);
 
                 post = new Post()
                 {

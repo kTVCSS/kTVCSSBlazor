@@ -60,8 +60,7 @@ namespace kTVCSSBlazor.Client.Pages.Cups
 
         private void CalculateTimeLeft()
         {
-            TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
-            DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+            DateTime now = DateTime.UtcNow.AddHours(3);
             DateTime target = now.Date.AddHours(18);
 
             if (now > target)

@@ -164,8 +164,7 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
                 // Обновляем статус пользователей в диалогах
                 if (dialogs != null)
                 {
-                    TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
-                    DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+                    DateTime now = DateTime.UtcNow.AddHours(3);
 
                     foreach (var dialog in dialogs)
                     {

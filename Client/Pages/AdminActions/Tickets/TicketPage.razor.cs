@@ -42,8 +42,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             if (string.IsNullOrEmpty(text))
                 return;
 
-            TimeZoneInfo moscowTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time");
-            DateTime now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, moscowTimeZone);
+            DateTime now = DateTime.UtcNow.AddHours(3);
 
             var msg = new TicketMessage
             {
