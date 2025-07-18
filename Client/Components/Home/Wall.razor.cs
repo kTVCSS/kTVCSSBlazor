@@ -112,6 +112,8 @@ namespace kTVCSSBlazor.Client.Components.Home
             await http.PostAsJsonAsync("/api/userposts/removecomment", comment);
 
             Posts.FirstOrDefault(x => x.PostId == post.PostId).Comments.RemoveAll(x => x.CommentId == comment.CommentId);
+
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task LikePost(Post post)
@@ -119,6 +121,8 @@ namespace kTVCSSBlazor.Client.Components.Home
             await http.PostAsJsonAsync($"/api/userposts/likepost?id={AuthProvider.CurrentUser.Id}", post);
             var p = await http.GetFromJsonAsync<Post>($"/api/userposts/getpost?id={post.PostId}");
             Posts.First(x => x.PostId == post.PostId).Likes = p.Likes;
+
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task DislikePost(Post post)
@@ -126,6 +130,8 @@ namespace kTVCSSBlazor.Client.Components.Home
             await http.PostAsJsonAsync($"/api/userposts/dislikepost?id={AuthProvider.CurrentUser.Id}", post);
             var p = await http.GetFromJsonAsync<Post>($"/api/userposts/getpost?id={post.PostId}");
             Posts.First(x => x.PostId == post.PostId).Likes = p.Likes;
+
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task AddComment(Post post)
@@ -159,6 +165,8 @@ namespace kTVCSSBlazor.Client.Components.Home
                 Posts.First(x => x.PostId == post.PostId).Comments = p.Comments;
 
                 post.NewComment = string.Empty;
+
+                await InvokeAsync(StateHasChanged);
             }
         }
 
@@ -197,6 +205,8 @@ namespace kTVCSSBlazor.Client.Components.Home
         {
             await http.GetAsync($"/api/userposts/removepost?id={postId}");
             Posts.RemoveAll(x => x.PostId == postId);
+
+            await InvokeAsync(StateHasChanged);
         }
 
         public async ValueTask DisposeAsync()
