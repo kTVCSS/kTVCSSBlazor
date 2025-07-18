@@ -12,7 +12,12 @@
 };
 
 window.getPermission = () => {
-    return Notification.permission === 'default'
+    if ('Notification' in window) {
+        return Notification.permission === 'default';
+    }
+    else {
+        return false;
+    }
 }
 
 window.requestNotificationPermission = () => {
@@ -22,19 +27,24 @@ window.requestNotificationPermission = () => {
 };
 
 function isMobileDevice() {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isMobile = /android|iphone|kindle|ipad/i.test(userAgent);
-    if (isMobile) {
-        return true;
+    try {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isMobile = /android|iphone|kindle|ipad/i.test(userAgent);
+        if (isMobile) {
+            return true;
+        }
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints;
+        if (screen.width <= 768) {
+            return true;
+        }
+        if (isTouchDevice) {
+            return true;
+        }
+        return false;
     }
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints;
-    if (screen.width <= 768) {
-        return true;
+    catch (ex) {
+        return false;
     }
-    if (isTouchDevice) {
-        return true;
-    }
-    return false;
 }
 
 window.toBoosty = () => {

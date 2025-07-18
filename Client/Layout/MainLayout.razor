@@ -271,31 +271,27 @@ else
     {
         if (firstRender)
         {
-            await WindowSize.InitializeAsync(JSRuntime);
+            bool nt = false;
 
-            isMobile = await mds.IsMobileDeviceAsync();
-
-            if (isMobile)
+            try
             {
-                sidebarExpanded = false;
-            }
+                await WindowSize.InitializeAsync(JSRuntime);
 
-            var nt = await JSRuntime.InvokeAsync<bool>("getPermission");
+                isMobile = await mds.IsMobileDeviceAsync();
+
+                if (isMobile)
+                {
+                    sidebarExpanded = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
 
             ready = true;
 
             await InvokeAsync(StateHasChanged);
-
-            if (nt)
-            {
-                await DialogService.OpenAsync("Подключение уведомлений", ds =>
-                            @<RadzenStack Gap="1.5rem">
-                                <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
-                            </RadzenStack>
-                , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
-
-                JSRuntime.InvokeVoidAsync("requestNotificationPermission");
-            }
 
             // таска для проверки, надо чуваку подтверждать регу или нет
             Task.Run(async () =>
@@ -330,6 +326,19 @@ else
                     }
                     else
                     {
+                        nt = await JSRuntime.InvokeAsync<bool>("getPermission");
+
+                        if (nt)
+                        {
+                            await DialogService.OpenAsync("Подключение уведомлений", ds =>
+                                        @<RadzenStack Gap="1.5rem">
+                                            <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
+                                        </RadzenStack>
+                            , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+
+                            JSRuntime.InvokeVoidAsync("requestNotificationPermission");
+                        }
+
                         ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
                         {
                             if (!NavigationManager.Uri.ToLower().Contains("/chat"))

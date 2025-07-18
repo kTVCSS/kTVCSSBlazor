@@ -4,7 +4,6 @@ namespace kTVCSSBlazor.Client.Services
 {
     public class WindowSizeService : IAsyncDisposable
     {
-        private IJSObjectReference _module;
         private DotNetObjectReference<WindowSizeService> _dotNetRef;
         private IJSObjectReference _resizer;
 
@@ -14,10 +13,8 @@ namespace kTVCSSBlazor.Client.Services
 
         public async ValueTask InitializeAsync(IJSRuntime js)
         {
-            if (_module != null) return;
-            _module = await js.InvokeAsync<IJSObjectReference>("import", "/js/windowSize.js");
             _dotNetRef = DotNetObjectReference.Create(this);
-            _resizer = await _module.InvokeAsync<IJSObjectReference>(
+            _resizer = await js.InvokeAsync<IJSObjectReference>(
               "registerResizeCallback",
               _dotNetRef,
               nameof(NotifyResize)
@@ -44,9 +41,6 @@ namespace kTVCSSBlazor.Client.Services
             }
 
             _dotNetRef?.Dispose();
-
-            if (_module != null)
-                await _module.DisposeAsync();
         }
     }
 }
