@@ -21,7 +21,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private bool isMeAFriend = false;
 
-        private kTVCSS.Models.Db.Models.Players.FriendRequest? FriendRequest;
+        private kTVCSS.Models.Db.Models.Players.FriendRequest FriendRequest;
 
         public List<MapWinrate> MapsWinrate = [];
 
@@ -54,6 +54,11 @@ namespace kTVCSSBlazor.Client.Pages.Players
         {
             Task.Run(async () =>
             {
+                if (!NavigationManager.Uri.ToString().Contains("/player/"))
+                {
+                    return;
+                }
+
                 NavigationManager.LocationChanged += HandleLocationChanged;
 
                 player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={Id}");
@@ -113,6 +118,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
                             NotificationService.Notify(Radzen.NotificationSeverity.Info, "Заявка в друзья", "Вас хотят добавить в друзья! Принять или отклонить заявку можно в меню действий под шапкой игрока.");
                         }
                     }
+
+                    await InvokeAsync(StateHasChanged);
                 });
             });
         }
