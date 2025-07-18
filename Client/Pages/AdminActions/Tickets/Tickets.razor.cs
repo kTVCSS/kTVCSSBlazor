@@ -2,6 +2,7 @@
 using kTVCSS.Models.Db.Models.Tickets;
 using kTVCSS.Models.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Radzen;
 using Radzen.Blazor;
 using System.Net.Http.Json;
@@ -21,7 +22,9 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
 
         public void Dispose()
         {
-            disposed = true;
+            NavigationManager.LocationChanged -= HandleLocationChanged;
+            StateHasChanged();
+            OnInitializedAsync();
         }
 
         private string ticketText = "";
@@ -58,10 +61,18 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             }
         }
 
+        private void HandleLocationChanged(object? sender, LocationChangedEventArgs e)
+        {
+            Dispose();
+            StateHasChanged();
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
+                NavigationManager.LocationChanged += HandleLocationChanged;
+
                 Task.Run(async () =>
                 {
                     int retries = 0;
