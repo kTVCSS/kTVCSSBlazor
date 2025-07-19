@@ -22,6 +22,9 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
 
         public void Dispose()
         {
+            ready = false;
+            _tickets = null;
+            _ticketsclosed = null;
             NavigationManager.LocationChanged -= HandleLocationChanged;
             StateHasChanged();
             OnInitializedAsync();
@@ -67,57 +70,54 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             StateHasChanged();
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
+            NavigationManager.LocationChanged += HandleLocationChanged;
+
+            Task.Run(async () =>
             {
-                NavigationManager.LocationChanged += HandleLocationChanged;
+                int retries = 0;
+                int max = 50;
 
-                Task.Run(async () =>
+                while (AuthProvider.CurrentUser is null)
                 {
-                    int retries = 0;
-                    int max = 50;
-
-                    while (AuthProvider.CurrentUser is null)
+                    if (disposed)
                     {
-                        if (disposed)
-                        {
-                            return;
-                        }
-
-                        if (retries > max)
-                        {
-                            ready = true;
-
-                            await InvokeAsync(StateHasChanged);
-
-                            return;
-                        }
-
-                        retries += 1;
-
-                        await Task.Delay(100);
+                        return;
                     }
 
-                    if (!Id.HasValue)
+                    if (retries > max)
                     {
-                        if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
-                        {
-                            _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
-                            _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
-                        }
-                    }
-                    else
-                    {
-                        _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/players/gettickets?id=" + AuthProvider.CurrentUser.Id);
-                        _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/players/getticketsclosed?id=" + AuthProvider.CurrentUser.Id);
+                        ready = true;
+
+                        await InvokeAsync(StateHasChanged);
+
+                        return;
                     }
 
-                    ready = true;
+                    retries += 1;
 
-                    await InvokeAsync(StateHasChanged);
-                });
-            }
+                    await Task.Delay(100);
+                }
+
+                if (!Id.HasValue)
+                {
+                    if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                    {
+                        _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/gettickets");
+                        _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/admins/getticketsclosed");
+                    }
+                }
+                else
+                {
+                    _tickets = await http.GetFromJsonAsync<List<Ticket>>("/api/players/gettickets?id=" + AuthProvider.CurrentUser.Id);
+                    _ticketsclosed = await http.GetFromJsonAsync<List<Ticket>>("/api/players/getticketsclosed?id=" + AuthProvider.CurrentUser.Id);
+                }
+
+                ready = true;
+
+                await InvokeAsync(StateHasChanged);
+            });
         }
     }
 }
