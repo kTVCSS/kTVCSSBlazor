@@ -28,15 +28,18 @@
                         </RadzenStack>
                     </HeaderTemplate>
                     <Columns>
-                        <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
-                            <Template>
-                                <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
-                                    <div style="margin: auto;">@ctx.Position</div>
-                                    <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
-                                    <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
-                                </RadzenStack>
-                            </Template>
-                        </RadzenDataGridColumn>
+                        @if (!isMobile)
+                        {
+                            <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                                <Template>
+                                    <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                                        <div style="margin: auto;">@ctx.Position</div>
+                                        <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                                        <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                                    </RadzenStack>
+                                </Template>
+                            </RadzenDataGridColumn>
+                        }
                         <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
                             <Template>
                                 <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>

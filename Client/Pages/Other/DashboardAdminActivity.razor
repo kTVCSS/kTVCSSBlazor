@@ -1,0 +1,51 @@
+﻿<RadzenStack Gap="1rem">
+    <RadzenRow>
+        <RadzenColumn SizeMD="12" SizeXS="12">
+            <RadzenDataGrid Style="height: 500px" AllowVirtualization Density="Density.Compact" AllowGrouping AllowSorting AllowMultiColumnSorting AllowColumnResize AllowFiltering AllowAlternatingRows AllowColumnReorder Data="@Admins.Where(x => x.UserName != "Система")">
+                <Columns>
+                    <RadzenDataGridColumn Title="Дата" Context="ctx">
+                        <Template>
+                            <div>@ctx.DateTime.ToShortDateString()</div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Context="ctx" Title="Админ" Property="UserName" />
+                    <RadzenDataGridColumn Context="ctx" Title="Ответы" Property="Count" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow>
+        @foreach (var admin in Admins.Where(x => x.UserName != "Система").GroupBy(x => x.UserName))
+        {
+            <RadzenColumn SizeMD="12" SizeXS="12">
+                <RadzenCard Variant="Radzen.Variant.Flat">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                        <RadzenText TextStyle="TextStyle.H4">@admin.Key</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@admin.Count()</RadzenText>
+                    </RadzenStack>
+                    <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                        <RadzenColumnSeries TItem="kTVCSS.Models.Models.DashboardAdminLog" Data="@admin.ToList()" ValueProperty="Count" CategoryProperty="DateTime">
+                            <ChildContent>
+                                <RadzenLegend Visible=false />
+                                <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                                <RadzenSeriesDataLabels Visible="true" />
+                            </ChildContent>
+                            <TooltipTemplate Context="Data">
+                                <div>
+                                    Ответов в тикетах за <span>@Data.DateTime.ToShortDateString()</span>:
+                                    <strong>@Data.Count</strong>
+                                </div>
+                            </TooltipTemplate>
+                        </RadzenColumnSeries>
+                    </RadzenChart>
+                </RadzenCard>
+            </RadzenColumn>
+        }
+    </RadzenRow>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public List<kTVCSS.Models.Models.DashboardAdminLog> Admins { get; set; }
+}
