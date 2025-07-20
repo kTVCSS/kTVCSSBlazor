@@ -42,6 +42,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         public void Dispose()
         {
+            MapsWinrate = null;
+            MapStats = null;
             ready = false;
             disposed = true;
             player = null;
@@ -63,7 +65,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
                 player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={Id}");
 
-                foreach (var map in player.LastTwentyMatches.DistinctBy(x => x.MapName))
+                foreach (var map in player.LastTwentyMatches.DistinctBy(x => x.MapName.Trim()))
                 {
                     MapStats.Add(new()
                     {

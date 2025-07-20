@@ -2,6 +2,7 @@
 @using System.Text
 @using System.Text.RegularExpressions
 @using System.Globalization
+@using kTVCSS.Models.Db.Models.Roles
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
 @using kTVCSSBlazor.Client.Services
@@ -93,7 +94,7 @@
                             <CascadingAuthenticationState>
                                 <AuthorizeView>
                                     <Authorized>
-                                        <RadzenButton MouseEnter="@(args => ShowTooltip(args, "Лучшие моменты матча (доступно VIP пользователям)"))" Click="@(() => { NavigationManager.NavigateTo($"/match/highlights/{MatchID}"); })" Disabled="!AuthProvider.CurrentUser.IsVip" Icon="movie"></RadzenButton>
+                                        <RadzenButton MouseEnter="@(args => ShowTooltip(args, "Лучшие моменты матча (доступно VIP пользователям)"))" Click="@(() => { NavigationManager.NavigateTo($"/match/highlights/{MatchID}"); })" Disabled="@(!AuthProvider.CurrentUser.IsVip && AuthProvider.CurrentUser.Role < RoleType.Moderator)" Icon="movie"></RadzenButton>
                                     </Authorized>
                                 </AuthorizeView>
                             </CascadingAuthenticationState>
@@ -103,7 +104,7 @@
             </div>
         </RadzenCard>
 
-        @if (isTeamStuffsVisible)
+        @if (!isMobile)
         {
             <RadzenRow>
                 <RadzenColumn SizeMD="12">

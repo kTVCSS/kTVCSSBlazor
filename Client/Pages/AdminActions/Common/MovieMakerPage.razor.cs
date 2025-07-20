@@ -9,7 +9,8 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
         List<IGrouping<int, Result>> results = [];
         int days = 7;
         int minsecs = 20;
-
+        bool justAces = false;
+        bool justQuadros = false;
         bool isMobile = false;
         bool ready = true;
 
@@ -22,6 +23,16 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
                 await InvokeAsync(StateHasChanged);
 
                 data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/ForMovieMaker?days={days}&minsecs={minsecs}");
+
+                if (justQuadros)
+                {
+                    data.RemoveAll(x => x.Type != "Quadro");
+                }
+
+                if (justAces)
+                {
+                    data.RemoveAll(x => x.Type != "Rampage");
+                }
 
                 results = data.GroupBy(x => x.MatchID).ToList();
 

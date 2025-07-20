@@ -33,9 +33,13 @@
                             <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
                                 <RadzenLabel Text="Количество дней" />
                                 <RadzenNumeric @bind-Value=days />
-                                <RadzenLabel Text="Минимум в секундах" />
+                                <RadzenLabel Text="Максимум в секундах" />
                                 <RadzenNumeric @bind-Value=minsecs />
                                 <RadzenButton Text="Анализ" Click="Analyse" />
+                                <RadzenLabel Text="Только квадро" />
+                                <RadzenSwitch @bind-Value=justQuadros />
+                                <RadzenLabel Text="Только эйсы" />
+                                <RadzenSwitch @bind-Value=justAces />
                             </RadzenStack>
                         </RadzenCard>
                         <RadzenStack>

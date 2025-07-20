@@ -1,0 +1,45 @@
+﻿@using kTVCSS.Models.Db.Models.Common
+@inject DialogService DialogService
+
+<RadzenRow>
+    <RadzenColumn SizeMD="12" SizeXS="12">
+        <RadzenDataGrid Style="height: 500px" AllowVirtualization Density="Density.Compact" AllowGrouping AllowSorting AllowMultiColumnSorting AllowColumnResize AllowFiltering AllowAlternatingRows AllowColumnReorder Data="@Logs">
+            <Columns>
+                <RadzenDataGridColumn OrderIndex="0" SortOrder="SortOrder.Descending" Context="ctx" Title="Дата" Property="TimeStamp" />
+                <RadzenDataGridColumn Context="ctx" Title="Уровень" Property="Level" />
+                <RadzenDataGridColumn Context="ctx" Title="Логгер" Property="Logger" />
+                <RadzenDataGridColumn Title="Сообщение" Context="ctx">
+                    <Template>
+                        <div @onclick=@((MouseEventArgs e) => { ShowText(ctx.Message); })>@ctx.Message</div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="Исключение" Context="ctx">
+                    <Template>
+                        <div @onclick=@((MouseEventArgs e) => { ShowText(ctx.Exception); })>@ctx.Exception</div>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+</RadzenRow>
+
+<style>
+    .rz-dialog-content, .rz-dialog-side-content {
+        overflow-wrap: break-word !important;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public List<NLogRecord> Logs { get; set; }
+
+    private async Task ShowText(string text)
+    {
+        await DialogService.OpenAsync("FullView", ds =>
+            @<RadzenStack Gap="1.5rem">
+            <RadzenText>@text</RadzenText>
+            <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
+        </RadzenStack>
+        , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+    }
+}

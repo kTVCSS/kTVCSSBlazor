@@ -344,6 +344,7 @@ else
                             await DialogService.OpenAsync("Подключение уведомлений", ds =>
                                         @<RadzenStack Gap="1.5rem">
                                             <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
+                                            <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
                                         </RadzenStack>
                             , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
 

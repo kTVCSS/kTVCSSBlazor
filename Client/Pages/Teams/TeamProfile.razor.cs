@@ -180,7 +180,7 @@ namespace kTVCSSBlazor.Client.Pages.Teams
 
                     var team = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}");
 
-                    foreach (var map in team.Matches.DistinctBy(x => x.MapName))
+                    foreach (var map in team.Matches.DistinctBy(x => x.MapName.Trim()))
                     {
                         MapStats.Add(new()
                         {

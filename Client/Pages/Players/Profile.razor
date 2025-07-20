@@ -110,6 +110,8 @@
                     <RadzenChartTooltipOptions Shared="false" />
                     <RadzenLineSeries Smooth="false" Data="@player.Rating.OrderByDescending(x => x.DateTime).Take(20).OrderBy(x => x.DateTime)" CategoryProperty="DateTime" Title="MMR" ValueProperty="Points">
                         <RadzenMarkers Visible="true" MarkerType="MarkerType.Circle" />
+                        <RadzenLegend Visible=false />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="false" />
                     </RadzenLineSeries>
                     <RadzenCategoryAxis Padding="20" />

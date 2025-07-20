@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using kTVCSS.Models.Db.Models.Common;
+using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Pages.Other
 {
@@ -6,6 +7,7 @@ namespace kTVCSSBlazor.Client.Pages.Other
     {
         private List<kTVCSS.Models.Models.Dashboard> data = [];
         private List<kTVCSS.Models.Models.DashboardAdminLog> admins = [];
+        private List<NLogRecord> logs = [];
         private bool ready = false;
         private int days = 7;
 
@@ -16,6 +18,8 @@ namespace kTVCSSBlazor.Client.Pages.Other
                 data = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.Dashboard>>("/api/admins/getdashboardinfo?days=" + days);
 
                 admins = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.DashboardAdminLog>>("/api/admins/GetDashboardInfoAdmins?days=" + days);
+                
+                logs = await http.GetFromJsonAsync<List<NLogRecord>>("/api/admins/GetLogs?days=" + days);
 
                 ready = true;
 
@@ -32,6 +36,8 @@ namespace kTVCSSBlazor.Client.Pages.Other
             data = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.Dashboard>>("/api/admins/getdashboardinfo?days=" + days);
 
             admins = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.DashboardAdminLog>>("/api/admins/GetDashboardInfoAdmins?days=" + days);
+
+            logs = await http.GetFromJsonAsync<List<NLogRecord>>("/api/admins/GetLogs?days=" + days);
 
             ready = true;
 
