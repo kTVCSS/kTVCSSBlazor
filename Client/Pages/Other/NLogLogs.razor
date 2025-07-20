@@ -3,7 +3,7 @@
 
 <RadzenRow>
     <RadzenColumn SizeMD="12" SizeXS="12">
-        <RadzenDataGrid Style="height: 500px" AllowVirtualization Density="Density.Compact" AllowGrouping AllowSorting AllowMultiColumnSorting AllowColumnResize AllowFiltering AllowAlternatingRows AllowColumnReorder Data="@Logs">
+        <RadzenDataGrid Responsive Style="height: 500px" AllowVirtualization Density="Density.Compact" AllowGrouping AllowSorting AllowMultiColumnSorting AllowColumnResize AllowFiltering AllowAlternatingRows AllowColumnReorder Data="@Logs">
             <Columns>
                 <RadzenDataGridColumn OrderIndex="0" SortOrder="SortOrder.Descending" Context="ctx" Title="Дата" Property="TimeStamp" />
                 <RadzenDataGridColumn Context="ctx" Title="Уровень" Property="Level" />

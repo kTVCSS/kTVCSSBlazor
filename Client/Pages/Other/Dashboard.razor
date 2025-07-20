@@ -1,7 +1,9 @@
 ﻿@page "/dashboard"
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
 @inject StateProvider StateProvider
 @inject HttpClient http
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Дашборд</PageTitle>
 
@@ -15,11 +17,22 @@
                     <RadzenStack Gap="1rem">
                         <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
                             <RadzenCard>
-                                <RadzenStack Orientation="Orientation.Horizontal">
+                                @if (!isMobile)
+                                {
+                                    <RadzenStack Orientation="Orientation.Horizontal">
                                     <RadzenLabel class="rz-m-auto" Text="Количество дней" />
                                     <RadzenNumeric @bind-Value=@days />
                                     <RadzenButton Click="Apply" Text="Применить" />
-                                </RadzenStack>
+                                    </RadzenStack>
+                                }
+                                else
+                                {
+                                    <RadzenStack class="rz-w-100" Orientation="Orientation.Vertical">
+                                        <RadzenLabel class="rz-m-auto rz-w-100" Text="Количество дней" />
+                                        <RadzenNumeric class="rz-w-100" @bind-Value=@days />
+                                        <RadzenButton class="rz-w-100" Click="Apply" Text="Применить" />
+                                    </RadzenStack>
+                                }
                             </RadzenCard>
                         </RadzenRow>
                         @if (data.Any() && data.Count() > 0)
@@ -58,3 +71,9 @@
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
+
+<style>
+    .rz-tabview-top>.rz-tabview-nav {
+        flex-wrap: wrap !important;
+    }
+</style>

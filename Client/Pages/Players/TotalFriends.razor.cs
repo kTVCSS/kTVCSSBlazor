@@ -36,6 +36,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
                         await Task.Delay(1000);
                     }
 
+                    isMobile = await mds.IsMobileDeviceAsync();
+
                     dataSource = await http.GetFromJsonAsync<List<TotalPlayer>>($"/api/friendsengine/getfriends?playerid={kTVCSSAuthenticationStateProvider.CurrentUser.Id}");
 
                     _filtered.AddRange(dataSource);
