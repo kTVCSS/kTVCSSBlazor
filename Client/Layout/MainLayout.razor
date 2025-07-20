@@ -101,6 +101,7 @@
                                     <RadzenPanelMenuItem Click=SidePanelClick Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
                                     @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                     {
+                                        <RadzenPanelMenuItem Click=SidePanelClick Text="Дашборд" Path="/dashboard" Icon="dashboard"></RadzenPanelMenuItem>
                                         <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
@@ -159,6 +160,16 @@
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="groups" Text="Команды" Path="/teams" />
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="videogame_asset" Text="Матчи" Path="/matches" />
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="trophy" Text="Боевые кубки" Path="/battlecups" />
+                @if (isMobile)
+                {
+                    <RadzenPanelMenuItem Expanded=false Text="Информация" Icon="info">
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="apartment" Path="/about" Text="О проекте" />
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="gavel" Path="/rules" Text="Правила" />
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="contactless" Path="/contacts" Text="Контакты" />
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="contact_support" Path="/faq" Text="FAQ" />
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="download_for_offline" Path="/downloads" Text="Загрузки" />
+                    </RadzenPanelMenuItem>
+                }
             </RadzenPanelMenu>
         </RadzenSidebar>
         <RadzenBody Expanded="@sidebarExpanded">

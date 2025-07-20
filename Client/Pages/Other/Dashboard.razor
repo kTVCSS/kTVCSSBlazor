@@ -1,0 +1,242 @@
+﻿@page "/dashboard"
+@using kTVCSSBlazor.Client.Authorization
+@inject StateProvider StateProvider
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Дашборд</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                @if (StateProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
+                {
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow AlignItems="AlignItems.Center">
+                            <RadzenColumn Size="12">
+                                <RadzenText Text="Информация за текущий день / всего за 10 дней" TextStyle="TextStyle.H3" TagName="TagName.H1" style="margin: 0" />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <RadzenRow>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="videogame_asset" class="rz-background-color-success-light rz-color-on-success-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Миксы" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="stadia_controller" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Матчи" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="contact_support" class="rz-background-color-warning-light rz-color-on-warning-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Тикеты" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="deskphone" class="rz-background-color-primary-dark rz-color-on-primary-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Ответы в тикетах" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Messages).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Messages).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="person" class="rz-background-color-info-light rz-color-on-success-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Регистрации" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Outlined">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                                        <RadzenIcon Icon="block" class="rz-background-color-danger-light rz-color-on-success-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                                        <RadzenStack Gap="0">
+                                            <RadzenText Text="Баны" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="@(string.Concat(data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans).Sum(x => x.Count).ToString()))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn Size="12">
+                                <RadzenCard Variant="Radzen.Variant.Flat">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenText TextStyle="TextStyle.H4">Миксы за 10 дней</RadzenText>
+                                        <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes).Sum(x => x.Count)</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenChart ColorScheme=ColorScheme.Divergent Style="width: 100%">
+                                        <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Количество за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenColumnSeries>
+                                    </RadzenChart>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12">
+                                <RadzenCard Variant="Radzen.Variant.Flat">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenText TextStyle="TextStyle.H4">Матчи за 10 дней</RadzenText>
+                                        <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars).Sum(x => x.Count)</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                                        <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Количество за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenColumnSeries>
+                                    </RadzenChart>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12">
+                                <RadzenCard Variant="Radzen.Variant.Flat">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenText TextStyle="TextStyle.H4">Тикеты за 10 дней</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenChart ColorScheme=ColorScheme.Palette Style="width: 100%">
+                                        <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Тикетов за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenColumnSeries>
+                                        <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Messages)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Ответов за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenColumnSeries>
+                                    </RadzenChart>
+                                </RadzenCard>
+                            </RadzenColumn>
+                        </RadzenRow>
+                        <RadzenRow>
+                            <RadzenColumn SizeMD="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Flat">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenText TextStyle="TextStyle.H4">Посты за 10 дней</RadzenText>
+                                        <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts).Sum(x => x.Count)</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                                        <RadzenDonutSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Количество за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenDonutSeries>
+                                    </RadzenChart>
+                                </RadzenCard>
+                            </RadzenColumn>
+                            <RadzenColumn SizeMD="6" Size="6" SizeXS="12">
+                                <RadzenCard Variant="Radzen.Variant.Flat">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenText TextStyle="TextStyle.H4">Баны/регистрации за 10 дней</RadzenText>
+                                    </RadzenStack>
+                                    <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                                        <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Регистраций за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenLineSeries>
+                                        <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans)" ValueProperty="Count" CategoryProperty="DateTime">
+                                            <ChildContent>
+                                                <RadzenLegend Visible=false />
+                                                <RadzenSeriesDataLabels Visible="true" />
+                                            </ChildContent>
+                                            <TooltipTemplate Context="data">
+                                                <div>
+                                                    Банов за <span>@data.DateTime.ToShortDateString()</span>:
+                                                    <strong>@data.Count</strong>
+                                                </div>
+                                            </TooltipTemplate>
+                                        </RadzenLineSeries>
+                                    </RadzenChart>
+                                </RadzenCard>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenStack>
+                }
+                else
+                {
+                    <kTVCSSBlazor.Client.Components.NoAccess />
+                }
+            }
+            else
+            {
+                <kTVCSSBlazor.Client.Components.ComponentLoader Text="Идет загрузка данных" />
+            }
+        </Authorized>
+        <NotAuthorized>
+            <kTVCSSBlazor.Client.Components.NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
