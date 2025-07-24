@@ -21,7 +21,7 @@
             <RadzenStack>
                 <RadzenCard>
                     <RadzenStack>
-                        <RadzenFormField Text="◊ÚÓ Û ‚‡Ò ÌÓ‚Ó„Ó?" Style="width: 100%;">
+                        <RadzenFormField Text="–ß—Ç–æ —É –≤–∞—Å –Ω–æ–≤–æ–≥–æ?" Style="width: 100%;">
                             @if (newPostContent.Length > 0)
                             {
                                 <RadzenTextArea Rows="10" @bind-Value="@newPostContent" />
@@ -34,8 +34,8 @@
                         @if (Posts.Any())
                         {
                             <RadzenStack Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
-                                <RadzenButton Click="PostNews" Style="" Text="ŒÔÛ·ÎËÍÓ‚‡Ú¸" Icon="post_add" />
-                                <RadzenUpload ChooseText="œËÍÂÔËÚ¸ ‚ÎÓÊÂÌËÂ" Multiple="false" Auto Change=@OnClientChange
+                                <RadzenButton Click="PostNews" Style="" Text="–û–ø—É–±–ª–∏–∫–æ–≤–∞—Ç—å" Icon="post_add" />
+                                <RadzenUpload ChooseText="–ü—Ä–∏–∫—Ä–µ–ø–∏—Ç—å –≤–ª–æ–∂–µ–Ω–∏–µ" Multiple="false" Auto Change=@OnClientChange
                                               InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
                             </RadzenStack>
                         }
@@ -49,7 +49,7 @@
                             <RadzenCard>
                                 <RadzenStack>
                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                        <img style="width: 60px;height: 60px; border-radius: 128px" src="@post.AuthorAvatar" class="rz-avatar" alt="¿‚‡Ú‡" />
+                                        <img style="width: 60px;height: 60px; border-radius: 128px" src="@post.AuthorAvatar" class="rz-avatar" alt="–ê–≤–∞—Ç–∞—Ä" />
                                         <RadzenStack>
                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
                                             <small>@post.PostDate.ToString("dd.MM.yyyy HH:mm")</small>
@@ -76,27 +76,27 @@
                                         <RadzenButton Icon="thumb_down" Text="@post.DislikesCount.ToString()" Click="() => DislikePost(post)" />
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || post.AuthorId == AuthProvider.CurrentUser.Id)
                                         {
-                                            <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="”‰‡ÎËÚ¸"></RadzenButton>
+                                            <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="–£–¥–∞–ª–∏—Ç—å"></RadzenButton>
                                         }
                                     </RadzenStack>
                                 </div>
                                 <div class="post-comments">
                                     @if (post.Comments.Any())
                                     {
-                                        <h4> ÓÏÏÂÌÚ‡ËË</h4>
+                                        <h4>–ö–æ–º–º–µ–Ω—Ç–∞—Ä–∏–∏</h4>
                                         @if (post.Comments.Count > 3)
                                         {
                                             @foreach (var comment in post.Comments.Take(3))
                                             {
                                                 <RadzenStack>
                                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="¿‚‡Ú‡" />
+                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="–ê–≤–∞—Ç–∞—Ä" />
                                                         <RadzenStack Gap="4px">
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
                                                             <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                                                 <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="”‰‡ÎËÚ¸" />
+                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="–£–¥–∞–ª–∏—Ç—å" />
                                                             </RadzenStack>
                                                         </RadzenStack>
                                                     </RadzenStack>
@@ -104,18 +104,18 @@
                                             }
                                             <RadzenAccordion>
                                                 <Items>
-                                                    <RadzenAccordionItem Text="œÓÍ‡Á‡Ú¸ ÓÒÚ‡Î¸Ì˚Â ÍÓÏÏÂÌÚ‡ËË">
+                                                    <RadzenAccordionItem Text="–ü–æ–∫–∞–∑–∞—Ç—å –æ—Å—Ç–∞–ª—å–Ω—ã–µ –∫–æ–º–º–µ–Ω—Ç–∞—Ä–∏–∏">
                                                         @foreach (var comment in post.Comments.Skip(3))
                                                         {
                                                             <RadzenStack>
                                                                 <RadzenStack Orientation="Orientation.Horizontal">
-                                                                    <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="¿‚‡Ú‡" />
+                                                                    <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="–ê–≤–∞—Ç–∞—Ä" />
                                                                     <RadzenStack Gap="4px">
                                                                         <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                                         <div>@comment.Content</div>
                                                                         <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                                                             <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                            <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="”‰‡ÎËÚ¸" />
+                                                                            <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="–£–¥–∞–ª–∏—Ç—å" />
                                                                         </RadzenStack>
                                                                     </RadzenStack>
                                                                 </RadzenStack>
@@ -131,13 +131,13 @@
                                             {
                                                 <RadzenStack>
                                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="¿‚‡Ú‡" />
+                                                        <img style="width: 30px;height: 30px;border-radius: 128px" src="@comment.AuthorAvatar" class="rz-avatar" alt="–ê–≤–∞—Ç–∞—Ä" />
                                                         <RadzenStack Gap="4px">
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
                                                             <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                                                 <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="”‰‡ÎËÚ¸" />
+                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="–£–¥–∞–ª–∏—Ç—å" />
                                                             </RadzenStack>
                                                         </RadzenStack>
                                                     </RadzenStack>
@@ -147,10 +147,10 @@
                                     }
                                 </div>
                                 <RadzenStack>
-                                    <RadzenFormField Text=" ÓÏÏÂÌÚ‡ËÈ" Style="width: 100%;">
+                                    <RadzenFormField Text="–ö–æ–º–º–µ–Ω—Ç–∞—Ä–∏–π" Style="width: 100%;">
                                         <RadzenTextBox @bind-Value="@post.NewComment" />
                                     </RadzenFormField>
-                                    <RadzenButton Style="width: 200px" Icon="send" Text="ŒÚÔ‡‚ËÚ¸" Click="() => AddComment(post)"></RadzenButton>
+                                    <RadzenButton Style="width: 200px" Icon="send" Text="–û—Ç–ø—Ä–∞–≤–∏—Ç—å" Click="() => AddComment(post)"></RadzenButton>
                                 </RadzenStack>
                             </RadzenCard>
                         }
@@ -158,7 +158,7 @@
                     else
                     {
                         <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
-                            <Loader Text="»‰ÂÚ Á‡„ÛÁÍ‡ ÔÓÒÚÓ‚" />
+                            <Loader Text="–ò–¥–µ—Ç –∑–∞–≥—Ä—É–∑–∫–∞ –ø–æ—Å—Ç–æ–≤" />
                         </RadzenStack>
                     }
                 </RadzenStack>

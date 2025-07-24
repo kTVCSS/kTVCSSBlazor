@@ -7,12 +7,12 @@
             <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         </Found>
         <NotFound>
-            <PageTitle>kTVCSS @@ Страница не найдена</PageTitle>
+            <PageTitle>kTVCSS @@ РЎС‚СЂР°РЅРёС†Р° РЅРµ РЅР°Р№РґРµРЅР°</PageTitle>
             <LayoutView Layout="@typeof(MainLayout)">
                 <RadzenRow>
                     <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
-                        <RadzenText Text="Страница не найдена" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
-                        <RadzenText Text="Извините, но по этому адресу у нас ничего нет!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                        <RadzenText Text="РЎС‚СЂР°РЅРёС†Р° РЅРµ РЅР°Р№РґРµРЅР°" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                        <RadzenText Text="РР·РІРёРЅРёС‚Рµ, РЅРѕ РїРѕ СЌС‚РѕРјСѓ Р°РґСЂРµСЃСѓ Сѓ РЅР°СЃ РЅРёС‡РµРіРѕ РЅРµС‚!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
                     </RadzenColumn>
                 </RadzenRow>
             </LayoutView>
@@ -25,12 +25,12 @@ else
     <LayoutView Layout="@typeof(MainLayout)">
         <RadzenRow>
             <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
-                <RadzenText Text="Backend не работает" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
-                <RadzenText Text="Извините, в данный момент служба ktvcss-backend не доступна, поэтому сайт не может получить какие-либо данные." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
-                <RadzenText Text="Администрация уже в курсе этой проблемы и занимается ее решением." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
-                <RadzenText Text="Пока мы чиним сайт, можете потренировать Ваш аим, лопая шарики!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenText Text="Backend РЅРµ СЂР°Р±РѕС‚Р°РµС‚" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                <RadzenText Text="РР·РІРёРЅРёС‚Рµ, РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ СЃР»СѓР¶Р±Р° ktvcss-backend РЅРµ РґРѕСЃС‚СѓРїРЅР°, РїРѕСЌС‚РѕРјСѓ СЃР°Р№С‚ РЅРµ РјРѕР¶РµС‚ РїРѕР»СѓС‡РёС‚СЊ РєР°РєРёРµ-Р»РёР±Рѕ РґР°РЅРЅС‹Рµ." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenText Text="РђРґРјРёРЅРёСЃС‚СЂР°С†РёСЏ СѓР¶Рµ РІ РєСѓСЂСЃРµ СЌС‚РѕР№ РїСЂРѕР±Р»РµРјС‹ Рё Р·Р°РЅРёРјР°РµС‚СЃСЏ РµРµ СЂРµС€РµРЅРёРµРј." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenText Text="РџРѕРєР° РјС‹ С‡РёРЅРёРј СЃР°Р№С‚, РјРѕР¶РµС‚Рµ РїРѕС‚СЂРµРЅРёСЂРѕРІР°С‚СЊ Р’Р°С€ Р°РёРј, Р»РѕРїР°СЏ С€Р°СЂРёРєРё!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
                 <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
-                    <div id="score">Очки: 0</div>
+                    <div id="score">РћС‡РєРё: 0</div>
                     <div id="game-area"></div>
                     <script src="game.js"></script>
                 </RadzenStack>

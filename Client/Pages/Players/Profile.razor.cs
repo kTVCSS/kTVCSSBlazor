@@ -42,8 +42,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         public void Dispose()
         {
-            MapsWinrate = null;
-            MapStats = null;
+            MapsWinrate = [];
+            MapStats = [];
             ready = false;
             disposed = true;
             player = null;

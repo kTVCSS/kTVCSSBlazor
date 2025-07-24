@@ -303,8 +303,7 @@ else
             ready = true;
 
             await InvokeAsync(StateHasChanged);
-
-            // таска для проверки, надо чуваку подтверждать регу или нет
+            
             Task.Run(async () =>
             {
                 await Task.Delay(3000);
