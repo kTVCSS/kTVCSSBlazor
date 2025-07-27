@@ -89,7 +89,7 @@
                                                     {
                                                         <div>@msg.UserName</div>
                                                     }
-                                                    <div class="text">@msg.MessageText</div>
+                                                    <div class="text"><RadzenMarkdown AllowHtml Text="@msg.MessageText" /></div>
                                                     <div class="time">@msg.CreatedAt.ToString("dd.MM.yy HH:mm")</div>
                                                 </div>
                                             </RadzenStack>
