@@ -7,6 +7,8 @@
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject HttpClient http
+@inject IJSRuntime JSRuntime
+@implements IDisposable
 
 <PageTitle>kTVCSS @@ Добавление хайлайта</PageTitle>
 
@@ -31,8 +33,11 @@
                     <RadzenFormField Text="Описание" Variant="Variant.Filled">
                         <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
                     </RadzenFormField>
-                    <RadzenUpload @ref=_uploader ChooseText="Загрузить видео" Multiple="false" Auto Change=@OnVideoChange
-                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                    <RadzenUpload Disabled=isUploading Progress=@OnProgress @ref=_uploader ChooseText="Загрузить видео" Multiple="false" Auto Change=@OnVideoChange
+                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
+                                  <RadzenUploadHeader Name="Content-Type" Value="multipart/form-data" />
+                    </RadzenUpload>
+                    <RadzenProgressBar Value=@progress class="rz-mt-2" Visible=isUploading />
                     <RadzenUpload ChooseText="Загрузить обложку для видео" Multiple="false" Auto Change=@OnPreviewChange
                                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
 
@@ -45,3 +50,32 @@
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
+
+<script>
+    async function uploadWithProgress(url, file, dotNetHelper) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            const formData = new FormData();
+            formData.append('file', file);
+
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    dotNetHelper.invokeMethodAsync('UpdateProgress', percentComplete);
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject(new Error(xhr.statusText));
+                }
+            };
+
+            xhr.onerror = () => reject(new Error('Ошибка загрузки'));
+            xhr.open('POST', url, true);
+            xhr.send(formData);
+        });
+    }
+</script>

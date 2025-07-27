@@ -407,6 +407,20 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
             }
         }
 
+        private async Task RestrictChat()
+        {
+            await Http.GetAsync($"{baseUri}/api/chat/dialogs/restrict?dialogId={selectedDialog.Id}&playerId={AuthProvider.CurrentUser.Id}&restrict=true");
+
+            nm.Refresh(true);
+        }
+
+        private async Task UnrestrictChat()
+        {
+            await Http.GetAsync($"{baseUri}/api/chat/dialogs/restrict?dialogId={selectedDialog.Id}&playerId={AuthProvider.CurrentUser.Id}&restrict=false");
+
+            nm.Refresh(true);
+        }
+
         public async ValueTask DisposeAsync()
         {
             foreach (var item in disposables)

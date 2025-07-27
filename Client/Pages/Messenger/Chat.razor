@@ -11,6 +11,7 @@
 @inject StateProvider AuthProvider
 @inject DialogService DialogService
 @inject ChatHubService ChatHub
+@inject NavigationManager nm
 
 <PageTitle>kTVCSS @@ Мессенджер</PageTitle>
 
@@ -167,9 +168,20 @@
                                     </div>
                                 }
                                 <div class="input-area">
-                                    <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
-                                    <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
-                                    <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
+                                    @if (selectedDialog.IsRestricted) {
+                                        if (selectedDialog.RestrictIssuier == AuthProvider.CurrentUser.Id) {
+                                            <RadzenButton class="rz-m-auto" Click=UnrestrictChat Text="Разблокировать" />
+                                        }
+                                        else {
+                                            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="Игрок заблокировал Вас" AllowClose=false />
+                                        }
+                                    }
+                                    else {
+                                        <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
+                                        <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
+                                        <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
+                                        <RadzenButton ButtonStyle=ButtonStyle.Danger Style="margin-left: 1%;" Icon="block" Click=RestrictChat />
+                                    }
                                 </div>
                             </div>
                         }
