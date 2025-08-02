@@ -33,7 +33,7 @@
                     <RadzenFormField Text="Описание" Variant="Variant.Filled">
                         <RadzenTextArea Rows="8" @bind-Value="_video.Description" />
                     </RadzenFormField>
-                    <RadzenUpload Disabled=isUploading Progress=@OnProgress @ref=_uploader ChooseText="Загрузить видео" Multiple="false" Auto Change=@OnVideoChange
+                    <RadzenUpload Disabled=isUploading @ref=_uploader ChooseText="Загрузить видео" Multiple="false" Auto Change=@OnVideoChange
                                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})">
                                   <RadzenUploadHeader Name="Content-Type" Value="multipart/form-data" />
                     </RadzenUpload>

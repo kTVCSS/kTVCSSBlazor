@@ -15,7 +15,7 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
         private Video _video = new Video();
         private RadzenUpload _uploader;
         private bool isUploading = false;
-        int progress = 0;
+        double progress = 0;
         private DotNetObjectReference<UploadVideoForm>? dotNetHelper;
 
         void OnProgress(UploadProgressArgs args)
@@ -116,40 +116,57 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
                         return;
                     }
 
-                    var fileStream = file.OpenReadStream(maxAllowedSize: 512 * 1024 * 1024);
-                    using var memoryStream = new MemoryStream();
-                    await fileStream.CopyToAsync(memoryStream);
-                    memoryStream.Position = 0;
-
                     string uploadUrl = "http://localhost:3000/api/UploadVideo";
 
-                    #if RELEASE 
+#if RELEASE
 
                     uploadUrl = "https://api.ktvcss.ru/api/UploadVideo";
 
-                    #endif
+#endif
 
-                    var result = await JSRuntime.InvokeAsync<string>(
-                        "uploadWithProgress",
-                        uploadUrl,
-                        new File(memoryStream.ToArray(), file.Name, file.ContentType),
-                        dotNetHelper);
+                    using var fileStream = file.OpenReadStream(maxAllowedSize: long.MaxValue);
 
-                    var uploadResult = JsonSerializer.Deserialize<FileUploadResult>(result);
-                    
-                    if (uploadResult.Status)
+                    var progressContent = new ProgressStreamContent(fileStream, file.Name);
+                    progressContent.Headers.Add("X-File-Name", file.Name);
+                    progressContent.ProgressChanged += (bytesRead, totalBytes) =>
                     {
-                        _video.Url = uploadResult.Message;
-                        NotificationService.Notify(NotificationSeverity.Success, "Успех", "Видео загружено!");
+                        if (totalBytes > 0)
+                        {
+                            progress = (int)((bytesRead * 100) / totalBytes);
+                            StateHasChanged();
+                        }
+                    };
+
+                    var httpClient = new HttpClient();
+                    var response = await httpClient.PostAsync(uploadUrl, progressContent);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        progress = 100;
+
+                        var result = await response.Content.ReadFromJsonAsync<FileUploadResult>();
+
+                        if (result.Status)
+                        {
+                            _video.Url = result.Message;
+                            NotificationService.Notify(NotificationSeverity.Success, "Видео загружено!");
+                        }
+                        else
+                        {
+                            NotificationService.Notify(NotificationSeverity.Error, "Ошибка загрузки: " + result.Message);
+                        }
                     }
                     else
                     {
-                        NotificationService.Notify(NotificationSeverity.Error, "Ошибка", uploadResult.Message);
+                        NotificationService.Notify(NotificationSeverity.Error, "Ошибка загрузки");
                     }
+
+                    isUploading = false;
                 }
                 catch (Exception ex)
                 {
                     NotificationService.Notify(NotificationSeverity.Error, "Ошибка", ex.Message);
+                    Console.WriteLine(ex.ToString());
                 }
                 finally
                 {
