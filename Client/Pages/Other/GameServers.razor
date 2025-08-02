@@ -1,0 +1,45 @@
+﻿@page "/gameservers"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
+@inject StateProvider StateProvider
+@inject HttpClient http
+@inject NavigationManager nm
+
+<PageTitle>kTVCSS @@ Игровые серверы</PageTitle>
+
+@if (ready) {
+    @if (gameServers.Any()){
+        <RadzenStack Gap="1rem">
+            <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4" Text="Игровые серверы проекта" />
+
+            @foreach (var server in gameServers){
+                @if (server.Busy) {
+                    <RadzenText>#@server.Id @(server.Type == kTVCSS.Models.Models.GameServerType.Cw ? "матч-сервер" : "")@(server.Type == kTVCSS.Models.Models.GameServerType.Mix ? "микс-сервер" : "")@(server.Type == kTVCSS.Models.Models.GameServerType.Registration ? "рег-сервер" : ""): 
+                        <b>@server.Ip:@server.Port</b> (<text Style="color: red">занят</text>)</RadzenText>
+                }
+                else {
+                    <RadzenText>#@server.Id @(server.Type == kTVCSS.Models.Models.GameServerType.Cw ? "матч-сервер" : "")@(server.Type == kTVCSS.Models.Models.GameServerType.Mix ? "микс-сервер" : "")@(server.Type == kTVCSS.Models.Models.GameServerType.Registration ? "рег-сервер" : ""): 
+                        <b>@server.Ip:@server.Port</b> (<text Style="color: green">свободен</text>) 
+                        <CascadingAuthenticationState>
+                            <AuthorizeView>
+                                <Authorized>
+                                    @if (StateProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin) {
+                                        @if (server.Type == kTVCSS.Models.Models.GameServerType.Cw) {
+                                            <RadzenButton Click=@(() => { Setup(server.Id, kTVCSS.Models.Models.GameServerType.Mix); }) Variant=Variant.Text Text="установить микс" />
+                                        }
+                                        else if (server.Type == kTVCSS.Models.Models.GameServerType.Mix) {
+                                            <RadzenButton Click=@(() => { Setup(server.Id, kTVCSS.Models.Models.GameServerType.Cw); }) Variant=Variant.Text Text="установить кв" />
+                                        }
+                                    }
+                                </Authorized>
+                            </AuthorizeView>
+                        </CascadingAuthenticationState>
+                    </RadzenText>
+                }
+            }
+        </RadzenStack>
+    }
+}
+else {
+    <kTVCSSBlazor.Client.Components.ComponentLoader Text="Идет загрузка списка серверов" />
+}
