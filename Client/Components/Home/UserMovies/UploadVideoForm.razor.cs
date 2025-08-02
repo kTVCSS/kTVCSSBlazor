@@ -15,6 +15,8 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
         private Video _video = new Video();
         private RadzenUpload _uploader;
         private bool isUploading = false;
+        private bool videoUploaded = false;
+        private bool videoPosterUploaded = false;
         double progress = 0;
         private DotNetObjectReference<UploadVideoForm>? dotNetHelper;
 
@@ -148,6 +150,7 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
 
                         if (result.Status)
                         {
+                            videoUploaded = true;
                             _video.Url = result.Message;
                             NotificationService.Notify(NotificationSeverity.Success, "Видео загружено!");
                         }
@@ -196,6 +199,7 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
                 if (result.Status)
                 {
                     _video.PreviewImage = result.Message;
+                    videoPosterUploaded = true;
                     NotificationService.Notify(NotificationSeverity.Success, "Успех", "Превьюшка успешно загружено! Не забудьте опубликовать ролик!");
                 }
                 else
