@@ -64,9 +64,9 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             StateHasChanged();
         }
 
-        private async Task Close()
+        private async Task Close(bool isAdmin)
         {
-            await http.GetAsync($"/api/players/closeticket?id={Id}");
+            await http.GetAsync($"/api/players/closeticket?id={Id}&isAdmin={isAdmin}");
 
             NavigationManager.Refresh(true);
         }

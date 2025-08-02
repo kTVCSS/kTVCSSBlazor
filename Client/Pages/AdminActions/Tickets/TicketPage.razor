@@ -106,11 +106,11 @@
                                     </RadzenStack>
                                     @if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator))
                                     {
-                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Если у Вас больше нет вопросов, то Вы можете закрыть обращение" Click="Close" />
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Если у Вас больше нет вопросов, то Вы можете закрыть обращение" Click="@(args => { Close(false); })" />
                                     }
                                     else
                                     {
-                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Закрыть обращение" Click="Close" />
+                                        <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Variant="Variant.Text" Text="Закрыть обращение" Click="@(args => { Close(true); })" />
                                     }
                                 </RadzenStack>
                             </div>

@@ -96,7 +96,9 @@
                                                             <div>@comment.Content</div>
                                                             <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                                                 <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
+                                                                    <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                                }
                                                             </RadzenStack>
                                                         </RadzenStack>
                                                     </RadzenStack>
@@ -115,7 +117,9 @@
                                                                         <div>@comment.Content</div>
                                                                         <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
                                                                             <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
-                                                                            <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
+                                                                                <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
+                                                                            }
                                                                         </RadzenStack>
                                                                     </RadzenStack>
                                                                 </RadzenStack>
