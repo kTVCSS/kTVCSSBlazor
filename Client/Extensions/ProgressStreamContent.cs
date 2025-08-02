@@ -4,7 +4,7 @@ public class ProgressStreamContent : HttpContent
 {
     private readonly Stream _fileStream;
     private readonly string _fileName;
-    private readonly int _bufferSize = 1048576;
+    private readonly int _bufferSize = 102400;
 
     public event Action<long, long>? ProgressChanged;
 
