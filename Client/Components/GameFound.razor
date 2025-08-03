@@ -1,0 +1,103 @@
+﻿<div class="nebula"></div>
+<div class="grid-plane"></div>
+<div class="stars-container">
+  <div class="star-layer"></div>
+  <div class="star-layer"></div>
+  <div class="star-layer"></div>
+</div>
+
+<div class="loader-container">
+  <div class="hologram-platform"></div>
+  <div class="platform-rings">
+    <div class="platform-ring"></div>
+    <div class="platform-ring"></div>
+    <div class="platform-ring"></div>
+  </div>
+
+  <div class="projection-beams">
+    <div class="beam"></div>
+    <div class="beam"></div>
+    <div class="beam"></div>
+    <div class="beam"></div>
+  </div>
+
+  <div class="holo-container">
+    <div class="holo-sphere">
+      <div class="holo-ring"></div>
+      <div class="holo-ring"></div>
+      <div class="holo-ring"></div>
+      <div class="holo-ring"></div>
+      <div class="holo-ring"></div>
+
+      <div class="holo-particles">
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+        <div class="holo-particle"></div>
+      </div>
+    </div>
+
+    <div class="glitch-effect"></div>
+    <div class="lightning"></div>
+  </div>
+
+  <div class="code-lines">
+    @foreach (var line in Strings)
+    {
+      <div class="code-line">@line</div>
+    }
+  </div>
+
+  <div class="holo-numbers">
+    <div class="number" style="top: 40%; left: 30%; animation-delay: 0.5s;">
+      сын шлюхи
+    </div>
+    <div class="number" style="top: 50%; left: 60%; animation-delay: 1.5s;">
+      пидорас
+    </div>
+    <div class="number" style="top: 60%; left: 40%; animation-delay: 2.5s;">
+      выйди с респы
+    </div>
+    <div class="number" style="top: 30%; left: 50%; animation-delay: 3.5s;">
+      ктв хуйня
+    </div>
+    <div class="number" style="top: 70%; left: 20%; animation-delay: 4.5s;">
+      мать шлюха
+    </div>
+    <div class="number" style="top: 20%; left: 70%; animation-delay: 5.5s;">
+      сын респы
+    </div>
+  </div>
+
+  <div class="radial-indicators">
+    <div class="radial-indicator"></div>
+    <div class="radial-indicator"></div>
+    <div class="radial-indicator"></div>
+    <div class="radial-indicator"></div>
+  </div>
+
+  <div class="corner-decorations">
+    <div class="corner"></div>
+    <div class="corner"></div>
+    <div class="corner"></div>
+    <div class="corner"></div>
+  </div>
+
+  <div class="loading-text">Игра найдена, загружаем данные...</div>
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+</div>
+
+@code {
+  [Parameter]
+  public List<string> Strings { get; set; } = [];
+}

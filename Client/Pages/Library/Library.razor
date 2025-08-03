@@ -1,0 +1,73 @@
+﻿@page "/library"
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Arcticles
+@inject StateProvider AuthProvider
+@inject NotificationService notifyService
+@inject NavigationManager nm
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ База знаний</PageTitle>
+
+<RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4" Text="База знаний" />
+
+<RadzenRow>
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                <RadzenColumn Size="12">
+                    <RadzenTextBox Placeholder="Поиск, например название или текст статьи" Change=@(value => OnChange(value, "TextBox with change on every input")) Style="width: 100%" />
+                </RadzenColumn>
+                <RadzenColumn Size="12">
+                    <RadzenButton Text="Добавить" Click="@(() => { nm.NavigateTo("/createlibraryitem"); })" />
+                </RadzenColumn>
+            </Authorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+    
+    <RadzenColumn Size="12">
+        @if (ready)
+        {
+            <CascadingAuthenticationState>
+                <AuthorizeView>
+                    <Authorized>
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                        {
+                            @if (searchItems.Any())
+                            {
+                                <RadzenStack>
+                                    @foreach (var item in searchItems)
+                                    {
+                                        <RadzenLink Path="@(string.Concat("/libraryrecord/", item.Id))">@item.Title (от
+                                            @item.DateTime.ToShortDateString())</RadzenLink>
+                                    }
+                                </RadzenStack>
+                            }
+                            else
+                            {
+                                <RadzenAlert AlertStyle="AlertStyle.Danger" Text="Статьи в базе знаний не найдены"
+                                    AllowClose=false />
+                            }
+                        }
+                        else
+                        {
+                            <NoAccess />
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <NoAccess />
+                    </NotAuthorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+        }
+        else
+        {
+            <RadzenRow JustifyContent="JustifyContent.Center">
+                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка базы знаний" />
+                </RadzenStack>
+            </RadzenRow>
+        }
+    </RadzenColumn>
+</RadzenRow>

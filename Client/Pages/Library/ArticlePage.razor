@@ -1,0 +1,60 @@
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Arcticles
+@inject StateProvider AuthProvider
+@page "/libraryrecord/{Id:int}"
+@inject NotificationService notifyService
+@inject NavigationManager nm
+@inject HttpClient http
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (ready)
+            {
+                @if (article is not null)
+                {
+                    @if (article.Role >= AuthProvider.CurrentUser.Role)
+                    {
+                        <PageTitle>kTVCSS @@ @article.Title</PageTitle>
+
+                        <RadzenContent>
+                            <div class="news-article-container">
+                                <div class="rz-mb-4 rz-p-10">
+                                    <RadzenText TextStyle="TextStyle.DisplayH3" TextAlign="TextAlign.Center"
+                                        Text="@article.Title" />
+                                    <RadzenText TextAlign="TextAlign.Center">Дата публикации:
+                                        @article.DateTime.ToString("dd.MM.yyyy")
+                                    </RadzenText>
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                                        <RadzenButton Click="OpenEdit" Size="ButtonSize.Small" Variant="Variant.Text"
+                                            Text="Редактировать" />
+                                        <RadzenButton Click="Remove" Size="ButtonSize.Small" Variant="Variant.Text"
+                                            Text="Удалить" />
+                                    </RadzenStack>
+                                </div>
+
+                                @((MarkupString)article.Html)
+                            </div>
+                        </RadzenContent>
+                    }
+                    else {
+                        <NoAccess />
+                    }
+                }
+            }
+            else
+            {
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка статьи" />
+                    </RadzenStack>
+                </RadzenRow>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <NoAccess />
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

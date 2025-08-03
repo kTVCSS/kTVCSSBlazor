@@ -1,7 +1,9 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using kTVCSS.Models.Db.Models.Chat.DTOs
+@using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Teams
 @using kTVCSS.Models.Models
+@using kTVCSS.Models;
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
 @using kTVCSSBlazor.Client.Services
@@ -16,6 +18,7 @@
 @inject HttpClient http
 @inject StateProvider AuthProvider
 @inject ChatHubService ChatHub
+@inject MMService mm
 @implements IDisposable
 @inject IMobileDetectionService mds
 @inject WindowSizeService WindowSize
@@ -99,6 +102,7 @@
                             {
                                 <RadzenPanelMenuItem Expanded=false Text="Админ" Icon="shield_person">
                                     <RadzenPanelMenuItem Click=SidePanelClick Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
+                                    <RadzenPanelMenuItem Click=SidePanelClick Text="База знаний" Path="/library" Icon="library_books"></RadzenPanelMenuItem>
                                     @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                     {
                                         <RadzenPanelMenuItem Click=SidePanelClick Text="Дашборд" Path="/dashboard" Icon="dashboard"></RadzenPanelMenuItem>
@@ -108,6 +112,9 @@
                                         </RadzenPanelMenuItem>
                                     }
                                     <RadzenPanelMenuItem Expanded=false Text="Общее" Icon="settings">
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
+                                            <RadzenPanelMenuItem Click=SidePanelClick Text="Редактор цитат" Path="/editcitations" Icon="comic_bubble"></RadzenPanelMenuItem>
+                                        }
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
                                         {
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Редактор причин бана" Path="/editbanreasons" Icon="no_accounts"></RadzenPanelMenuItem>
@@ -258,6 +265,8 @@ else
     private bool disposed = false;
     private bool isMobile = false;
     private bool ready = false;
+    private bool inSearch = false;
+    private List<string> citations = [];
 
     public void Dispose()
     {
@@ -285,6 +294,10 @@ else
         {
             bool nt = false;
 
+            var ctss = await http.GetFromJsonAsync<List<Citation>>("/api/citations");
+
+            citations = ctss.Select(x => x.Text).OrderBy(x => new Random().Next()).Take(8).ToList();
+
             try
             {
                 await WindowSize.InitializeAsync(JSRuntime);
@@ -304,6 +317,8 @@ else
             ready = true;
 
             await InvokeAsync(StateHasChanged);
+
+            #pragma warning disable CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
             
             Task.Run(async () =>
             {
@@ -370,9 +385,60 @@ else
 
                             ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
                         }
+
+                        mm.Connection.On<GameHubConnectResult>("GetConnectResult", async (result) => {
+                            switch (result) {
+                                case GameHubConnectResult.Ok: {
+                                    inSearch = true;
+                                    await InvokeAsync(StateHasChanged);
+                                    NotificationService.Notify(NotificationSeverity.Success, "Вы вошли в поиск игры");
+                                    break;
+                                }
+                                case GameHubConnectResult.NoPlayerData: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Не удалось получить данные о Вас. Попробуйте обновить страницу.");
+                                    break;
+                                }
+                                case GameHubConnectResult.AlreadyExists: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Вы уже в поиске игры!");
+                                    break;
+                                }
+                                case GameHubConnectResult.AlreadyPlaying: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Вы уже играете микс!");
+                                    break;
+                                }
+                                case GameHubConnectResult.IsBanned: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Вы были заблокированы, поэтому Вы не можете начать поиск игры!");
+                                    break;
+                                }
+                                case GameHubConnectResult.MixesDisabled: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Миксы временно отключены, попробуйте позже!");
+                                    break;
+                                }
+                            }
+                        });
+
+                        mm.Connection.On<string>("JoinRoom", (guid) => {
+                            NavigationManager.NavigateTo("/mixroom/" + guid);
+                        });
+
+                        mm.Connection.On<GameHubMixCreateResult>("GetMixCreateResult", async (result) => {
+                            switch (result)
+                            {
+                                case GameHubMixCreateResult.Ok: {
+                                    await ShowGameReady();
+                                    break;
+                                }
+                                case GameHubMixCreateResult.NoServersAvailable: {
+                                    NotificationService.Notify(NotificationSeverity.Error, "Не удалось создать микс, потому что нет свободных серверов!");
+                                    break;
+                                }
+                            }
+                        });
                     }
                 }
             });
+            
+            #pragma warning restore CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
         }
     }
 
@@ -382,6 +448,21 @@ else
     }
 
     private string _teamName = string.Empty;
+
+    private async Task ShowGameReady()
+    {
+        JSRuntime.InvokeVoidAsync("playGameReadySound");
+
+        DialogService.OpenAsync("", ds => 
+        @<RadzenStack Style="height: 100vh;max-height: 100%;overflow: hidden;" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center"><GameFound Strings="citations"/></RadzenStack>, 
+        new DialogOptions(){ Width = "60vw", Height = "80vh", ShowClose = false, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+
+        Task.Run(async () => {
+            await Task.Delay(6500);
+
+            DialogService.Close();
+        });
+    }
 
     private async Task OpenTeamCreation()
     {

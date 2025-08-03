@@ -1,0 +1,44 @@
+@page "/editlibraryitem/{Id:int}"
+@using kTVCSS.Models.Db.Models.Roles
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db
+@using kTVCSSBlazor.Db.Models.Arcticles
+@inject StateProvider AuthProvider
+@inject NotificationService notifyService
+@inject NavigationManager nm
+@inject HttpClient http
+
+@if (ready)
+{
+    <CascadingAuthenticationState>
+        <AuthorizeView>
+            <Authorized>
+                @if (AuthProvider.CurrentUser.Role >= article.Role)
+                {
+                    <RadzenStack>
+                        <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование статьи" />
+                        <RadzenFormField Text="Заголовок" Style="width: 100%;">
+                            <RadzenTextBox @bind-Value="@article.Title" />
+                        </RadzenFormField>
+                        <RadzenFormField Text="Права доступа" Style="width: 100%;">
+                            <RadzenDropDown Data="@(Enum.GetValues(typeof(RoleType)).Cast<Enum>())" @bind-Value=@article.Role
+                                AllowClear="true" AllowFiltering="true"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+                            </RadzenDropDown>
+                        </RadzenFormField>
+                        <RadzenHtmlEditor @bind-Value=@article.Html style="height: 600px;" />
+                        <RadzenButton Click="Edit" Text="Сохранить" />
+                    </RadzenStack>
+                }
+                else
+                {
+                    <NoAccess />
+                }
+            </Authorized>
+            <NotAuthorized>
+                <NoAccess />
+            </NotAuthorized>
+        </AuthorizeView>
+    </CascadingAuthenticationState>
+}

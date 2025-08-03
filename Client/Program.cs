@@ -39,7 +39,7 @@ builder.Services.AddScoped(sp =>
 {
     var serverSelector = sp.GetRequiredService<ApiServerSelector>();
     var serverUrl = serverSelector.GetNextServer();
-    return new HttpClient { BaseAddress = new Uri(serverUrl), Timeout = TimeSpan.FromSeconds(30) };
+    return new HttpClient { BaseAddress = new Uri(serverUrl), Timeout = TimeSpan.FromMinutes(1) };
 });
 
 builder.Services.AddScoped<UserService>();
@@ -49,6 +49,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
 
 builder.Services.AddScoped<ChatHubService>();
+builder.Services.AddScoped<MMService>();
 builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize
 builder.Services.AddScoped<IMobileDetectionService, MobileDetectionService>(); //@inject IMobileDetectionService MobileDetectionService
 

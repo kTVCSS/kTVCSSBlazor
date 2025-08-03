@@ -11,6 +11,12 @@
     }
 };
 
+window.playGameReadySound = () => {
+    let audio = new Audio('/sounds/pornhub.mp3')
+    audio.volume = 1
+    audio.play();
+}
+
 window.getPermission = () => {
     if ('Notification' in window) {
         return Notification.permission === 'default';
