@@ -6,6 +6,7 @@
 @using kTVCSS.Models;
 @using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Components.Home
 @using kTVCSSBlazor.Client.Services
 @using kTVCSSBlazor.Db.Models.Players
 @inherits LayoutComponentBase
@@ -49,6 +50,7 @@
                                 </Authorizing>
                                 <Authorized>
                                     <RadzenStack Orientation="Orientation.Horizontal">
+                                        <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="ShowMM" Icon="globe" />
                                         <NotificationBell />
                                         <RadzenProfileMenu Style="position: relative">
                                             <Template>
@@ -265,12 +267,17 @@ else
     private bool disposed = false;
     private bool isMobile = false;
     private bool ready = false;
-    private bool inSearch = false;
     private List<string> citations = [];
+
+    private bool inSearch = false;
+    private bool searchButtonEnabled = true;
+    private int currentSearchUsersCount = 0;
 
     public void Dispose()
     {
         disposed = true;
+        mm.DisposeAsync();
+        ChatHub.DisposeAsync();
     }
 
     private void SidePanelClick()
@@ -279,6 +286,38 @@ else
         {
             sidebarExpanded = false;
         }
+    }
+
+    private async Task ShowMM()
+    {
+        var parameters = new Dictionary<string, object>();
+
+        parameters.Add("InSearch", inSearch);
+        parameters.Add("InSearchChanged", EventCallback.Factory.Create<bool>(this, value => 
+        {
+            inSearch = value;
+            StateHasChanged();
+        }));
+
+        parameters.Add("SearchButtonEnabled", searchButtonEnabled);
+        parameters.Add("SearchButtonEnabledChanged", EventCallback.Factory.Create<bool>(this, value => 
+        {
+            searchButtonEnabled = value;
+            StateHasChanged();
+        }));
+
+        parameters.Add("CurrentSearchUsersCount", currentSearchUsersCount);
+        parameters.Add("CurrentSearchUsersCountChanged", EventCallback.Factory.Create<int>(this, value => 
+        {
+            currentSearchUsersCount = value;
+            StateHasChanged();
+        }));
+
+        parameters.Add("Hub", mm);
+
+        await DialogService.OpenSideAsync<GameWindow>("Система подбора матчей kTVCSS", 
+            parameters: parameters,
+            options: new SideDialogOptions { CloseDialogOnOverlayClick = true, Position = DialogPosition.Left, ShowMask = true, Width = "600px" });
     }
 
     protected override bool ShouldRender()
@@ -366,30 +405,28 @@ else
                             JSRuntime.InvokeVoidAsync("requestNotificationPermission");
                         }
 
-                        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
-                        {
-                            if (!NavigationManager.Uri.ToLower().Contains("/chat"))
+                        mm.Connection.Closed += async (exception) => {
+                            if (exception is not null)
                             {
-                                JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+                                Console.WriteLine(exception.Message);
 
-                                NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
-                                {
-                                    NavigationManager.NavigateTo("/chat/" + message.DialogId);
-                                });
+                                await DialogService.OpenAsync("Система подбора матчей - ошибка", ds =>
+                                        @<RadzenStack Gap="1.5rem">
+                                            <RadzenText>Подключение к сервису подбора матчей было закрыто: @exception.Message</RadzenText>
+                                            <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
+                                        </RadzenStack>
+                            , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+
+                                NavigationManager.Refresh(true);
                             }
-                        });
-
-                        if (ChatHub.Connection.State != HubConnectionState.Connected)
-                        {
-                            await ChatHub.StartAsync();
-
-                            ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
-                        }
+                        };
 
                         mm.Connection.On<GameHubConnectResult>("GetConnectResult", async (result) => {
+
+                            Console.WriteLine(result.ToString());
+
                             switch (result) {
                                 case GameHubConnectResult.Ok: {
-                                    inSearch = true;
                                     await InvokeAsync(StateHasChanged);
                                     NotificationService.Notify(NotificationSeverity.Success, "Вы вошли в поиск игры");
                                     break;
@@ -434,6 +471,26 @@ else
                                 }
                             }
                         });
+
+                        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
+                        {
+                            if (!NavigationManager.Uri.ToLower().Contains("/chat"))
+                            {
+                                JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+
+                                NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
+                                {
+                                    NavigationManager.NavigateTo("/chat/" + message.DialogId);
+                                });
+                            }
+                        });
+
+                        if (ChatHub.Connection.State != HubConnectionState.Connected)
+                        {
+                            await ChatHub.StartAsync();
+
+                            ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
+                        }
                     }
                 }
             });

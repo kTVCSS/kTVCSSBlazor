@@ -1,0 +1,70 @@
+﻿@using kTVCSS.Models.Models
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
+@inject NotificationService ns
+@inject StateProvider AuthProvider
+@implements IDisposable
+@inject HttpClient http
+
+<RadzenStack Style="height: 100%" JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenStack>
+        <RadzenAccordion>
+            <Items>
+                <RadzenAccordionItem Text="Краткая информация о правилах">
+                    <RadzenText>
+                        <p>1. Это проект, на котором играют игроки, которые, в основном, хотят побеждать. Если Вы решили
+                            пофаниться
+                            у нас на проекте, то лучше не теряйте зря время, чтобы Вы не получили от игроков проекта
+                            негативный
+                            отзыв, а также блокировку от администрации проекта.</p>
+                        <p>2. Мы рады новым игрокам, однако понимаем, что Ваш уровень игры может не соответствовать
+                            ожиданиям
+                            некоторых игроков проекта. В случаях, если на Вас начался шквал критики, то Вы можете подать
+                            жалобу на
+                            игроков и они будут рассмотрены.</p>
+                        <p>3. Матчи бывают разные - легкие и тяжелые. Во втором случае у некоторых игроков бывает
+                            лопается терпение,
+                            начинают шалить нервы. Администрация и модераторы проекта относятся негативно к попыткам
+                            руина игры - за
+                            это можно получить бан.</p>
+                        <p>4. Для комфортного взаимодействия с командой игроки проекта используют TeamSpeak сервер
+                            проекта
+                            (ts.ktvcss.ru). Если Вы никогда о таком не слышали или не желаете туда заходить, то
+                            пользуйтесь хотя бы
+                            голосовым или текстовым чатами для информирования товарищей по команде.</p>
+                        <p>5. Администрация проекта не снимает блокировку за токсичное поведение, за выход с микса или
+                            за то, что Вы
+                            не зашли на микс по разным причинам (даже если свет выключили и так далее) и за прочие
+                            причины,
+                            указанные на странице найденного микса.</p>
+                    </RadzenText>
+                </RadzenAccordionItem>
+                <RadzenAccordionItem Text="Оповещения в Telegram">
+                    <RadzenText>
+                        <p>Вы можете подключить оповещения о найденных матчах в телеграм.</p>
+                        <p>Чтобы они приходили Вам нужно привязать Ваш телеграм к профилю.</p>
+                        <p>Сделать это можно в Вашем профиле, нажав на кнопку <RadzenLink Style="text-decoration: underline !important;" Path="@(string.Concat("editprofile/", AuthProvider.CurrentUser.Id))" Text="'Редактировать профиль'" />.</p>
+                        <p>Если у Вас всё привязано, то <RadzenLink Style="text-decoration: underline !important;" Path="https://t.me/ktvcss_matchalerterbot" Target="_blank" Text="запустите бота"></RadzenLink>.</p>
+                        <p>P.S. Он после запуска ничего в ответ писать не должен.</p>
+                    </RadzenText>
+                </RadzenAccordionItem>
+            </Items>
+        </RadzenAccordion>
+    </RadzenStack>
+    <RadzenStack>
+        <RadzenText>Сейчас в поиске: @CurrentSearchUsersCount</RadzenText>
+        <RadzenButton Disabled Text="Капитанский мод" />
+        @if (InSearch)
+        {
+            <RadzenButton ButtonStyle=ButtonStyle.Danger Click=Stop Text="Остановить" Disabled=!SearchButtonEnabled>
+                <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
+                    Value="50" ShowValue="false" Size="ProgressBarCircularSize.Small" />
+                <RadzenText Style="margin:auto" Text="Остановить" />
+            </RadzenButton>
+        }
+        else
+        {
+            <RadzenButton ButtonStyle=ButtonStyle.Success Click=Start Text="Обычный режим" Disabled=!SearchButtonEnabled />
+        }
+    </RadzenStack>
+</RadzenStack>
