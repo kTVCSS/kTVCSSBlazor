@@ -75,7 +75,9 @@ namespace kTVCSSBlazor.Client.Pages.Matches
         {
             try
             {
-                demoDownloadButtonDisabled = true;
+                await JS.InvokeVoidAsync("openUrl", "/demos/" + match.DemoUrl + ".dem.zip");
+
+                /*demoDownloadButtonDisabled = true;
 
                 NotifyService.Notify(summary: "Скачивание демо-записи", detail: "Подождите, мы готовим файл к загрузке...");
 
@@ -86,7 +88,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
                 NotifyService.Notify(NotificationSeverity.Success, "Демо найдено и мы отправили его Вам на скачивание!");
 
-                await JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef);
+                await JS.InvokeVoidAsync("downloadFileFromStream", $"ktvcss-match-id-{MatchID}.zip", streamRef); */
             }
             catch (Exception ex)
             {
