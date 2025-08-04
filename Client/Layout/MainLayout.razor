@@ -535,6 +535,8 @@ else
     {
         JSRuntime.InvokeVoidAsync("playGameReadySound");
 
+        JSRuntime.InvokeVoidAsync("showNotification", "ИГРА НАЙДЕНА!");
+
         DialogService.OpenAsync("", ds => 
         @<RadzenStack Style="height: 100vh;max-height: 100%;overflow: hidden;" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center"><GameFound Strings="citations"/></RadzenStack>, 
         new DialogOptions(){ Width = "60vw", Height = "80vh", ShowClose = false, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
