@@ -50,7 +50,10 @@
                                 </Authorizing>
                                 <Authorized>
                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                        <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="ShowMM" Icon="globe" />
+                                        @if (!isMobile) {
+                                            <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="@(() => { NavigationManager.NavigateTo("/github"); })" Icon="developer_board" />
+                                            <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="ShowMM" Icon="globe" />
+                                        }
                                         <NotificationBell />
                                         <RadzenProfileMenu Style="position: relative">
                                             <Template>

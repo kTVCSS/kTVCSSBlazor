@@ -6,6 +6,7 @@ using kTVCSSBlazor.Server.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using Radzen;
+using RadzenBlazorDemos.Services;
 
 var options = new WebApplicationOptions
 {
@@ -30,6 +31,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 
+builder.Services.AddScoped<GitHubService>();
 builder.Services.AddScoped<ChatHubService>();
 builder.Services.AddScoped<MMService>();
 builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize

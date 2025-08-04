@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.JSInterop;
 using Radzen;
+using RadzenBlazorDemos.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -42,6 +43,7 @@ builder.Services.AddScoped(sp =>
     return new HttpClient { BaseAddress = new Uri(serverUrl), Timeout = TimeSpan.FromMinutes(1) };
 });
 
+builder.Services.AddScoped<GitHubService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
