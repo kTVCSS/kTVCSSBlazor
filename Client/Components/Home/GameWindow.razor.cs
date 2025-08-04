@@ -33,6 +33,8 @@ public partial class GameWindow
 
     private bool disposed = false;
 
+    string hubUrl = "";
+
     public void Dispose()
     {
         disposed = true;
@@ -60,9 +62,19 @@ public partial class GameWindow
 
     protected override async Task OnInitializedAsync()
     {
+#if DEBUG
+        hubUrl = "http://localhost:5175/";
+#endif
+
+#if RELEASE
+        hubUrl = "https://mm.ktvcss.ru/";
+#endif
+
         Hub.Connection.On<GameHubConnectResult>("GetConnectResult", async (result) =>
         {
             Console.WriteLine(result.ToString());
+
+            RefreshCount();
 
             switch (result)
             {
@@ -99,16 +111,6 @@ public partial class GameWindow
             }
         });
 
-        string hubUrl = "";
-
-#if DEBUG
-        hubUrl = "http://localhost:5175/";
-#endif
-
-#if RELEASE
-        hubUrl = "https://mm.ktvcss.ru/";
-#endif
-
         Task.Run(async () =>
         {
             while (!disposed)
@@ -134,6 +136,8 @@ public partial class GameWindow
         {
             await Hub.StartAsync();
             await Hub.OnAfterConnect(AuthProvider.CurrentUser);
+
+            RefreshCount();
         }
         catch (Exception ex)
         {
@@ -153,6 +157,8 @@ public partial class GameWindow
 
     public async Task Stop()
     {
+        RefreshCount();
+
         UpdateSearchButtonEnabled(false);
 
         await InvokeAsync(StateHasChanged);
@@ -171,5 +177,19 @@ public partial class GameWindow
 
             await InvokeAsync(StateHasChanged);
         });
+    }
+
+    private async Task RefreshCount()
+    {
+        try
+        {
+            int count = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscount");
+
+            UpdateCurrentSearchUsersCount(count);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }

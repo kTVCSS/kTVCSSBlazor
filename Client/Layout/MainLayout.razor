@@ -405,10 +405,35 @@ else
                             JSRuntime.InvokeVoidAsync("requestNotificationPermission");
                         }
 
-                        mm.Connection.Closed += async (exception) => {
+                        mm.Connection.Reconnecting += (async (exception) => {
                             if (exception is not null)
                             {
-                                Console.WriteLine(exception.Message);
+                                Console.Error.WriteLine(exception.ToString());
+                            }
+
+                            NotificationService.Notify(NotificationSeverity.Warning, "Попытка восстановления соединения к поиску игры...");
+                        });
+
+                        mm.Connection.Reconnected += (async (message) => {
+                            if (!string.IsNullOrEmpty(message))
+                            {
+                                Console.WriteLine(message);
+                            }
+
+                            NotificationService.Notify(NotificationSeverity.Info, "Соединение до поиска игры восстановлено!");
+
+                            await mm.OnAfterConnect(AuthProvider.CurrentUser);
+                        });
+
+                        mm.Connection.Closed += async (exception) => 
+                        {
+                            inSearch = false;
+
+                            await InvokeAsync(StateHasChanged);
+
+                            if (exception is not null)
+                            {
+                                Console.Error.WriteLine(exception.Message);
 
                                 await DialogService.OpenAsync("Система подбора матчей - ошибка", ds =>
                                         @<RadzenStack Gap="1.5rem">
