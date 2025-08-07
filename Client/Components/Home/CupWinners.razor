@@ -1,5 +1,20 @@
-﻿@using kTVCSSBlazor.Db.Models.Home
+﻿@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Home
+@inject DialogService DialogService
+@inject NotificationService NotificationService
 @inject HttpClient http
+@inject StateProvider AuthProvider
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
+            {
+                <RadzenButton Text="Добавить запись" Variant="Variant.Text" Click="Add" />
+            }
+        </Authorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
 
 @if (winners == null)
 {
@@ -31,8 +46,51 @@ else
                     <div class="text-primary">
                         @item.Winner
                     </div>
+                    <CascadingAuthenticationState>
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
+                                {
+                                    <RadzenButton Text="Удалить" Variant="Variant.Text" Click="@(() => { Remove(item.Id); })" />
+                                }
+                            </Authorized>
+                        </AuthorizeView>
+                    </CascadingAuthenticationState>
                 </li>
             }
         </ul>
+    }
+}
+
+@code {
+    private async Task Add()
+    {
+        CupWinner winner = new();
+
+        var result = await DialogService.OpenAsync("Добавление записи", ds =>
+            @<RadzenStack Gap="1.5rem">
+            <RadzenTextBox Placeholder="Турнир" @bind-Value=winner.CupName Style="width: 100%;" />
+            <RadzenTextBox Placeholder="Победитель" @bind-Value=winner.Winner Style="width: 100%;" />
+            <RadzenNumeric Placeholder="Год" @bind-Value=winner.Year Style="width: 100%;" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); }) />
+                        <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenStack>
+        );
+
+        if (winner.CupName.Length > 0 && winner.Winner.Length > 0 && winner.Year > 0) {
+            var request = await http.PostAsJsonAsync("/api/cupwinners", winner);
+            
+            var response = await request.Content.ReadFromJsonAsync<CupWinner>();
+
+            winners.Add(response);
+
+            await InvokeAsync(StateHasChanged);
+
+            NotificationService.Notify(NotificationSeverity.Success, "Запись добавлена");
+        }
     }
 }
