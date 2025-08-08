@@ -1,5 +1,8 @@
 ﻿@using kTVCSS.Models.Db.Models.Common
+@using kTVCSSBlazor.Client.Authorization
 @inject HttpClient http
+@inject NavigationManager nm
+@inject StateProvider AuthProvider
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-w-100">
     @foreach (var adv in adverts)
@@ -7,5 +10,6 @@
         <RadzenLink Target="_blank" Path="@adv.Link">
             @((MarkupString)adv.Html)
         </RadzenLink>
+        <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
     }
 </RadzenStack>

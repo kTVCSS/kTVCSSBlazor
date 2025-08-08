@@ -114,6 +114,7 @@
                                         <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Добавить вакансию" Path="/addwork" Icon="work"></RadzenPanelMenuItem>
+                                            <RadzenPanelMenuItem Click=OpenAdvertAdder Text="Добавить рекламу" Icon="ad"></RadzenPanelMenuItem>
                                         </RadzenPanelMenuItem>
                                     }
                                     <RadzenPanelMenuItem Expanded=false Text="Общее" Icon="settings">
@@ -217,7 +218,6 @@
                     <RadzenLink class="rz-text-caption" Path="/contacts" Text="Контакты" />
                     <RadzenLink class="rz-text-caption" Path="/faq" Text="FAQ" />
                     <RadzenLink class="rz-text-caption" Path="/downloads" Text="Загрузки" />
-                    <RadzenLink class="rz-text-caption" Target="_blank" Path="https://api.ktvcss.ru/swagger" Text="Разработчикам" />
                 </RadzenStack>
             </RadzenFooter>
         }
@@ -551,6 +551,30 @@ else
         });
     }
 
+    private async Task OpenAdvertAdder()
+    {
+        Advert advert = new();
+
+        var result = await DialogService.OpenAsync("Создание рекламы", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenTextArea Rows=10 Placeholder="Введите HTML-код рекламы" @bind-Value=@advert.Html Style="width: 100%;" />
+            <RadzenTextBox Placeholder="Ссылка на ресурс" @bind-Value="advert.Link" Style="width: 100%;" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); }) />
+                        <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenStack>
+        );
+
+        if (advert.Link.Length > 0 && advert.Html.Length > 0) 
+        {
+            await http.PostAsJsonAsync("/api/guest/addadvert", advert);
+
+            NavigationManager.Refresh(true);
+        }
+    }
     private async Task OpenTeamCreation()
     {
         var result = await DialogService.OpenAsync("Создание команды", ds =>

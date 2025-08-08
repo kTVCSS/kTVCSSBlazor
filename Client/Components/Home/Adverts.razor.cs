@@ -1,4 +1,5 @@
 ﻿using kTVCSS.Models.Db.Models.Common;
+using Microsoft.AspNetCore.Components;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Components.Home
@@ -10,6 +11,13 @@ namespace kTVCSSBlazor.Client.Components.Home
         protected override async Task OnInitializedAsync()
         {
             adverts = await http.GetFromJsonAsync<List<Advert>>($"api/guest/adverts");
+        }
+
+        private async Task Remove(int id)
+        {
+            await http.DeleteAsync($"/api/guest/removeadvert?id={id}");
+
+            nm.Refresh(true);
         }
     }
 }
