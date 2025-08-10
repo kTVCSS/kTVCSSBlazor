@@ -76,6 +76,12 @@
                                                         </div>
                                                     }
                                                 }
+                                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || AuthProvider.CurrentUser.IsVip || AuthProvider.CurrentUser.IsPremiumVip) 
+                                                {
+                                                    <div @onclick=@(async (MouseEventArgs e) => OpenStylesEditor())>
+                                                        <RadzenProfileMenuItem Text="Редактор стилей" Icon="style"></RadzenProfileMenuItem>
+                                                    </div>
+                                                }
                                                 <RadzenProfileMenuItem Path="/vip-features" Text="VIP" Icon="diamond"></RadzenProfileMenuItem>
                                                 <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
                                                     <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
@@ -265,6 +271,10 @@ else
     }
 </style>
 
+<style>
+    @globalStyles
+</style>
+
 @code {
     private bool sidebarExpanded = true;
     private bool disposed = false;
@@ -275,6 +285,7 @@ else
     private bool inSearch = false;
     private bool searchButtonEnabled = true;
     private int currentSearchUsersCount = 0;
+    private string globalStyles = string.Empty;
 
     public void Dispose()
     {
@@ -364,7 +375,7 @@ else
             
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
+                await Task.Delay(100);
 
                 while (AuthProvider.CurrentUser is null)
                 {
@@ -373,7 +384,7 @@ else
                         return;
                     }
  
-                    await Task.Delay(3000); // ждем авторизацию
+                    await Task.Delay(500); // ждем авторизацию
                 }
 
                 if (AuthProvider.CurrentUser is not null)
@@ -407,6 +418,10 @@ else
 
                             JSRuntime.InvokeVoidAsync("requestNotificationPermission");
                         }
+
+                        globalStyles = await http.GetStringAsync("/api/players/getstyles?id=" + AuthProvider.CurrentUser.Id);
+
+                        await InvokeAsync(StateHasChanged);
 
                         mm.Connection.Reconnecting += (async (exception) => {
                             if (exception is not null)
@@ -551,6 +566,37 @@ else
         });
     }
 
+    private async Task OpenStylesEditor()
+    {
+        string styles = await http.GetStringAsync("/api/players/getstyles?id=" + AuthProvider.CurrentUser.Id);
+        bool save = false;
+
+        var result = await DialogService.OpenAsync("Редактор стилей", ds =>
+        @<RadzenStack Gap="1.5rem">
+            <RadzenTextArea Rows=10 Placeholder="Введите CSS стили, которые хотели бы применить к сайту" @bind-Value=@styles Style="width: 100%;" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Сохранить" Click=@(() => { save = true; ds.Close(true); }) />
+                        <RadzenButton Text="Отмена" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenStack>
+        );
+
+        if (save) 
+        {
+            StyleItem style = new StyleItem() 
+            {
+                Id = AuthProvider.CurrentUser.Id,
+                Style = styles
+            };
+
+            await http.PostAsJsonAsync("/api/players/savestyles", style);
+
+            NavigationManager.Refresh(true);
+        }
+    }
+
     private async Task OpenAdvertAdder()
     {
         Advert advert = new();
@@ -575,6 +621,7 @@ else
             NavigationManager.Refresh(true);
         }
     }
+
     private async Task OpenTeamCreation()
     {
         var result = await DialogService.OpenAsync("Создание команды", ds =>
