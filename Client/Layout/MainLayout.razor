@@ -347,10 +347,6 @@ else
         {
             bool nt = false;
 
-            var ctss = await http.GetFromJsonAsync<List<Citation>>("/api/citations");
-
-            citations = ctss.Select(x => x.Text).OrderBy(x => new Random().Next()).Take(8).ToList();
-
             try
             {
                 await WindowSize.InitializeAsync(JSRuntime);
@@ -361,6 +357,10 @@ else
                 {
                     sidebarExpanded = false;
                 }
+
+                var ctss = await http.GetFromJsonAsync<List<Citation>>("/api/citations");
+
+                citations = ctss.Select(x => x.Text).OrderBy(x => new Random().Next()).Take(8).ToList();
             }
             catch (Exception ex)
             {

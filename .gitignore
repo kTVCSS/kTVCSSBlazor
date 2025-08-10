@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /Server/wwwroot/uploads
 /Server/wwwroot/configs
 /Server/wwwroot/demos
+Server/wwwroot/maintenance.flag

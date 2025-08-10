@@ -1,6 +1,8 @@
 @inject HttpClient http
+@inject NavigationManager nm
+@inject DialogService DialogService
 
-@if (isApiWorking)
+@if (isApiWorking && !isMaintenance)
 {
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -11,29 +13,46 @@
             <LayoutView Layout="@typeof(MainLayout)">
                 <RadzenRow>
                     <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
-                        <RadzenText Text="Страница не найдена" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
-                        <RadzenText Text="Извините, но по этому адресу у нас ничего нет!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                        <RadzenText Text="Страница не найдена" TextStyle="TextStyle.DisplayH1"
+                            style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                        <RadzenText Text="Извините, но по этому адресу у нас ничего нет!" TextStyle="TextStyle.H6"
+                            style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
                     </RadzenColumn>
                 </RadzenRow>
             </LayoutView>
         </NotFound>
     </Router>
 }
-else
-{
-    <PageTitle>kTVCSS @@ backend is dead</PageTitle>
+else if (!isApiWorking) {
+    <PageTitle>kTVCSS @@ Ошибка</PageTitle>
     <LayoutView Layout="@typeof(MainLayout)">
         <RadzenRow>
             <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
-                <RadzenText Text="Backend не работает" TextStyle="TextStyle.DisplayH1" style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
-                <RadzenText Text="Извините, в данный момент служба ktvcss-backend не доступна, поэтому сайт не может получить какие-либо данные." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
-                <RadzenText Text="Администрация уже в курсе этой проблемы и занимается ее решением." TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
-                <RadzenText Text="Пока мы чиним сайт, можете потренировать Ваш аим, лопая шарики!" TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
-                <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
+                <RadzenText Text="Backend не работает" TextStyle="TextStyle.DisplayH1"
+                    style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                <RadzenText
+                    Text="Извините, в данный момент служба ktvcss-backend не доступна, поэтому сайт не может получить какие-либо данные."
+                    TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                <RadzenText Text="Администрация уже в курсе этой проблемы и занимается ее решением."
+                    TextStyle="TextStyle.H6" style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" />
+                @* <RadzenText Text="Пока мы чиним сайт, можете потренировать Ваш аим, лопая шарики!" TextStyle="TextStyle.H6"
+                    style="margin: 0" TextAlign="TextAlign.Center" TagName="TagName.P" /> *@
+                @* <RadzenStack AlignItems=AlignItems.Center JustifyContent="JustifyContent.Center">
                     <div id="score">Очки: 0</div>
                     <div id="game-area"></div>
                     <script src="game.js"></script>
-                </RadzenStack>
+                </RadzenStack> *@
+            </RadzenColumn>
+        </RadzenRow>
+    </LayoutView>
+} else if (isMaintenance) 
+{
+    <PageTitle>kTVCSS @@ Идет обновление</PageTitle>
+    <LayoutView Layout="@typeof(MainLayout)">
+        <RadzenRow>
+            <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
+                <RadzenText Text="Сайт обновляется, вернитесь чуть позже" TextStyle="TextStyle.DisplayH3"
+                    style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
             </RadzenColumn>
         </RadzenRow>
     </LayoutView>
@@ -67,38 +86,82 @@ else
         transition: box-shadow 0.1s;
     }
 
-        .ball:hover {
-            box-shadow: 0 0 40px #fff0;
-            filter: brightness(1.2);
-        }
+    .ball:hover {
+        box-shadow: 0 0 40px #fff0;
+        filter: brightness(1.2);
+    }
 </style>
 
 @code {
     private bool isApiWorking = true;
+    private bool isMaintenance = false;
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Task.Run(async () =>
-            // {
-            //     while (true)
-            //     {
-            //         try
-            //         {
-            //             await http.GetAsync("/api/ping");
-            //             isApiWorking = true;
-            //             InvokeAsync(StateHasChanged);
-            //         }
-            //         catch (Exception)
-            //         {
-            //             isApiWorking = false;
-            //             InvokeAsync(StateHasChanged);
-            //         }
+            SendPing();
 
-            //         await Task.Delay(TimeSpan.FromMinutes(1));
-            //     }
-            // });
+            MaintenanceChecker();
+        }
+    }
+
+    RenderFragment GetMessage(string text)
+    {
+        return __builder =>
+        {
+            <text>
+                <b>@text</b>!
+            </text>
+        };
+    }    
+    private async Task SendPing()
+    {
+        while (true)
+        {
+            try
+            {
+                await http.GetAsync("/api/ping");
+                isApiWorking = true;
+                InvokeAsync(StateHasChanged);
+            }
+            catch (Exception)
+            {
+                if (!isApiWorking) {
+                    await DialogService.Alert(GetMessage("API проекта вновь работает, требуется обновить страницу"), "API", new AlertOptions() { OkButtonText = "Ок" });
+                    nm.Refresh(true);
+                }
+                
+                isApiWorking = false;
+                InvokeAsync(StateHasChanged);
+            }
+
+            await Task.Delay(TimeSpan.FromMinutes(1));
+        }
+    }
+
+    private async Task MaintenanceChecker()
+    {
+        while (true)
+        {
+            try
+            {
+                await http.GetStringAsync("/maintenance.flag");
+                isMaintenance = true;
+                InvokeAsync(StateHasChanged);
+            }
+            catch (Exception ex)
+            {
+                if (isMaintenance) {
+                    await DialogService.Alert(GetMessage("Обновление сайта завершено, требуется обновить страницу"), "Обновление", new AlertOptions() { OkButtonText = "Ок" });
+                    nm.Refresh(true);
+                }
+
+                isMaintenance = false;
+                InvokeAsync(StateHasChanged);
+            }
+
+            await Task.Delay(TimeSpan.FromMinutes(1));
         }
     }
 }
