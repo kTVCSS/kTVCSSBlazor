@@ -2,7 +2,7 @@
 @inject NavigationManager nm
 @inject DialogService DialogService
 
-@if (isApiWorking && !isMaintenance)
+@if (isApiWorking && !isMaintenance && !locked)
 {
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -23,7 +23,8 @@
         </NotFound>
     </Router>
 }
-else if (!isApiWorking) {
+else if (!isApiWorking)
+{
     <PageTitle>kTVCSS @@ Ошибка</PageTitle>
     <LayoutView Layout="@typeof(MainLayout)">
         <RadzenRow>
@@ -45,7 +46,8 @@ else if (!isApiWorking) {
             </RadzenColumn>
         </RadzenRow>
     </LayoutView>
-} else if (isMaintenance) 
+}
+else if (isMaintenance)
 {
     <PageTitle>kTVCSS @@ Идет обновление</PageTitle>
     <LayoutView Layout="@typeof(MainLayout)">
@@ -53,6 +55,23 @@ else if (!isApiWorking) {
             <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
                 <RadzenText Text="Сайт обновляется, вернитесь чуть позже" TextStyle="TextStyle.DisplayH3"
                     style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+            </RadzenColumn>
+        </RadzenRow>
+    </LayoutView>
+}
+else if (locked)
+{
+    <PageTitle>kTVCSS @@ Сайт закрыт</PageTitle>
+    <LayoutView Layout="@typeof(MainLayout)">
+        <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
+                <RadzenText Text="Сайт временно закрыт администраторами" TextStyle="TextStyle.DisplayH3"
+                    style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                <RadzenStack JustifyContent="JustifyContent.Center">
+                    <RadzenPassword Disabled=passwordDisabled Style="width: 400px;margin:auto" Placeholder="Введите пароль"
+                        @bind-Value="password" />
+                    <RadzenButton Style="width: 300px;margin:auto" Click="SendPassword" Text="Отправить" />
+                </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
     </LayoutView>
@@ -95,6 +114,29 @@ else if (!isApiWorking) {
 @code {
     private bool isApiWorking = true;
     private bool isMaintenance = false;
+    private bool locked = false;
+    private string password;
+    private bool passwordDisabled = false;
+
+    private async Task SendPassword()
+    {
+        passwordDisabled = true;
+
+        await InvokeAsync(StateHasChanged);
+
+        locked = !await http.GetFromJsonAsync<bool>($"/api/admins/getpassword?password={password}");
+
+        await Task.Delay(2000);
+
+        passwordDisabled = false;
+
+        if (locked)
+        {
+            await DialogService.Alert(GetMessage("Неверный пароль"), "Ошибка", new AlertOptions() { OkButtonText = "Ок" });
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -103,6 +145,8 @@ else if (!isApiWorking) {
             SendPing();
 
             MaintenanceChecker();
+
+            Locker();
         }
     }
 
@@ -114,7 +158,7 @@ else if (!isApiWorking) {
                 <b>@text</b>!
             </text>
         };
-    }    
+    }
     private async Task SendPing()
     {
         while (true)
@@ -122,16 +166,20 @@ else if (!isApiWorking) {
             try
             {
                 await http.GetAsync("/api/ping");
+
+                if (!isApiWorking)
+                {
+                    await DialogService.Alert(GetMessage("API проекта вновь работает, требуется обновить страницу"), "API", new
+                    AlertOptions()
+                    { OkButtonText = "Ок" });
+                    nm.Refresh(true);
+                }
+
                 isApiWorking = true;
                 InvokeAsync(StateHasChanged);
             }
             catch (Exception)
             {
-                if (!isApiWorking) {
-                    await DialogService.Alert(GetMessage("API проекта вновь работает, требуется обновить страницу"), "API", new AlertOptions() { OkButtonText = "Ок" });
-                    nm.Refresh(true);
-                }
-                
                 isApiWorking = false;
                 InvokeAsync(StateHasChanged);
             }
@@ -152,14 +200,32 @@ else if (!isApiWorking) {
             }
             catch (Exception ex)
             {
-                if (isMaintenance) {
-                    await DialogService.Alert(GetMessage("Обновление сайта завершено, требуется обновить страницу"), "Обновление", new AlertOptions() { OkButtonText = "Ок" });
+                if (isMaintenance)
+                {
+                    await DialogService.Alert(GetMessage("Обновление сайта завершено, требуется обновить страницу"), "Обновление", new
+                    AlertOptions()
+                    { OkButtonText = "Ок" });
                     nm.Refresh(true);
                 }
 
                 isMaintenance = false;
                 InvokeAsync(StateHasChanged);
             }
+
+            await Task.Delay(TimeSpan.FromMinutes(1));
+        }
+    }
+
+    private async Task Locker()
+    {
+        while (true)
+        {
+            try
+            {
+                locked = await http.GetFromJsonAsync<bool>("/api/admins/IsLockedAccess");
+                InvokeAsync(StateHasChanged);
+            }
+            catch (Exception) { }
 
             await Task.Delay(TimeSpan.FromMinutes(1));
         }

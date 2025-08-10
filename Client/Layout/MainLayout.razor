@@ -138,9 +138,9 @@
                                         {
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
                                         }
-                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Developer)
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                         {
-                                            <RadzenPanelMenuItem Click=SidePanelClick Text="Управление миксом #1" Path="/mixconsole" Icon="folder"></RadzenPanelMenuItem>
+                                            <RadzenPanelMenuItem Click=CloseProject Text="Открыть/закрыть сайт" Icon="shield_locked"></RadzenPanelMenuItem>
                                         }
                                     </RadzenPanelMenuItem>
                                 </RadzenPanelMenuItem>
@@ -339,6 +339,13 @@ else
         Console.WriteLine($"ShouldRender returns {base.ShouldRender()}");
 
         return base.ShouldRender();
+    }
+
+    private async Task CloseProject()
+    {
+        await http.GetAsync("/api/admins/SwitchLockAccess");
+
+        NavigationManager.Refresh(true);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
