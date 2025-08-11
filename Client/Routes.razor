@@ -1,6 +1,8 @@
+@using kTVCSSBlazor.Client.Services
 @inject HttpClient http
 @inject NavigationManager nm
 @inject DialogService DialogService
+@inject IMobileDetectionService mds
 
 @if (isApiWorking && !isMaintenance && !locked)
 {
@@ -117,6 +119,7 @@ else if (locked)
     private bool locked = false;
     private string password;
     private bool passwordDisabled = false;
+    private bool isMobile = false;
 
     private async Task SendPassword()
     {
@@ -142,7 +145,12 @@ else if (locked)
     {
         if (firstRender)
         {
-            SendPing();
+            isMobile = await mds.IsMobileDeviceAsync();
+
+            if (!isMobile)
+            {
+                SendPing();
+            }
 
             MaintenanceChecker();
 
@@ -184,7 +192,7 @@ else if (locked)
                 InvokeAsync(StateHasChanged);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1));
+            await Task.Delay(TimeSpan.FromMinutes(5));
         }
     }
 
@@ -212,7 +220,7 @@ else if (locked)
                 InvokeAsync(StateHasChanged);
             }
 
-            await Task.Delay(TimeSpan.FromMinutes(1));
+            await Task.Delay(TimeSpan.FromMinutes(2));
         }
     }
 
@@ -227,7 +235,7 @@ else if (locked)
             }
             catch (Exception) { }
 
-            await Task.Delay(TimeSpan.FromMinutes(1));
+            await Task.Delay(TimeSpan.FromMinutes(5));
         }
     }
 }

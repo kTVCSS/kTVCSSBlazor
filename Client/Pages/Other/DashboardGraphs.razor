@@ -1,15 +1,21 @@
 ﻿<RadzenRow>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Миксы</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Mixes).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Mixes).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Divergent Style="width: 100%">
-                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Mixes)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -24,15 +30,21 @@
     </RadzenColumn>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Матчи</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Clanwars).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type
+                                        == kTVCSS.Models.Models.ReportType.Clanwars).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
-                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Clanwars)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -47,15 +59,21 @@
     </RadzenColumn>
     <RadzenColumn Size="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Тикеты</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Tickets).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type
+                                        == kTVCSS.Models.Models.ReportType.Tickets).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Palette Style="width: 100%">
-                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Tickets)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -65,10 +83,13 @@
                         </div>
                     </TooltipTemplate>
                 </RadzenColumnSeries>
-                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Messages)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenColumnSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Messages)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-primary-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-primary-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -83,15 +104,21 @@
     </RadzenColumn>
     <RadzenColumn SizeMD="12" SizeXS="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Посты</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Posts).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Posts).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
-                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Posts)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -101,10 +128,13 @@
                         </div>
                     </TooltipTemplate>
                 </RadzenLineSeries>
-                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.PostComments)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.PostComments)"
+                    ValueProperty="Count" CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-primary-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-primary-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -119,15 +149,21 @@
     </RadzenColumn>
     <RadzenColumn SizeMD="12" SizeXS="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Баны</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Bans).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Bans).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
-                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Bans)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -142,15 +178,21 @@
     </RadzenColumn>
     <RadzenColumn SizeMD="12" SizeXS="12">
         <RadzenCard Variant="Radzen.Variant.Flat">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText TextStyle="TextStyle.H4">Регистрации</RadzenText>
-                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs).Average(x => x.Count))))</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Regs).Sum(x => x.Count) (AVG @(Math.Round(Data.Where(x => x.Type ==
+                                        kTVCSS.Models.Models.ReportType.Regs).Average(x => x.Count))))</RadzenText>
             </RadzenStack>
             <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
-                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard" Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs)" ValueProperty="Count" CategoryProperty="DateTime">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.Regs)" ValueProperty="Count"
+                    CategoryProperty="DateTime">
                     <ChildContent>
                         <RadzenLegend Visible=false />
-                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)" LineType="LineType.Dotted" />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
                         <RadzenSeriesDataLabels Visible="true" />
                     </ChildContent>
                     <TooltipTemplate Context="Data">
@@ -163,9 +205,71 @@
             </RadzenChart>
         </RadzenCard>
     </RadzenColumn>
+    <RadzenColumn SizeMD="12" SizeXS="12">
+        <RadzenCard Variant="Radzen.Variant.Flat">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText TextStyle="TextStyle.H4">Микс-игроки</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Dmp (AVG @(Math.Round(Data.Where(x =>
+                                        x.Type == kTVCSS.Models.Models.ReportType.UniqMixPlayers).Average(x => x.Count))))</RadzenText>
+            </RadzenStack>
+            <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.UniqMixPlayers)"
+                    ValueProperty="Count" CategoryProperty="DateTime">
+                    <ChildContent>
+                        <RadzenLegend Visible=false />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
+                        <RadzenSeriesDataLabels Visible="true" />
+                    </ChildContent>
+                    <TooltipTemplate Context="Data">
+                        <div>
+                            Игроков за <span>@Data.DateTime.ToShortDateString()</span>:
+                            <strong>@Dmp</strong>
+                        </div>
+                    </TooltipTemplate>
+                </RadzenLineSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn SizeMD="12" SizeXS="12">
+        <RadzenCard Variant="Radzen.Variant.Flat">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText TextStyle="TextStyle.H4">Кв-игроки</RadzenText>
+                <RadzenText TextStyle="TextStyle.H3" class="rz-m-0">@Dcp (AVG @(Math.Round(Data.Where(x =>
+                                        x.Type == kTVCSS.Models.Models.ReportType.UniqCwPlayers).Average(x => x.Count))))</RadzenText>
+            </RadzenStack>
+            <RadzenChart ColorScheme=ColorScheme.Pastel Style="width: 100%">
+                <RadzenLineSeries TItem="kTVCSS.Models.Models.Dashboard"
+                    Data="@Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.UniqCwPlayers)"
+                    ValueProperty="Count" CategoryProperty="DateTime">
+                    <ChildContent>
+                        <RadzenLegend Visible=false />
+                        <RadzenSeriesMedianLine Visible="true" Stroke="var(--rz-warning-light)"
+                            LineType="LineType.Dotted" />
+                        <RadzenSeriesDataLabels Visible="true" />
+                    </ChildContent>
+                    <TooltipTemplate Context="Data">
+                        <div>
+                            Игроков за <span>@Data.DateTime.ToShortDateString()</span>:
+                            <strong>@Dcp</strong>
+                        </div>
+                    </TooltipTemplate>
+                </RadzenLineSeries>
+            </RadzenChart>
+        </RadzenCard>
+    </RadzenColumn>
 </RadzenRow>
 
 @code {
     [Parameter]
     public List<kTVCSS.Models.Models.Dashboard> Data { get; set; }
+
+    [Parameter]
+    public int Dcp { get; set; }
+
+    [Parameter]
+    public int Dmp { get; set; }
 }

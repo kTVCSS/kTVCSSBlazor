@@ -11,6 +11,8 @@ namespace kTVCSSBlazor.Client.Pages.Other
         private bool ready = false;
         private int days = 7;
         private bool isMobile = false;
+        int dmp = 0;
+        int dcp = 0;
 
         protected override async Task OnInitializedAsync()
         {
@@ -18,10 +20,14 @@ namespace kTVCSSBlazor.Client.Pages.Other
             {
                 isMobile = await mds.IsMobileDeviceAsync();
 
+                dmp = await http.GetFromJsonAsync<int>("/api/admins/GetDistinctCountMixPlayers?days=" + days);
+
+                dcp = await http.GetFromJsonAsync<int>("/api/admins/GetDistinctCountCwPlayers?days=" + days);
+
                 data = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.Dashboard>>("/api/admins/getdashboardinfo?days=" + days);
 
                 admins = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.DashboardAdminLog>>("/api/admins/GetDashboardInfoAdmins?days=" + days);
-                
+
                 logs = await http.GetFromJsonAsync<List<NLogRecord>>("/api/admins/GetLogs?days=" + days);
 
                 ready = true;
@@ -35,6 +41,10 @@ namespace kTVCSSBlazor.Client.Pages.Other
             ready = false;
 
             await InvokeAsync(StateHasChanged);
+
+            dmp = await http.GetFromJsonAsync<int>("/api/admins/GetDistinctCountMixPlayers?days=" + days);
+
+            dcp = await http.GetFromJsonAsync<int>("/api/admins/GetDistinctCountCwPlayers?days=" + days);
 
             data = await http.GetFromJsonAsync<List<kTVCSS.Models.Models.Dashboard>>("/api/admins/getdashboardinfo?days=" + days);
 

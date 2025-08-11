@@ -102,9 +102,39 @@
             </RadzenStack>
         </RadzenCard>
     </RadzenColumn>
+
+    <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+        <RadzenCard Variant="Radzen.Variant.Outlined">
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                <RadzenIcon Icon="comment" class="rz-background-color-primary-light rz-color-on-success-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                <RadzenStack Gap="0">
+                    <RadzenText Text="Микс-игроки" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                    <RadzenText Text="@(string.Concat(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.UniqMixPlayers).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", Dmp))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
+
+    <RadzenColumn SizeLG="6" SizeMd="6" SizeXS="12">
+        <RadzenCard Variant="Radzen.Variant.Outlined">
+            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                <RadzenIcon Icon="comment" class="rz-background-color-primary-light rz-color-on-success-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px" />
+                <RadzenStack Gap="0">
+                    <RadzenText Text="Кв-игроки" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" />
+                    <RadzenText Text="@(string.Concat(Data.Where(x => x.Type == kTVCSS.Models.Models.ReportType.UniqCwPlayers).OrderByDescending(x => x.DateTime).First().Count.ToString(), " / ", Dcp))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenColumn>
 </RadzenRow>
 
 @code {
     [Parameter]
     public List<kTVCSS.Models.Models.Dashboard> Data { get; set; }
+
+    [Parameter]
+    public int Dcp { get; set; }
+
+    [Parameter]
+    public int Dmp { get; set; }
 }
