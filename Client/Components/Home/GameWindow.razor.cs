@@ -4,6 +4,7 @@ using kTVCSS.Models.Models;
 using kTVCSSBlazor.Client.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.JSInterop;
 using Radzen;
 
 namespace kTVCSSBlazor.Client.Components.Home;
@@ -137,6 +138,8 @@ public partial class GameWindow
             await Hub.StartAsync();
             await Hub.OnAfterConnect(AuthProvider.CurrentUser);
 
+            js.InvokeVoidAsync("playAmbience");
+
             RefreshCount();
         }
         catch (Exception ex)
@@ -164,6 +167,8 @@ public partial class GameWindow
         await InvokeAsync(StateHasChanged);
 
         await Hub.Connection.StopAsync();
+
+        js.InvokeVoidAsync("stopAmbience");
 
         UpdateInSearch(false);
 

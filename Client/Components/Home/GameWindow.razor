@@ -5,6 +5,7 @@
 @inject StateProvider AuthProvider
 @implements IDisposable
 @inject HttpClient http
+@inject IJSRuntime js
 
 <RadzenStack Style="height: 100%" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack>
@@ -68,3 +69,13 @@
         }
     </RadzenStack>
 </RadzenStack>
+
+<script>
+    @* function startNoSleep() {
+        noSleep.enable();
+    }
+
+    function stopNoSleep() {
+        noSleep.disable();
+    } *@
+</script>

@@ -280,6 +280,33 @@ else
     @globalStyles
 </style>
 
+<script>
+    var noSleep = new NoSleep();
+    var ambience = new Audio('/sounds/ambience.mp3'); 
+    ambience.loop = true;
+
+    window.playAmbience = function() {
+        ambience.volume = 0.01;
+        ambience.play();
+    }
+
+    window.stopAmbience = function() {
+        ambience.pause();
+    }
+
+    document.addEventListener('click', function enableNoSleep() {
+        document.removeEventListener('click', enableNoSleep, false);
+        noSleep.enable();
+    }, false);
+
+    setInterval(() => {
+            if (document.hidden) { 
+                console.log("Keeping alive...");
+                fetch('/');
+            }
+        }, 30000);
+</script>
+
 @code {
     private bool sidebarExpanded = true;
     private bool disposed = false;
@@ -510,6 +537,7 @@ else
                         });
 
                         mm.Connection.On<string>("JoinRoom", (guid) => {
+                            JSRuntime.InvokeVoidAsync("stopAmbience");
                             NavigationManager.NavigateTo("/mixroom/" + guid);
                         });
 
@@ -517,6 +545,7 @@ else
                             switch (result)
                             {
                                 case GameHubMixCreateResult.Ok: {
+                                    JSRuntime.InvokeVoidAsync("stopAmbience");
                                     await ShowGameReady();
                                     break;
                                 }
