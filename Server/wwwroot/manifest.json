@@ -3,12 +3,12 @@
   "short_name": "kTVCSS",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#222529",
+  "background_color": "#121518",
   "theme_color": "#03173d",
   "icons": [
     {
-      "src": "/images/ktvcss.jpg",
-      "type": "image/jpeg",
+      "src": "/images/title.png",
+      "type": "image/png",
       "sizes": "512x512"
     }
   ]
