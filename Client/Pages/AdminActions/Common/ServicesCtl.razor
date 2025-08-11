@@ -1,0 +1,68 @@
+﻿@page "/servicesctl"
+@using Radzen.Blazor
+@using kTVCSS.Models.Db.Models.Common
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject StateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Управление сервисами</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+            {
+                @if (ready)
+                {
+                    <RadzenDataGrid Responsive AllowAlternatingRows="true" AllowVirtualization Data="@services">
+                        <Columns>
+                            <RadzenDataGridColumn Property="Name" Title="Сервис" />
+                            <RadzenDataGridColumn Property="IsActive" Title="Статус">
+                                <Template Context="item">
+                                    @if (item.IsActive)
+                                    {
+                                        <RadzenText Style="color: green;margin:auto" Text="Активен" />
+                                    }
+                                    else
+                                    {
+                                        <RadzenText Style="color: red;margin:auto" Text="Мертв" />
+                                    }
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn>
+                                <Template Context="item">
+                                    <RadzenButton Disabled=@(item.IsActive) Click=@(() => { Execute(item.Name, "start"); }) Text="Старт" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn>
+                                <Template Context="item">
+                                    <RadzenButton Disabled=@(!item.IsActive) Click=@(() => { Execute(item.Name, "stop"); }) Text="Стоп" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn>
+                                <Template Context="item">
+                                    <RadzenButton Click=@(() => { Execute(item.Name, "restart"); }) Text="Рестарт" />
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                }
+                else {
+                    <ComponentLoader Text="Идет загрузка сервисов" />
+                }
+            }
+            else
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger">У Вас нет прав для просмотра этой страницы!</RadzenAlert>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <RadzenAlert AlertStyle="AlertStyle.Danger">Вы должны быть авторизованы для просмотра этой страницы!
+            </RadzenAlert>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>

@@ -138,9 +138,14 @@
                                         {
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="MovieMaking-центр" Path="/moviemaker" Icon="movie"></RadzenPanelMenuItem>
                                         }
+                                    </RadzenPanelMenuItem>
+                                    <RadzenPanelMenuItem Expanded=false Text="Системное" Icon="terminal">
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                         {
-                                            <RadzenPanelMenuItem Click=CloseProject Text="Открыть/закрыть сайт" Icon="shield_locked"></RadzenPanelMenuItem>
+                                            <RadzenPanelMenuItem Click=CloseProject Text="Открыть/закрыть сайт" Icon="power_settings_circle"></RadzenPanelMenuItem>
+                                        }
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
+                                            <RadzenPanelMenuItem Click=SidePanelClick Text="Управление сервисами" Path="/servicesctl" Icon="function"></RadzenPanelMenuItem>
                                         }
                                     </RadzenPanelMenuItem>
                                 </RadzenPanelMenuItem>
