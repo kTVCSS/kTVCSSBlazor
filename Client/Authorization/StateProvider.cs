@@ -1,6 +1,7 @@
 ﻿using kTVCSS.Models.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using Radzen;
 using System.Security.Claims;
 
 namespace kTVCSSBlazor.Client.Authorization
@@ -24,7 +25,7 @@ namespace kTVCSSBlazor.Client.Authorization
 
             if (user is not null)
             {
-                var userInDatabase = await _userService.LookupUserInDatabaseAsync(user.Username, user.Password);
+                var userInDatabase = await _userService.LookupUserInDatabaseAsync(new LoginArgs() { Username = user.Username, Password = user.Password });
 
                 if (userInDatabase is not null)
                 {
@@ -51,7 +52,7 @@ namespace kTVCSSBlazor.Client.Authorization
             var localStorageData = await _userService.FetchUserFromBrowserAsync();
             if (localStorageData != null)
             {
-                return await _userService.LookupUserInDatabaseAsync(localStorageData.Username, localStorageData.Password);
+                return await _userService.LookupUserInDatabaseAsync(new LoginArgs() { Username = localStorageData.Username, Password = localStorageData.Password });
             }
             else return null;
         }
@@ -61,14 +62,14 @@ namespace kTVCSSBlazor.Client.Authorization
             return await _userService.FetchUserFromBrowserAsync();
         }
 
-        public async Task<string> LoginAsync(string username, string password)
+        public async Task<string> LoginAsync(LoginArgs args)
         {
             string error = string.Empty;
             var principal = new ClaimsPrincipal();
             
             try
             {
-                var user = await _userService.LookupUserInDatabaseAsync(username, password);
+                var user = await _userService.LookupUserInDatabaseAsync(args);
 
                 if (user is not null)
                 {

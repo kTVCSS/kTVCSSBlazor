@@ -51,7 +51,6 @@
                                 <Authorized>
                                     <RadzenStack Orientation="Orientation.Horizontal">
                                         @if (!isMobile) {
-                                            <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="@(() => { NavigationManager.NavigateTo("/github"); })" Icon="developer_board" />
                                             <RadzenButton Style="width: 32px; height: 32px; align-self: center;" Size="ButtonSize.Small" Click="ShowMM" Icon="globe" />
                                         }
                                         <NotificationBell />
@@ -185,16 +184,17 @@
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="videogame_asset" Text="Матчи" Path="/matches" />
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="trophy" Text="Боевые кубки" Path="/battlecups" />
                 <RadzenPanelMenuItem Click=SidePanelClick Icon="lan" Text="Серверы" Path="/gameservers" />
-                @if (isMobile)
-                {
-                    <RadzenPanelMenuItem Expanded=false Text="Информация" Icon="info">
-                        <RadzenPanelMenuItem Click=SidePanelClick Icon="apartment" Path="/about" Text="О проекте" />
-                        <RadzenPanelMenuItem Click=SidePanelClick Icon="gavel" Path="/rules" Text="Правила" />
-                        <RadzenPanelMenuItem Click=SidePanelClick Icon="contactless" Path="/contacts" Text="Контакты" />
-                        <RadzenPanelMenuItem Click=SidePanelClick Icon="contact_support" Path="/faq" Text="FAQ" />
-                        @*<RadzenPanelMenuItem Click=SidePanelClick Icon="download_for_offline" Path="/downloads" Text="Загрузки" />*@
-                    </RadzenPanelMenuItem>
-                }
+                <RadzenPanelMenuItem Expanded=false Text="Информация" Icon="info">
+                    <RadzenPanelMenuItem Click=SidePanelClick Icon="apartment" Path="/about" Text="О проекте" />
+                    <RadzenPanelMenuItem Click=SidePanelClick Icon="gavel" Path="/rules" Text="Правила" />
+                    <RadzenPanelMenuItem Click=SidePanelClick Icon="contactless" Path="/contacts" Text="Контакты" />
+                    <RadzenPanelMenuItem Click=SidePanelClick Icon="contact_support" Path="/faq" Text="FAQ" />
+                    @if (!isMobile)
+                    {
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="download_for_offline" Path="/downloads" Text="Загрузки" />
+                        <RadzenPanelMenuItem Click=SidePanelClick Icon="deployed_code_history" Path="/github" Text="GitHub монитор" />
+                    }
+                </RadzenPanelMenuItem>
             </RadzenPanelMenu>
         </RadzenSidebar>
         <RadzenBody Expanded="@sidebarExpanded">

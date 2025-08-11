@@ -60,7 +60,7 @@ namespace kTVCSSBlazor.Client.Components
                 return;
             }
 
-            await AuthProvider.LoginAsync(args.Username, args.Password);
+            await AuthProvider.LoginAsync(args);
 
             notify.Notify(NotificationSeverity.Success, "Успех", $"Добро пожаловать, {args.Username}. Сейчас вы будете перенаправлены на главную страницу!", TimeSpan.FromSeconds(5));
 

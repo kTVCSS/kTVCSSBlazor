@@ -1,4 +1,5 @@
-﻿using Radzen;
+﻿using System.Text;
+using Radzen;
 
 namespace kTVCSSBlazor.Client.Components
 {
@@ -10,7 +11,10 @@ namespace kTVCSSBlazor.Client.Components
 
         private async Task OnLogin(LoginArgs args, string name)
         {
-            string result = await AuthProvider.LoginAsync(args.Username, args.Password);
+            var tArgs = args;
+            tArgs.Password = MD5.Calculate(Encoding.ASCII.GetBytes(args.Password));
+
+            string result = await AuthProvider.LoginAsync(tArgs);
 
             if (!string.IsNullOrEmpty(result))
             {

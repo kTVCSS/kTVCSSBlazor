@@ -3,6 +3,7 @@ using kTVCSS.Models.Models;
 using kTVCSSBlazor.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
+using Radzen;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -28,11 +29,16 @@ namespace kTVCSSBlazor.Client.Authorization
             return await _http.GetFromJsonAsync<RegisterResult>($"/api/register?username={username}&password={password}");
         }
 
-        private async Task<User?> Get(string username, string password)
+        private async Task<User?> Get(LoginArgs args)
         {
             try
             {
-                var user = await _http.GetFromJsonAsync<User>($"/api/login?username={username}&password={password}");
+                var response = await _http.PostAsJsonAsync($"/api/login", args);
+
+                response.EnsureSuccessStatusCode();
+
+                var user = await response.Content.ReadFromJsonAsync<User>();
+
                 if (user is not null)
                 {
                     return user;
@@ -45,9 +51,9 @@ namespace kTVCSSBlazor.Client.Authorization
             return null;
         }
 
-        public async Task<User?> LookupUserInDatabaseAsync(string username, string password)
+        public async Task<User?> LookupUserInDatabaseAsync(LoginArgs args)
         {
-            var task = Get(username, password);            
+            var task = Get(args);            
 
             await Task.WhenAll(task);
 
