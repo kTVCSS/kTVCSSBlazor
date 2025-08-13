@@ -54,6 +54,11 @@
                                                 <RadzenDataGridColumn Context="ctx" Title="Момент" Property="Type" />
                                                 <RadzenDataGridColumn Context="ctx" Title="Время (тики)" Property="Ticks" />
                                                 <RadzenDataGridColumn Context="ctx" Title="Длительность (сек)" Property="Length" />
+                                                <RadzenDataGridColumn Context="ctx">
+                                                    <Template>
+                                                        <RadzenButton Icon="download" Click="@(() => { JS.InvokeVoidAsync("openDemoUrl", ctx.DemoName); })" />
+                                                    </Template>
+                                                </RadzenDataGridColumn>
                                             </Columns>
                                         </RadzenDataGrid>
                                     </RadzenStack>
@@ -81,3 +86,9 @@
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
+
+<script>
+    function openDemoUrl(name) {
+        window.open('/demos/' + name + '.dem.zip', '_blank');
+    }
+</script>
