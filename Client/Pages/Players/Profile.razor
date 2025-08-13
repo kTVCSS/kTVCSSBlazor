@@ -44,7 +44,7 @@
 
         @if (player.MainInfo.Block == 1)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose=false Text="@string.Concat("Игрок заблокирован: ", player.MainInfo.BlockReason)" />
+            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose=false Text="@string.Concat("Игрок заблокирован: ", player.MainInfo.BlockReason, " (истекает: ", player.BanExpires, ")")" />
         }
 
         <CascadingAuthenticationState>
