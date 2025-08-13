@@ -115,6 +115,7 @@
                                     <RadzenPanelMenuItem Click=SidePanelClick Text="База знаний" Path="/library" Icon="library_books"></RadzenPanelMenuItem>
                                     @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                     {
+                                        <RadzenPanelMenuItem Click=SidePanelClick Text="Управление админами" Path="/editadmins" Icon="manage_accounts"></RadzenPanelMenuItem>
                                         <RadzenPanelMenuItem Click=SidePanelClick Text="Дашборд" Path="/dashboard" Icon="dashboard"></RadzenPanelMenuItem>
                                         <RadzenPanelMenuItem Expanded=false Text="Разделы главной" Icon="home">
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Создать новость" Path="/createarticle" Icon="newspaper"></RadzenPanelMenuItem>

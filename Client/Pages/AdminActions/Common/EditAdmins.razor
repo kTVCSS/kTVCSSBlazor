@@ -1,0 +1,82 @@
+﻿@page "/editadmins"
+@using kTVCSS.Models.Db.Models.Common
+@using kTVCSS.Models.Db.Models.Roles
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Db.Models.Players
+@inject IJSRuntime JS
+@inject StateProvider AuthProvider
+@inject NavigationManager NavigationManager
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Редактор списка админов</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+            {
+                <RadzenDataGrid Responsive @ref="itemsGrid" Style="height: 70svh" AllowColumnResize AllowAlternatingRows="true" AllowVirtualization EditMode="@editMode"
+                                Data="@items" TItem="Role" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset">
+                    <HeaderTemplate>
+                        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Добавить" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && itemsToInsert.Count() > 0)" />
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Property="Name" Title="Имя">
+                            <EditTemplate Context="item">
+                                <RadzenTextBox @bind-Value="item.Name" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="PlayerId" Title="ID игрока">
+                            <EditTemplate Context="item">
+                                <RadzenNumeric @bind-Value="item.PlayerId" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Width=275px Property="Type" Title="Права">
+                            <EditTemplate Context="item">
+                                <RadzenDropDown Data="@(Enum.GetValues(typeof(RoleType)).Cast<Enum>().Where(x => (RoleType)x <= AuthProvider.CurrentUser.Role))" @bind-Value=@item.Type
+                                AllowClear="true" AllowFiltering="true"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+                            </RadzenDropDown>
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Link" Title="Ссылка">
+                            <EditTemplate Context="item">
+                                <RadzenTextBox @bind-Value="item.Link" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="GroupName" Title="Группа">
+                            <EditTemplate Context="item">
+                                <RadzenTextBox @bind-Value="item.GroupName" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Property="Description" Title="Описание">
+                            <EditTemplate Context="item">
+                                <RadzenTextArea Rows="5" @bind-Value="item.Description" Style="width:100%; display: block;" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Context="item" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen FrozenPosition="FrozenColumnPosition.Right">
+                            <Template Context="item">
+                                @* <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" Click="@(() => InsertAfterRow(item))" title="Add new row after this row" Disabled="@(editMode == DataGridEditMode.Single && itemsToInsert.Count() > 0)" /> *@
+                                <RadzenButton Disabled=@(AuthProvider.CurrentUser.Role < item.Type) Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(item))" @onclick:stopPropagation="true" />
+                                <RadzenButton Disabled=@(AuthProvider.CurrentUser.Role < item.Type) Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(item))" @onclick:stopPropagation="true" />
+                            </Template>
+                            <EditTemplate Context="item">
+                                <RadzenButton Disabled=@(AuthProvider.CurrentUser.Role < item.Type) Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(item))" aria-label="Save" />
+                                <RadzenButton Disabled=@(AuthProvider.CurrentUser.Role < item.Type) Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(item))" aria-label="Cancel" />
+                                <RadzenButton Disabled=@(AuthProvider.CurrentUser.Role < item.Type) Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(item))" aria-label="Delete" />
+                            </EditTemplate>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+            else
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger">У Вас нет прав для просмотра этой страницы!</RadzenAlert>
+            }
+        </Authorized>
+        <NotAuthorized>
+            <RadzenAlert AlertStyle="AlertStyle.Danger">Вы должны быть авторизованы для просмотра этой страницы!</RadzenAlert>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
