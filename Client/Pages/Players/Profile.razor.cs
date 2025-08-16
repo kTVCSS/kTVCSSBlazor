@@ -56,7 +56,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
         {
             Task.Run(async () =>
             {
-                if (!NavigationManager.Uri.ToString().Contains("/player/"))
+                if (!NavigationManager.Uri.ToString().Contains("/player/") && !NavigationManager.Uri.ToString().Contains("/mixroom/"))
                 {
                     return;
                 }

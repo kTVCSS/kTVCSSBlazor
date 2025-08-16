@@ -1,0 +1,105 @@
+﻿@page "/mixroom/{Guid}"
+@inject HttpClient http
+@inject DialogService DialogService
+
+<PageTitle>kTVCSS @@ Микс-комната</PageTitle>
+
+@if (ready)
+{
+    <RadzenCard Style="@headerStyle">
+        <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;">
+            <div class="rz-text-h5" style="font-weight: 600;width:100%;text-align:center">@timeLeftString</div>
+            <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
+                <div style="font-weight: 600;text-align: center;width: 45%;">
+                    <img style="background-repeat: no-repeat;background-position: 50%;border-radius: 50%;width: 80px; height:80px" src="/images/logo_ktv.png" width="60" height="60">
+                    <div class="rz-text-h5">Team Alpha</div>
+                </div>
+                <div class="rz-text-h4" style="font-weight: 600;display:flex;text-align:center;"><div>0</div><div style="margin-left: 5px;margin-right: 5px;">  -  </div><div>0</div></div>
+                <div style="font-weight: 600;text-align: center;width: 45%;">
+                    <img style="background-repeat: no-repeat;background-position: 50%;border-radius: 50%;width: 80px; height:80px" src="/images/logo_ktv.png" width="60" height="60">
+                    <div class="rz-text-h5">Team Bravo</div>
+                </div>
+            </div>
+            <div class="rz-display-flex">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenText TextStyle=TextStyle.DisplayH6 TextAlign="TextAlign.Center">Сервер: <b>@mix.ServerAddress</b></RadzenText>
+                </RadzenStack>
+            </div>
+        </div>
+    </RadzenCard>
+    <RadzenRow class="rz-mt-4" JustifyContent=JustifyContent.SpaceBetween Gap="4px">
+        <RadzenColumn Size="3">
+            <RadzenStack>
+                @foreach (var player in mix.MixPlayers.Where(x => x.TeamID == "0"))
+                {
+                    <RadzenCard>
+                        <RadzenStack Gap="1rem" AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                            <RadzenImage Path="@player.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%;" AlternateText="@(player.Username)" />
+                            <RadzenStack Gap="0.25rem">
+                                <h4 style="cursor:pointer" @onclick=@(() => LoadPlayerProfile(player.Id)) class="rz-mb-0 rz-mt-0">@(player.Username)</h4>
+                                <div>@(player.CurrentMMR) ELO</div>
+                                <div style="font-size: .8em">
+                                    <RadzenStack Orientation="Orientation.Horizontal">
+                                        @(player.TotalMatches) матчей
+                                    </RadzenStack>
+                                </div>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                }
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="4">
+            <RadzenText>
+                Микс создан. Вам необходимо зайти на игровой сервер, указанный в шапке страницы в течение 5 минут.
+            </RadzenText>
+            <RadzenText>
+                Вероятность победы Team Alpha составляет @(CalculateWinProbability(mix.MixPlayers.Where(x => x.TeamID == "0").ToList(), mix.MixPlayers.Where(x => x.TeamID == "1").ToList()))%.
+            </RadzenText>
+            <RadzenText>
+                После захода на сервер, обязательно зайдите за любую команду (не сидите в спеках). Матч будет запущен автоматически.
+            </RadzenText>
+            <RadzenText>Проявляйте уважение к товарищам по команде, а так же к оппонентам. За нарушения правил проекта последует блокировка на указанные правилами сроки.</RadzenText>
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+            <RadzenStack>
+                @foreach (var player in mix.MixPlayers.Where(x => x.TeamID == "1"))
+                {
+                    <RadzenCard>
+                        <RadzenStack Gap="1rem" AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                            <RadzenImage Path="@player.AvatarUrl" Style="width: 80px; height: 80px; border-radius: 50%;" AlternateText="@(player.Username)" />
+                            <RadzenStack Gap="0.25rem">
+                                <h4 style="cursor:pointer" @onclick=@(() => LoadPlayerProfile(player.Id)) class="rz-mb-0 rz-mt-0">@(player.Username)</h4>
+                                <div>@(player.CurrentMMR) ELO</div>
+                                <div style="font-size: .8em">
+                                    <RadzenStack Orientation="Orientation.Horizontal">
+                                        @(player.TotalMatches) матчей
+                                    </RadzenStack>
+                                </div>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                }
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+}
+else
+{
+    <kTVCSSBlazor.Client.Components.ComponentLoader Text="Идет загрузка комнаты" />
+}
+
+@code {
+    private async Task LoadPlayerProfile(int id)
+    {
+        await DialogService.OpenAsync("Профиль игрока", ds =>
+            @<RadzenStack Gap="1.5rem">
+                <kTVCSSBlazor.Client.Pages.Players.Profile Id="@id" />
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Text="Закрыть" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenStack>, options: new DialogOptions() { Width = "1280px", Height = "720px" });
+    }
+}
