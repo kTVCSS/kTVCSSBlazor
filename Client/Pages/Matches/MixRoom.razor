@@ -100,6 +100,6 @@ else
                         <RadzenButton Text="Закрыть" Click="() => ds.Close(false)" ButtonStyle="ButtonStyle.Light" />
                     </RadzenStack>
                 </RadzenStack>
-            </RadzenStack>, options: new DialogOptions() { Width = "1280px", Height = "720px" });
+            </RadzenStack>, options: new DialogOptions() { Width = "1280px", Height = "720px", CloseDialogOnEsc = true, ShowClose = true, CloseDialogOnOverlayClick = true });
     }
 }
