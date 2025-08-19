@@ -160,8 +160,6 @@ public partial class GameWindow
 
     public async Task Stop()
     {
-        RefreshCount();
-
         UpdateSearchButtonEnabled(false);
 
         await InvokeAsync(StateHasChanged);
@@ -171,6 +169,8 @@ public partial class GameWindow
         js.InvokeVoidAsync("stopAmbience");
 
         UpdateInSearch(false);
+
+        RefreshCount();
 
         await InvokeAsync(StateHasChanged);
 

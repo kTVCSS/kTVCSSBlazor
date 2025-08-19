@@ -546,6 +546,7 @@ else
                             switch (result)
                             {
                                 case GameHubMixCreateResult.Ok: {
+                                    inSearch = false;
                                     JSRuntime.InvokeVoidAsync("stopAmbience");
                                     await ShowGameReady();
                                     break;

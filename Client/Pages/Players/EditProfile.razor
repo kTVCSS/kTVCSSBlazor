@@ -42,7 +42,7 @@
 
                         @if (profile.Telegram.HasValue)
                         {
-                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin && profile.Telegram.Value > 0)
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                             {
                                 <RadzenFormField Text="Telegram" Style="width: 100%;">
                                     <ChildContent>
