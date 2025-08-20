@@ -4,6 +4,7 @@ using kTVCSSBlazor.Client.Extensions;
 using kTVCSSBlazor.Client.Services;
 using kTVCSSBlazor.Server.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.JSInterop;
 using Radzen;
 using RadzenBlazorDemos.Services;
@@ -60,5 +61,22 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
    .AddInteractiveWebAssemblyRenderMode()
    .AddAdditionalAssemblies(typeof(kTVCSSBlazor.Client._Imports).Assembly);
+
+app.MapGet("/api/DeleteMixMemory", async (string guid) =>
+{
+    try
+    {
+        using (var http = new HttpClient())
+        {
+            await http.GetAsync($"https://mm.ktvcss.ru/api/DeleteMixMemory?guid={guid}");
+        }
+    }
+    catch (Exception ex)
+    {
+        return ex.ToString();
+    }
+
+    return "cleared";
+});
 
 app.Run();

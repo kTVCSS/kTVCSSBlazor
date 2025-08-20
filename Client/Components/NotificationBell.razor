@@ -1,12 +1,19 @@
 ﻿@using kTVCSS.Models.Db.Models.Common
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
 @inject HttpClient http
 @inject NavigationManager nm
 @inject StateProvider AuthProvider
 @implements IDisposable
 @inject NotificationService NotifyService
+@inject IMobileDetectionService mds
 
-<RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+@if (isMobile) {
+    <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+}
+else {
+    <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Text="Уведомления" Style="height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+}
 
 <div class="drawer-overlay" style="@(drawerVisible ? "display:block" : "display:none")" @onclick="ToggleDrawer"></div>
 

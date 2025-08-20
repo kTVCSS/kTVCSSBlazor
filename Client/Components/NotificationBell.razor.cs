@@ -33,10 +33,14 @@ namespace kTVCSSBlazor.Client.Components
             });
         }
 
+        private bool isMobile = false;
+
         protected override async Task OnInitializedAsync()
         {
             Task.Run(async () =>
             {
+                isMobile = await mds.IsMobileDeviceAsync();
+
                 while (!_disposed)
                 {
                     await LoadNotifications();

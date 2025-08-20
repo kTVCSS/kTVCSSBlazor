@@ -62,11 +62,11 @@ namespace kTVCSSBlazor.Client.Components
 
             await AuthProvider.LoginAsync(args);
 
-            notify.Notify(NotificationSeverity.Success, "Успех", $"Добро пожаловать, {args.Username}. Сейчас вы будете перенаправлены на главную страницу!", TimeSpan.FromSeconds(5));
+            notify.Notify(NotificationSeverity.Success, "Успех", $"Благодарим за регистрацию, {args.Username}. Теперь можете войти в свою учетную запись!", TimeSpan.FromSeconds(5));
 
-            await Task.Delay(1500);
+            await Task.Delay(2500);
 
-            NavigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo("/login", true);
 
             StateHasChanged();
         }
