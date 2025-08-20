@@ -12,25 +12,27 @@
 @inject DialogService DialogService
 @inject ChatHubService ChatHub
 @inject NavigationManager nm
+@inject IMobileDetectionService mds
 
 <PageTitle>kTVCSS @@ Мессенджер</PageTitle>
 
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            <div class="chat-container">
+            @if (!isMobile) {
+                <div class="chat-container">
                     <div class="sidebar">
                         <div class="sidebar-header">
                             <h3>Чаты</h3>
                         </div>
-        
+                        
                         <div class="dialogs-list">
                             @if (dialogs != null)
                             {
                                 @foreach (var dialog in dialogs)
                                 {
                                     <div class="dialog-item @(selectedDialog?.Id == dialog.Id ? "active" : "")"
-                                         @onclick="() => SelectDialog(dialog)">
+                                        @onclick="() => SelectDialog(dialog)">
                                         <div class="dialog-avatar">
                                             @if (dialog.IsGroup)
                                             {
@@ -39,9 +41,10 @@
                                             else if (dialog.Participants.Any())
                                             {
                                                 <img src="@(dialog.Participants.First().AvatarUrl ?? "/images/default-avatar.png")" 
-                                                     alt="Avatar" class="avatar" />
+                                                    alt="Avatar" class="avatar" />
                                             }
                                         </div>
+                                        
                                         <div class="dialog-info">
                                             <div class="dialog-name">
                                                 @if (dialog.IsGroup)
@@ -61,6 +64,7 @@
                                                     }
                                                 }
                                             </div>
+                                            
                                             <div class="dialog-last-message">
                                                 @if (dialog.LastMessage != null)
                                                 {
@@ -73,6 +77,7 @@
                                                 }
                                             </div>
                                         </div>
+                                        
                                         @if (!dialog.IsGroup && dialog.Participants.Any() && dialog.Participants.First().IsOnline)
                                         {
                                             <div class="online-indicator"></div>
@@ -96,9 +101,13 @@
                                     else if (selectedDialog.Participants.Any())
                                     {
                                         <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
-                                             alt="Avatar" class="avatar-small" />
+                                            alt="Avatar" class="avatar-small" />
                                         <div>
-                                            <div class="user-name"><RadzenLink Target="_blank" Path="@string.Concat("/player/", selectedDialog.Participants.First().UserId)"><RadzenText>@selectedDialog.Participants.First().Login</RadzenText></RadzenLink></div>
+                                            <div class="user-name">
+                                                <RadzenLink Target="_blank" Path="@string.Concat("/player/", selectedDialog.Participants.First().UserId)">
+                                                    <RadzenText>@selectedDialog.Participants.First().Login</RadzenText>
+                                                </RadzenLink>
+                                            </div>
                                             <div class="user-status">
                                                 @if (selectedDialog.Participants.First().IsOnline)
                                                 {
@@ -123,8 +132,9 @@
                                             @if (message.Sender.UserId != currentUserId)
                                             {
                                                 <img src="@(message.Sender.AvatarUrl ?? "/images/default-avatar.png")" 
-                                                     alt="@message.Sender.Login" class="message-avatar" />
+                                                    alt="@message.Sender.Login" class="message-avatar" />
                                             }
+                                            
                                             <div class="message-content">
                                                 @if (message.ReplyToMessage != null)
                                                 {
@@ -133,7 +143,9 @@
                                                         <div class="reply-text">@message.ReplyToMessage.Content</div>
                                                     </div>
                                                 }
+                                                
                                                 <div class="message-text">@message.Content</div>
+                                                
                                                 <div class="message-meta">
                                                     <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
                                                     @if (message.IsEdited)
@@ -167,20 +179,38 @@
                                         </button>
                                     </div>
                                 }
+                                
                                 <div class="input-area">
-                                    @if (selectedDialog.IsRestricted) {
-                                        if (selectedDialog.RestrictIssuier == AuthProvider.CurrentUser.Id) {
+                                    @if (selectedDialog.IsRestricted)
+                                    {
+                                        if (selectedDialog.RestrictIssuier == AuthProvider.CurrentUser.Id)
+                                        {
                                             <RadzenButton class="rz-m-auto" Click=UnrestrictChat Text="Разблокировать" />
                                         }
-                                        else {
+                                        else
+                                        {
                                             <RadzenAlert AlertStyle="AlertStyle.Danger" Text="Игрок заблокировал Вас" AllowClose=false />
                                         }
                                     }
-                                    else {
-                                        <RadzenTextBox Style="width: 100%;margin-right: 2%;" @onkeypress="HandleKeyPress" @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) @bind-Value=messageText Placeholder="Сообщение..." />
-                                        <RadzenButton Style="margin-right: 1%;" Icon="send" Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) Click="SendMessage" />
+                                    else
+                                    {
+                                        <RadzenTextBox Style="width: 100%;margin-right: 2%;" 
+                                                    @onkeypress="HandleKeyPress" 
+                                                    @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) 
+                                                    @bind-Value=messageText 
+                                                    Placeholder="Сообщение..." />
+                                        
+                                        <RadzenButton Style="margin-right: 1%;" 
+                                                    Icon="send" 
+                                                    Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) 
+                                                    Click="SendMessage" />
+                                        
                                         <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
-                                        <RadzenButton ButtonStyle=ButtonStyle.Danger Style="margin-left: 1%;" Icon="block" Click=RestrictChat />
+                                        
+                                        <RadzenButton ButtonStyle=ButtonStyle.Danger 
+                                                    Style="margin-left: 1%;" 
+                                                    Icon="block" 
+                                                    Click=RestrictChat />
                                     }
                                 </div>
                             </div>
@@ -204,9 +234,239 @@
                         }
                     </div>
                 </div>
+            }
+            else {
+                <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
+                    <RadzenHeader>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+                            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+                            <RadzenLabel Text="Диалоги" />
+                        </RadzenStack>
+                    </RadzenHeader>
+                    <RadzenSidebar @bind-Expanded="@sidebarExpanded">
+                        @if (dialogs != null)
+                            {
+                                @foreach (var dialog in dialogs)
+                                {
+                                    <div class="dialog-item @(selectedDialog?.Id == dialog.Id ? "active" : "")"
+                                        @onclick="() => SelectDialog(dialog)">
+                                        <div class="dialog-avatar">
+                                            @if (dialog.IsGroup)
+                                            {
+                                                <i class="fas fa-users"></i>
+                                            }
+                                            else if (dialog.Participants.Any())
+                                            {
+                                                <img src="@(dialog.Participants.First().AvatarUrl ?? "/images/default-avatar.png")" 
+                                                    alt="Avatar" class="avatar" />
+                                            }
+                                        </div>
+                                        
+                                        <div class="dialog-info">
+                                            <div class="dialog-name">
+                                                @if (dialog.IsGroup)
+                                                {
+                                                    @dialog.Name
+                                                    @if (dialog.LastMessage is not null)
+                                                    {
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                    }
+                                                }
+                                                else if (dialog.Participants.Any())
+                                                {
+                                                    @dialog.Participants.First().Login
+                                                    @if (dialog.LastMessage is not null) 
+                                                    {
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                    }
+                                                }
+                                            </div>
+                                            
+                                            <div class="dialog-last-message">
+                                                @if (dialog.LastMessage != null)
+                                                {
+                                                    <span class="last-message-text">@dialog.LastMessage.Content</span>
+                                            
+                                                    @if (dialog.UnreadCount > 0)
+                                                    {
+                                                        <div class="unread-badge">@dialog.UnreadCount</div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        
+                                        @if (!dialog.IsGroup && dialog.Participants.Any() && dialog.Participants.First().IsOnline)
+                                        {
+                                            <div class="online-indicator"></div>
+                                        }
+                                    </div>
+                                }
+                            }
+                    </RadzenSidebar>
+                    <RadzenBody Style="overflow: hidden !important;padding: 0px;padding-top: 6px;">
+                        @if (selectedDialog != null)
+                        {
+                            <div class="chat-header">
+                                <div class="chat-info">
+                                    @if (selectedDialog.IsGroup)
+                                    {
+                                        <i class="fas fa-users"></i>
+                                        <span>@selectedDialog.Name</span>
+                                    }
+                                    else if (selectedDialog.Participants.Any())
+                                    {
+                                        <img src="@(selectedDialog.Participants.First().AvatarUrl ?? "/images/logo_ktv.png")" 
+                                            alt="Avatar" class="avatar-small" />
+                                        <div>
+                                            <div class="user-name">
+                                                <RadzenLink Target="_blank" Path="@string.Concat("/player/", selectedDialog.Participants.First().UserId)">
+                                                    <RadzenText>@selectedDialog.Participants.First().Login</RadzenText>
+                                                </RadzenLink>
+                                            </div>
+                                            <div class="user-status">
+                                                @if (selectedDialog.Participants.First().IsOnline)
+                                                {
+                                                    <span class="online">в сети</span>
+                                                }
+                                                else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
+                                                {
+                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <div id="msg-cntr" style="height: 47%;" class="messages-container" @ref="messagesContainer">
+                                @if (messages != null)
+                                {
+                                    @foreach (var message in messages)
+                                    {
+                                        <div class="message @(message.Sender.UserId == currentUserId ? "message-own" : "message-other")">
+                                            @if (message.Sender.UserId != currentUserId)
+                                            {
+                                                <img src="@(message.Sender.AvatarUrl ?? "/images/default-avatar.png")" 
+                                                    alt="@message.Sender.Login" class="message-avatar" />
+                                            }
+                                            
+                                            <div class="message-content">
+                                                @if (message.ReplyToMessage != null)
+                                                {
+                                                    <div class="reply-message">
+                                                        <div class="reply-author">@message.ReplyToMessage.Sender.Login</div>
+                                                        <div class="reply-text">@message.ReplyToMessage.Content</div>
+                                                    </div>
+                                                }
+                                                
+                                                <div class="message-text">@message.Content</div>
+                                                
+                                                <div class="message-meta">
+                                                    <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
+                                                    @if (message.IsEdited)
+                                                    {
+                                                        <span class="edited-indicator">изменено</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                
+                                @if (typingUsers.Any())
+                                {
+                                    <div class="typing-indicator">
+                                        @string.Join(", ", typingUsers.Select(u => u.Login)) печата@(typingUsers.Count > 1 ? "ют" : "ет")...
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="message-input-container">
+                                @if (replyToMessage != null)
+                                {
+                                    <div class="reply-preview">
+                                        <div class="reply-content">
+                                            <strong>@replyToMessage.Sender.Login:</strong>
+                                            <span>@replyToMessage.Content</span>
+                                        </div>
+                                        <button class="btn-close-reply" @onclick="CancelReply">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                }
+                                
+                                <RadzenStack class="rz-p-2">
+                                    @if (selectedDialog.IsRestricted)
+                                    {
+                                        if (selectedDialog.RestrictIssuier == AuthProvider.CurrentUser.Id)
+                                        {
+                                            <RadzenButton class="rz-m-auto" Click=UnrestrictChat Text="Разблокировать" />
+                                        }
+                                        else
+                                        {
+                                            <RadzenAlert AlertStyle="AlertStyle.Danger" Text="Игрок заблокировал Вас" AllowClose=false />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <RadzenTextBox Style="width: 100%;" 
+                                                    @onkeypress="HandleKeyPress" 
+                                                    @oninput=@(args => { messageText=args.Value.ToString(); HandleTyping();}) 
+                                                    @bind-Value=messageText 
+                                                    Placeholder="Сообщение..." />
+                                        
+                                        <RadzenButton Style="" 
+                                                    Icon="send" 
+                                                    Disabled=@(string.IsNullOrWhiteSpace(messageText) || isWaiting) 
+                                                    Click="SendMessage" />
+                                        
+                                        <RadzenSpeechToTextButton Change="@(args => OnSpeechCaptured(args, true, "Button2"))" />
+                                        
+                                        <RadzenButton ButtonStyle=ButtonStyle.Danger 
+                                                    Style="" 
+                                                    Icon="block" 
+                                                    Click=RestrictChat />
+                                    }
+                                </RadzenStack>
+                            </div>
+                        }
+                        else
+                        {
+                            @if (!ready)
+                            {
+                                <RadzenRow class="rz-mt-8" JustifyContent="JustifyContent.Center">
+                                    <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                                        <Loader Size="ProgressBarCircularSize.Medium" Text="@currentLoadText" />
+                                    </RadzenStack>
+                                </RadzenRow>
+                            }
+                            else
+                            {
+                                <div class="no-chat-selected">
+                                    <RadzenText TextStyle="TextStyle.DisplayH5">Выберите чат для начала общения</RadzenText>
+                                </div>
+                            }
+                        }
+                    </RadzenBody>
+                </RadzenLayout>
+            }
         </Authorized>
+        
         <NotAuthorized>
             <NoAccess />
         </NotAuthorized>
     </AuthorizeView>
 </CascadingAuthenticationState>
+
+<style>
+    @@media (max-width: 768px) {
+        .rz-header, .rz-footer, .rz-body {
+            width: 100%;
+        }
+    }
+
+    .rz-layout .rz-body {
+        grid-area: rz-body;
+        overflow: hidden;
+    }
+</style>

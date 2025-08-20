@@ -61,10 +61,27 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
         }
 
         List<IDisposable> disposables = [];
+        bool isMobile = false;
+        bool sidebarExpanded = true;
+
+        private void SidePanelClick()
+        {
+            if (isMobile)
+            {
+                sidebarExpanded = false;
+            }
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (!firstRender) return;
+
+            isMobile = await mds.IsMobileDeviceAsync();
+
+            if (isMobile)
+            {
+                sidebarExpanded = true;
+            }
 
             while (AuthProvider.CurrentUser is null)
             {
@@ -223,6 +240,11 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
         private async Task SelectDialog(DialogDto dialog)
         {
             if (selectedDialog?.Id == dialog.Id) return;
+
+            if (isMobile)
+            {
+                SidePanelClick();
+            }
 
             Console.WriteLine(dialog.Id);
 
