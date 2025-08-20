@@ -15,7 +15,7 @@
             {
                 @if (article is not null)
                 {
-                    @if (article.Role >= AuthProvider.CurrentUser.Role)
+                    @if (article.Role <= AuthProvider.CurrentUser.Role)
                     {
                         <PageTitle>kTVCSS @@ @article.Title</PageTitle>
 
