@@ -24,8 +24,7 @@
                                 <div class="rz-mb-4 rz-p-10">
                                     <RadzenText TextStyle="TextStyle.DisplayH3" TextAlign="TextAlign.Center"
                                         Text="@article.Title" />
-                                    <RadzenText TextAlign="TextAlign.Center">Дата публикации:
-                                        @article.DateTime.ToString("dd.MM.yyyy")
+                                    <RadzenText TextAlign="TextAlign.Center">Дата публикации: @article.DateTime.ToString("dd.MM.yyyy") (для @article.Role.ToString() и выше)
                                     </RadzenText>
                                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
                                         <RadzenButton Click="OpenEdit" Size="ButtonSize.Small" Variant="Variant.Text"

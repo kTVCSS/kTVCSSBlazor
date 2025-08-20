@@ -463,6 +463,29 @@ else
 
                         await InvokeAsync(StateHasChanged);
 
+                        Task.Run(async () => {
+                            try {
+                                string baseUri = "http://localhost:4050";
+
+                                #if RELEASE
+
+                                baseUri = "https://chat.ktvcss.ru";
+
+                                #endif
+
+                                var dialogs = await http.GetFromJsonAsync<List<DialogDto>>($"{baseUri}/api/chat/dialogs?userId={AuthProvider.CurrentUser.Id}");
+                                
+                                if (dialogs.Any(x => x.UnreadCount > 0)) {
+                                    NotificationService.Notify(NotificationSeverity.Info, "У Вас есть новые сообщения в мессенджере. Нажмите на это сообщение, чтобы перейти в него!", click: (msg) => {
+                                        NavigationManager.NavigateTo("/chat");
+                                    });
+                                }
+                            }
+                            catch (Exception) {
+                                // chat not available
+                            }
+                        });
+
                         mm.Connection.Reconnecting += (async (exception) => {
                             if (exception is not null)
                             {
