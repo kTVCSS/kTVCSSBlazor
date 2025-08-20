@@ -527,6 +527,13 @@ else
                             }
                         };
 
+                        mm.Connection.On("MixEnded", async () => {
+                            JSRuntime.InvokeVoidAsync("playGameReadySound");
+                            NotificationService.Notify(NotificationSeverity.Success, "Матч закончился! Ждем Вас снова!");
+                            inSearch = false;
+                            await InvokeAsync(StateHasChanged);
+                        });
+
                         mm.Connection.On<GameHubConnectResult>("GetConnectResult", async (result) => {
 
                             Console.WriteLine(result.ToString());
