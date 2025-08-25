@@ -528,7 +528,14 @@ else
                         };
 
                         mm.Connection.On("MixEnded", async () => {
-                            JSRuntime.InvokeVoidAsync("playGameReadySound");
+                            if (mm.Connection.State != HubConnectionState.Disconnected) {
+                                try {
+                                    await mm.Connection.StopAsync();
+                                }
+                                catch (Exception) {
+
+                                }
+                            }
                             NotificationService.Notify(NotificationSeverity.Success, "Матч закончился! Ждем Вас снова!");
                             inSearch = false;
                             await InvokeAsync(StateHasChanged);
@@ -569,7 +576,7 @@ else
 
                         mm.Connection.On<string>("JoinRoom", (guid) => {
                             JSRuntime.InvokeVoidAsync("stopAmbience");
-                            NavigationManager.NavigateTo("/mixroom/" + guid);
+                            NavigationManager.NavigateTo("/mixroom/" + guid, true);
                         });
 
                         mm.Connection.On<GameHubMixCreateResult>("GetMixCreateResult", async (result) => {

@@ -24,7 +24,7 @@ namespace kTVCSSBlazor.Client.Components
             Task.Run(async () =>
             {
                 // фича, чтобы не задрачивать бэк
-                int random = new Random().Next(0, 3);
+                int random = new Random().Next(0, 10);
 
                 if (random == 2)
                 {
