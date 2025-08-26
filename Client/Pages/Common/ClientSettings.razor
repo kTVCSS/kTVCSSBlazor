@@ -1,0 +1,135 @@
+﻿@page "/clientsettings"
+@using Blazored.LocalStorage
+@using kTVCSS.Models.Db.Models.Common
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Components
+@using kTVCSSBlazor.Client.Services
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject StateProvider AuthProvider
+@inject DialogService DialogService
+@inject NavigationManager nm
+@inject IMobileDetectionService mds
+@inject ILocalStorageService localStorage
+@inject HttpClient http
+
+<PageTitle>kTVCSS @@ Настройки</PageTitle>
+
+<RadzenRow JustifyContent="JustifyContent.Center">
+    <RadzenColumn SizeXS="12" SizeSM="8">
+        <RadzenStack>
+            <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4">Настройки сайта
+                <RadzenText Text="БЕТА" TextStyle="TextStyle.Subtitle2" />
+            </RadzenText>
+
+            <RadzenStack Gap="4px">
+                <RadzenLabel Text="Звук найденной игры" Component="DropDownTemplate" />
+                <RadzenDropDown @bind-Value=@selectedGameFoundSound Data=@sounds TextProperty="@nameof(Sound.Name)"
+                    Style="width: 250px;" Name="DropDownTemplate">
+                    <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                            <RadzenButton Size="ButtonSize.Small" Icon="play_circle"
+                                Click="@(() => { JSRuntime.InvokeVoidAsync("testSound", (context as Sound).Value); })" />
+                            @((context as Sound).Name)
+                        </RadzenStack>
+                    </Template>
+                    <ValueTemplate>
+                        @((context as Sound).Name)
+                    </ValueTemplate>
+                </RadzenDropDown>
+                <RadzenButton Style="width: 250px" Text="Сделать тест найденной игры" Click="ShowGameReady" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<script>
+    window.testSound = (track) => {
+        let audio = new Audio(track)
+        audio.volume = 0.25
+        audio.play();
+    }
+</script>
+
+@code {
+    private List<string> citations = [];
+    private List<Sound> sounds = [];
+    private Sound _selectedGameFoundSound;
+    private Sound selectedGameFoundSound
+    {
+        get
+        {
+            return _selectedGameFoundSound;
+        }
+        set
+        {
+            localStorage.SetItemAsync("GFSound", value);
+            _selectedGameFoundSound = value;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            sounds.Add(new() { Name = "PornHub", Value = "/sounds/pornhub.mp3" });
+            sounds.Add(new() { Name = "Seagull", Value = "/sounds/seagull.mp3" });
+            sounds.Add(new() { Name = "RockMeme", Value = "/sounds/rockmeme.mp3" });
+            sounds.Add(new() { Name = "Nani?", Value = "/sounds/nani.mp3" });
+            sounds.Add(new() { Name = "Max Verstappen", Value = "/sounds/max-verstappen.mp3" });
+            sounds.Add(new() { Name = "Lobotomy", Value = "/sounds/lobotomy.mp3" });
+
+            var actualGameSound = await localStorage.GetItemAsync<Sound>("GFSound");
+
+            if (actualGameSound is not null)
+            {
+                selectedGameFoundSound = sounds[sounds.IndexOf(sounds.FirstOrDefault(x => x.Name == actualGameSound.Name))];
+            }
+            else
+            {
+                localStorage.SetItemAsync("GFSound", new Sound() { Name = "PornHub", Value = "/sounds/pornhub.mp3" });
+                selectedGameFoundSound = sounds[0];
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task ShowGameReady()
+    {
+        var ctss = await http.GetFromJsonAsync<List<Citation>>("/api/citations");
+
+        citations = ctss.Select(x => x.Text).OrderBy(x => new Random().Next()).Take(8).ToList();
+
+        JSRuntime.InvokeVoidAsync("playGameReadySound");
+
+        JSRuntime.InvokeVoidAsync("showNotification", "ИГРА НАЙДЕНА!");
+
+        DialogService.OpenAsync("", ds =>
+        @<RadzenStack Style="height: 100vh;max-height: 100%;overflow: hidden;" JustifyContent="JustifyContent.Center"
+            AlignItems="AlignItems.Center">
+            <GameFound Strings="citations" />
+        </RadzenStack>,
+        new DialogOptions()
+        {
+            Width = "60vw",
+            Height = "80vh",
+            ShowClose = false,
+            CloseDialogOnEsc = true,
+            CloseDialogOnOverlayClick = true
+        });
+
+        Task.Run(async () =>
+        {
+            await Task.Delay(6500);
+
+            DialogService.Close();
+        });
+    }
+
+    public class Sound
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+}

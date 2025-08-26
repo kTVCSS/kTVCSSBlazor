@@ -23,6 +23,22 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
         public double CalculateWinProbability(List<User> teamA, List<User> teamB)
         {
+            foreach (var player in teamA)
+            {
+                if (player.CurrentMMR == 0)
+                {
+                    player.CurrentMMR = 1000;
+                }
+            }
+
+            foreach (var player in teamB)
+            {
+                if (player.CurrentMMR == 0)
+                {
+                    player.CurrentMMR = 1000;
+                }
+            }
+
             double totalRatingA = teamA.Sum(p => p.CurrentMMR);
             double totalRatingB = teamB.Sum(p => p.CurrentMMR);
 
