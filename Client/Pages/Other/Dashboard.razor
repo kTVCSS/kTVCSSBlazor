@@ -21,7 +21,7 @@
                                 {
                                     <RadzenStack Orientation="Orientation.Horizontal">
                                     <RadzenLabel class="rz-m-auto" Text="Количество дней" />
-                                    <RadzenNumeric @bind-Value=@days />
+                                    <RadzenNumeric Max="90" Min="1" @bind-Value=@days />
                                     <RadzenButton Click="Apply" Text="Применить" />
                                     </RadzenStack>
                                 }

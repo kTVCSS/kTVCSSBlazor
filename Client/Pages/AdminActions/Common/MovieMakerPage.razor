@@ -31,14 +31,16 @@
                         <RadzenText TextAlign=TextAlign.Center TextStyle="TextStyle.DisplayH4">Мувимейкинг-центр</RadzenText>
                         <RadzenCard>
                             <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
-                                <RadzenLabel Text="Количество дней" />
-                                <RadzenNumeric @bind-Value=days />
-                                <RadzenLabel Text="Максимум в секундах" />
+                                <RadzenLabel Text="От" />
+                                <RadzenDatePicker @bind-Value=@dtFrom ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd.MM.yyyy HH:mm" />
+                                <RadzenLabel Text="До" />
+                                <RadzenDatePicker @bind-Value=@dtTo ShowTime="true" ShowSeconds="true" HoursStep="1" MinutesStep="5" SecondsStep="10" DateFormat="dd.MM.yyyy HH:mm" />
+                                <RadzenLabel Text="Макс. сек." />
                                 <RadzenNumeric @bind-Value=minsecs />
                                 <RadzenButton Text="Анализ" Click="Analyse" />
-                                <RadzenLabel Text="Только квадро" />
+                                <RadzenLabel Text="Квадро" />
                                 <RadzenSwitch @bind-Value=justQuadros />
-                                <RadzenLabel Text="Только эйсы" />
+                                <RadzenLabel Text="Эйсы" />
                                 <RadzenSwitch @bind-Value=justAces />
                             </RadzenStack>
                         </RadzenCard>

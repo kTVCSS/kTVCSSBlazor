@@ -1,4 +1,5 @@
-﻿using kTVCSSBlazor.Db.Models.Highlights;
+﻿using kTVCSS.Models.Models;
+using kTVCSSBlazor.Db.Models.Highlights;
 using System.Net.Http.Json;
 
 namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
@@ -7,7 +8,8 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
     {
         List<Result> data = [];
         List<IGrouping<int, Result>> results = [];
-        int days = 7;
+        DateTime dtFrom = DateTime.Now;
+        DateTime dtTo = DateTime.Now;
         int minsecs = 20;
         bool justAces = false;
         bool justQuadros = false;
@@ -22,7 +24,19 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
 
                 await InvokeAsync(StateHasChanged);
 
-                data = await http.GetFromJsonAsync<List<Result>>($"/api/Highlights/ForMovieMaker?days={days}&minsecs={minsecs}");
+                var from = dtFrom.ToString("yyyy-MM-dd HH:mm:ss");
+                var to = dtTo.ToString("yyyy-MM-dd HH:mm:ss");
+
+                MMRequest request = new MMRequest()
+                {
+                    DTFrom = DateTime.Parse(from),
+                    DTTo = DateTime.Parse(to),
+                    MinSeconds = minsecs
+                };
+
+                var response = await http.PostAsJsonAsync($"/api/Highlights/ForMovieMaker", request);
+
+                data = await response.Content.ReadFromJsonAsync<List<Result>>();
 
                 if (justQuadros)
                 {
@@ -48,6 +62,8 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Common
             {
                 Task.Run(async () =>
                 {
+                    dtFrom = dtFrom.AddDays(-7);
+
                     isMobile = await mds.IsMobileDeviceAsync();
 
                     ready = true;
