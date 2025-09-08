@@ -1,4 +1,5 @@
 @using kTVCSSBlazor.Db.Models.Players
+@inject DialogService DialogService
 
 <RadzenCard Style="height: 655px; overflow: auto">
     <RadzenRow>
@@ -41,7 +42,7 @@
                 <RadzenCard Variant="Radzen.Variant.Outlined">
                     <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.NoWrap">
                         <RadzenIcon Icon="bubble_chart" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                        <RadzenStack Gap="0">
+                        <RadzenStack Style="cursor:pointer" @onclick="@((MouseEventArgs e) => { ShowDialog($"<p>Убийств: {player.MainInfo.Kills}<p>Смертей: {player.MainInfo.Deaths}"); })" Gap="0">
                             <RadzenText Text="KDR" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
                             <RadzenText Style="word-break: break-all" Text="@player.MainInfo.KDR.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                         </RadzenStack>
@@ -146,4 +147,28 @@
 
 @code {
     [Parameter] public PlayerInfo player { get; set; }
+
+    async Task ShowDialog(string message)
+    {
+        await DialogService.OpenAsync("", ds =>
+        {
+            RenderFragment content = dialogContent =>
+            {
+                dialogContent.OpenComponent<RadzenRow>(0);
+                dialogContent.AddComponentParameter(1, nameof(RadzenRow.ChildContent), (RenderFragment)(rowContent => 
+                {
+                    rowContent.OpenComponent<RadzenColumn>(0);
+                    rowContent.AddComponentParameter(1, nameof(RadzenColumn.Size), 12);
+                    rowContent.AddComponentParameter(2, nameof(RadzenRow.ChildContent), (RenderFragment)(columnContent => 
+                    {
+                        columnContent.AddContent(0, message);
+                    }));
+                    rowContent.CloseComponent();
+                }));
+
+                dialogContent.CloseComponent();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+    }
 }

@@ -436,7 +436,7 @@ a:focus {
     text-align: center;
 }
 
-/* Модальные окна */
+/* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -519,7 +519,7 @@ a:focus {
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
 
-/* Кнопки */
+/* пїЅпїЅпїЅпїЅпїЅпїЅ */
 .btn {
     padding: 8px 16px;
     border: none;
@@ -556,7 +556,7 @@ a:focus {
     font-size: 12px;
 }
 
-/* Анимации */
+/* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -579,7 +579,7 @@ a:focus {
     }
 }
 
-/* Адаптивность */
+/* пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ */
 @media (max-width: 768px) {
     .chat-container {
         flex-direction: column;
@@ -597,4 +597,8 @@ a:focus {
     .message-content {
         max-width: 85%;
     }
+}
+
+.rz-markdown {
+    word-break: break-word;
 }

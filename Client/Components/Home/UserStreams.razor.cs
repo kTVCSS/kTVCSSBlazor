@@ -16,7 +16,7 @@ namespace kTVCSSBlazor.Client.Components.Home
 
             foreach (var stream in _streams)
             {
-                stream.Channel = $"https://player.twitch.tv/?channel={stream.Name}&parent=ktvcss.ru";
+                stream.Channel = $"https://player.twitch.tv/?channel={stream.Name}&parent=ktvcss.com";
             }
         }
 

@@ -136,19 +136,23 @@
                                     <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
                                     <RadzenButton Click="DeleteTeam" Icon="delete" Text="Удалить команду"></RadzenButton>
                                 }
-                                @if (data.Members.Where(x => x.SteamID == AuthProvider.CurrentUser.SteamId).Any())
-                                {
-                                    @if (AuthProvider.CurrentUser.SteamId != data.Info.CapSteamID)
-                                    {
-                                        <RadzenButton Click="async () => { await LeaveTeam(); }" Icon="exit_to_app" Text="Покинуть команду"></RadzenButton>
-                                    }
-                                }
                                 @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
                                 }
                             </RadzenStack>
                         </RadzenCard>
+                    }
+                    @if (data.Members.Where(x => x.SteamID == AuthProvider.CurrentUser.SteamId).Any())
+                    {
+                        @if (AuthProvider.CurrentUser.SteamId != data.Info.CapSteamID)
+                        {
+                            <RadzenCard>
+                                <RadzenStack Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                                    <RadzenButton Click="async () => { await LeaveTeam(); }" Icon="exit_to_app" Text="Покинуть команду"></RadzenButton>
+                                </RadzenStack>
+                            </RadzenCard>
+                        }
                     }
                 </Authorized>
             </AuthorizeView>

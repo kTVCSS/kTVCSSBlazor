@@ -122,7 +122,7 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
 
 #if RELEASE
 
-                    uploadUrl = "https://api.ktvcss.ru/api/UploadVideo";
+                    uploadUrl = "https://api.ktvcss.com/api/UploadVideo";
 
 #endif
 

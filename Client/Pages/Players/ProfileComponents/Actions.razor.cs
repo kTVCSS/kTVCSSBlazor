@@ -156,7 +156,7 @@ namespace kTVCSSBlazor.Client.Pages.Players.ProfileComponents
 
 #if RELEASE
 
-        baseUri = "https://chat.ktvcss.ru";
+        baseUri = "https://chat.ktvcss.com";
 
 #endif
 

@@ -1,47 +1,70 @@
 @using kTVCSSBlazor.Db.Models.Players
+@inject TooltipService tooltipService
+@inject DialogService DialogService
 
 <RadzenCard>
     <RadzenRow>
         <RadzenColumn Size="12" SizeMD="3">
             <RadzenCard Variant="Radzen.Variant.Outlined">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                    <RadzenIcon Icon="bubble_chart" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem"
+                    AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="bubble_chart"
+                        class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10"
+                        Style="font-size: 32px; min-height: 56px; min-width: 56px" />
                     <RadzenStack Gap="0">
-                        <RadzenText Text="KDR" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.KDR.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                        <RadzenText Style="cursor:pointer" @onclick="@((MouseEventArgs e) => { ShowDialog($"{player.MainInfo.Kills}/{player.MainInfo.Deaths}"); })"
+                            Text="KDR" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4"
+                            class="rz-mb-1" />
+                        <RadzenText TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="3">
             <RadzenCard Variant="Radzen.Variant.Outlined">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                    <RadzenIcon Icon="insert_chart" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem"
+                    AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="insert_chart"
+                        class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10"
+                        Style="font-size: 32px; min-height: 56px; min-width: 56px" />
                     <RadzenStack Gap="0">
-                        <RadzenText Text="HS" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.HSR.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                        <RadzenText Text="HS" TextStyle="Radzen.Blazor.TextStyle.Overline"
+                            TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.HSR.ToString()"
+                            TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="3">
             <RadzenCard Variant="Radzen.Variant.Outlined">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                    <RadzenIcon Icon="area_chart" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem"
+                    AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="area_chart"
+                        class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10"
+                        Style="font-size: 32px; min-height: 56px; min-width: 56px" />
                     <RadzenStack Gap="0">
-                        <RadzenText Text="AVG" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.AVG.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                        <RadzenText Text="AVG" TextStyle="Radzen.Blazor.TextStyle.Overline"
+                            TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all" Text="@player.MainInfo.AVG.ToString()"
+                            TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeMD="3">
             <RadzenCard Variant="Radzen.Variant.Outlined">
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
-                    <RadzenIcon Icon="access_time" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem"
+                    AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                    <RadzenIcon Icon="access_time"
+                        class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10"
+                        Style="font-size: 32px; min-height: 56px; min-width: 56px" />
                     <RadzenStack Gap="0">
-                        <RadzenText Text="Сыграно" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                        <RadzenText Style="word-break: break-all" Text="@(string.Concat(player.MainInfo.GameHours, " часов"))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                        <RadzenText Text="Сыграно" TextStyle="Radzen.Blazor.TextStyle.Overline"
+                            TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                        <RadzenText Style="word-break: break-all"
+                            Text="@(string.Concat(player.MainInfo.GameHours, " часов"))"
+                            TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenCard>
@@ -51,4 +74,28 @@
 
 @code {
     [Parameter] public PlayerInfo player { get; set; }
+
+    async Task ShowDialog(string message)
+    {
+        await DialogService.OpenAsync("", ds =>
+        {
+            RenderFragment content = dialogContent =>
+            {
+                dialogContent.OpenComponent<RadzenRow>(0);
+                dialogContent.AddComponentParameter(1, nameof(RadzenRow.ChildContent), (RenderFragment)(rowContent => 
+                {
+                    rowContent.OpenComponent<RadzenColumn>(0);
+                    rowContent.AddComponentParameter(1, nameof(RadzenColumn.Size), 12);
+                    rowContent.AddComponentParameter(2, nameof(RadzenRow.ChildContent), (RenderFragment)(columnContent => 
+                    {
+                        columnContent.AddContent(0, message);
+                    }));
+                    rowContent.CloseComponent();
+                }));
+
+                dialogContent.CloseComponent();
+            };
+            return content;
+        }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = true });
+    }
 }

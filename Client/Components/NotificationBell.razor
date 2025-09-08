@@ -8,18 +8,26 @@
 @inject NotificationService NotifyService
 @inject IMobileDetectionService mds
 
-@if (isMobile) {
-    <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
-}
-else {
-    <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning) Text="Уведомления" Style="height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+@if (ready)
+{
+    @if (isMobile)
+    {
+        <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning)
+            Style="width: 32px; height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+    }
+    else
+    {
+        <RadzenButton Size=ButtonSize.Small ButtonStyle=@(unreadCount == 0 ? ButtonStyle.Primary : ButtonStyle.Warning)
+            Text="Уведомления" Style="height: 32px; align-self: center;" Icon="notifications" Click="@ToggleDrawer" />
+    }
 }
 
 <div class="drawer-overlay" style="@(drawerVisible ? "display:block" : "display:none")" @onclick="ToggleDrawer"></div>
 
 <div class="notification-drawer @(drawerVisible ? "open" : "")">
     <div class="notification-header">
-        <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenStack AlignItems=AlignItems.Center Orientation="Orientation.Horizontal"
+            JustifyContent="JustifyContent.SpaceBetween">
             <RadzenButton IconColor="white" Variant=Variant.Text Icon="arrow_back" Click="ToggleDrawer" />
             Уведомления (@unreadCount)
             <RadzenButton Style="color: white" Variant="Variant.Text" Text="Скрыть все" Icon="close" Click="CloseAll" />
@@ -38,8 +46,7 @@ else {
     {
         @foreach (var n in notifications)
         {
-            <div class="notification-item @(n.IsRead ? "" : "unread")"
-                 @onclick="@(() => OnNotificationClick(n))">
+            <div class="notification-item @(n.IsRead ? "" : "unread")" @onclick="@(() => OnNotificationClick(n))">
                 <div><strong>@n.Title</strong></div>
                 <div style="font-size:0.9em; color:#8b8b8b;overflow-wrap: anywhere;">@n.Message</div>
                 <div style="font-size:0.8em; color:#999; margin-top:4px;">
@@ -57,7 +64,7 @@ else {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.4);
+        background: rgba(0, 0, 0, 0.4);
         z-index: 1000;
     }
 
@@ -70,7 +77,7 @@ else {
         max-width: 500px;
         height: 100%;
         background: #131417;
-        box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+        box-shadow: -2px 0 6px rgba(0, 0, 0, 0.2);
         z-index: 1001;
         display: flex;
         flex-direction: column;
@@ -79,10 +86,10 @@ else {
         transition: transform 0.35s cubic-bezier(.65, .05, .36, 1), opacity 0.32s cubic-bezier(.65, .05, .36, 1);
     }
 
-        .notification-drawer.open {
-            transform: translateX(0);
-            opacity: 1;
-        }
+    .notification-drawer.open {
+        transform: translateX(0);
+        opacity: 1;
+    }
 
     .notification-header {
         padding: 16px;
@@ -96,11 +103,11 @@ else {
         cursor: pointer;
     }
 
-        .notification-item.unread {
-            background: #121518
-        }
+    .notification-item.unread {
+        background: #121518
+    }
 
-        .notification-item:hover {
-            background: #171818;
-        }
+    .notification-item:hover {
+        background: #171818;
+    }
 </style>

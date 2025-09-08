@@ -29,7 +29,7 @@ builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
 
 var apiEndpoints = new List<string>()
 {
-    "https://api.ktvcss.ru",
+    "https://api.ktvcss.com",
 };
 
 builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
@@ -49,7 +49,7 @@ builder.Services.AddScoped<StateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
-
+builder.Services.AddScoped<KeepAliveService>();
 builder.Services.AddScoped<ChatHubService>();
 builder.Services.AddScoped<MMService>();
 builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize

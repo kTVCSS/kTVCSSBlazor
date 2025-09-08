@@ -81,6 +81,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
                     });
                 }
 
+                isOnline = await http.GetFromJsonAsync<bool>($"/api/players/isonline?id={Id}");
+
                 ready = true;
 
                 await InvokeAsync(StateHasChanged);

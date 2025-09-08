@@ -13,6 +13,7 @@
 @using static kTVCSSBlazor.Client.Pages.Common.ClientSettings
 @inherits LayoutComponentBase
 @inject IJSRuntime JSRuntime
+@inject KeepAliveService KeepAliveService
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject ContextMenuService ContextMenuService
@@ -54,7 +55,10 @@
                                 <Authorized>
                                     <RadzenStack Orientation="Orientation.Horizontal">
                                         @if (!isMobile) {
-                                            <RadzenButton Style="height: 32px; align-self: center;" Size="ButtonSize.Small" Click="ShowMM" Text="Играть" Icon="globe" />
+                                            <RadzenButton Style="height: 32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="Играть" Icon="globe" />
+                                        }
+                                        else {
+                                            <RadzenButton Style="height: 32px;width:32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="" Icon="globe" />
                                         }
                                         <NotificationBell />
                                         <RadzenProfileMenu Style="position: relative">
@@ -286,24 +290,24 @@ else
 </style>
 
 <script>
-    window.onload = function() {
+    window.onload = function () {
         console.log('init');
 
-        chrome.tabs.onCreated.addListener(function(tab) {
+        chrome.tabs.onCreated.addListener(function (tab) {
             chrome.tabs.update(tab.id, {
                 autoDiscardable: false
             });
         });
 
-        chrome.tabs.onReplaced.addListener(function(tabId) {
+        chrome.tabs.onReplaced.addListener(function (tabId) {
             chrome.tabs.update(tabId, {
                 autoDiscardable: false
             });
         });
 
-        chrome.runtime.onInstalled.addListener(function(details) {
-            chrome.tabs.query({}, function(tabs) {
-                tabs.forEach(function(tab) {
+        chrome.runtime.onInstalled.addListener(function (details) {
+            chrome.tabs.query({}, function (tabs) {
+                tabs.forEach(function (tab) {
                     chrome.tabs.update(tab.id, {
                         autoDiscardable: false
                     });
@@ -313,15 +317,15 @@ else
     }
 
     var noSleep = new NoSleep();
-    var ambience = new Audio('/sounds/ambience.mp3'); 
+    var ambience = new Audio('/sounds/ambience.mp3');
     ambience.loop = true;
 
-    window.playAmbience = function() {
+    window.playAmbience = function () {
         ambience.volume = 0.01;
         ambience.play();
     }
 
-    window.stopAmbience = function() {
+    window.stopAmbience = function () {
         ambience.pause();
     }
 
@@ -331,11 +335,11 @@ else
     }, false);
 
     setInterval(() => {
-            if (document.hidden) { 
-                console.log("Keeping alive...");
-                fetch('/');
-            }
-        }, 30000);
+        if (document.hidden) {
+            console.log("Keeping alive...");
+            fetch('/');
+        }
+    }, 30000);
 
     window.playGameReadySound = () => {
         var audio = new Audio('/sounds/pornhub.mp3');
@@ -357,6 +361,67 @@ else
             audio.play();
         }
     }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/sw.js')
+                .then(function (registration) {
+                    console.log('Service Worker зарегистрирован:', registration.scope);
+
+                    // Регистрируем фоновую синхронизацию
+                    if ('sync' in registration) {
+                        return registration.sync.register('keep-alive-sync');
+                    }
+                })
+                .then(function () {
+                    console.log('Фоновая синхронизация зарегистрирована');
+                })
+                .catch(function (error) {
+                    console.log('Ошибка регистрации Service Worker:', error);
+                });
+        });
+    }
+
+    let keepAliveInterval;
+    let audioContext;
+
+    window.startKeepAliveActivities = () => {
+        if (!audioContext && (window.AudioContext || window.webkitAudioContext)) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(20000, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.001, audioContext.currentTime);
+
+            oscillator.start();
+        }
+
+        keepAliveInterval = setInterval(() => {
+            let title = document.title;
+            const timestamp = Date.now();
+            document.title = title + '_';
+            setTimeout(() => {
+                document.title = title;
+            }, 100);
+        }, 60000);
+    };
+
+    window.sendServiceWorkerMessage = (message) => {
+        if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage(message);
+        }
+    };
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            console.log('Вкладка стала активной');
+            window.sendServiceWorkerMessage({ type: 'MANUAL_PING' });
+        }
+    });
 </script>
 
 @code {
@@ -376,6 +441,7 @@ else
         disposed = true;
         mm.DisposeAsync();
         ChatHub.DisposeAsync();
+        KeepAliveService.StopKeepAlive();
     }
 
     private void SidePanelClick()
@@ -441,6 +507,8 @@ else
         {
             bool nt = false;
 
+            KeepAliveService.StartKeepAlive();
+
             try
             {
                 await WindowSize.InitializeAsync(JSRuntime);
@@ -491,7 +559,7 @@ else
                             @<RadzenStack Gap="1.5rem">
                                 <RadzenStack Gap="0px">
                                     <RadzenText>Чтобы начать играть или всячески взаимодействовать с сайтом, Вам необходимо зайти на сервер, чтобы зарегистрировать и подтвердить Ваш SteamID.</RadzenText>
-                                    <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.ru:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
+                                    <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.com:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
                                     <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
                                 </RadzenStack>
                             </RadzenStack>
@@ -542,7 +610,7 @@ else
 
                                 #if RELEASE
 
-                                baseUri = "https://chat.ktvcss.ru";
+                                baseUri = "https://chat.ktvcss.com";
 
                                 #endif
 

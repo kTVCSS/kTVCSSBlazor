@@ -20,6 +20,8 @@ var options = new WebApplicationOptions
 
 var builder = WebApplication.CreateBuilder(options);
 
+builder.Services.AddScoped<KeepAliveService>();
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
       .AddInteractiveWebAssemblyComponents();
@@ -68,7 +70,7 @@ app.MapGet("/api/DeleteMixMemory", async (string guid) =>
     {
         using (var http = new HttpClient())
         {
-            await http.GetAsync($"https://mm.ktvcss.ru/api/DeleteMixMemory?guid={guid}");
+            await http.GetAsync($"https://mm.ktvcss.com/api/DeleteMixMemory?guid={guid}");
         }
     }
     catch (Exception ex)

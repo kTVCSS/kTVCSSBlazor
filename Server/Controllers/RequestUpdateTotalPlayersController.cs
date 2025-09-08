@@ -21,7 +21,7 @@ namespace kTVCSSBlazor.Server.Controllers
 #if RELEASE 
             var apiEndpoints = new List<string>()
             {
-                "https://api.ktvcss.ru",
+                "https://api.ktvcss.com",
             };
 #endif
 

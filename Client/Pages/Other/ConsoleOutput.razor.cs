@@ -92,7 +92,7 @@ namespace kTVCSSBlazor.Client.Pages.Other
 
 #if RELEASE
 
-        baseUri = "https://api.ktvcss.ru";
+        baseUri = "https://api.ktvcss.com";
 
 #endif
 

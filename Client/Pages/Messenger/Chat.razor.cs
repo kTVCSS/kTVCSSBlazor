@@ -43,7 +43,7 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
 
 #if RELEASE
 
-        baseUri = "https://chat.ktvcss.ru";
+        baseUri = "https://chat.ktvcss.com";
 
 #endif
 

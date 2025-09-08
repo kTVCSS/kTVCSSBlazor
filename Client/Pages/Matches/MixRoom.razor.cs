@@ -86,7 +86,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
 #if RELEASE
 
-                hubUrl = "https://mm.ktvcss.ru/";
+                hubUrl = "https://mm.ktvcss.com/";
 #endif
 
                 mix = await http.GetFromJsonAsync<Mix>(hubUrl + "api/getmixbyguid?guid=" + Guid);

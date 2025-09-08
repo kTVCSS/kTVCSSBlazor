@@ -12,6 +12,7 @@ namespace kTVCSSBlazor.Client.Components
         private List<Notification> notifications;
         private bool _disposed = false;
         private bool firstLoad = true;
+        private bool ready = false;
 
         public void Dispose()
         {
@@ -40,6 +41,10 @@ namespace kTVCSSBlazor.Client.Components
             Task.Run(async () =>
             {
                 isMobile = await mds.IsMobileDeviceAsync();
+
+                ready = true;
+
+                await InvokeAsync(StateHasChanged);
 
                 while (!_disposed)
                 {

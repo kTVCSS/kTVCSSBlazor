@@ -18,7 +18,7 @@ namespace kTVCSSBlazor.Client.Services
 #if RELEASE
 
             Connection = new HubConnectionBuilder()
-                .WithUrl(navManager.ToAbsoluteUri("https://chat.ktvcss.ru/chathub"))
+                .WithUrl(navManager.ToAbsoluteUri("https://chat.ktvcss.com/chathub"))
                 .WithAutomaticReconnect()
                 .Build();
 #endif

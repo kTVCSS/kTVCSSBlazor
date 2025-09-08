@@ -12,7 +12,7 @@ namespace kTVCSSBlazor.Client.Authorization
 {
     public class UserService
     {
-        private const string _storageKey = "kTVCSSIdentityv11052025";
+        private const string _storageKey = "kTVCSSComIdent092025";
         private readonly IConfiguration _configuration;
         private readonly ILocalStorageService _localStorage;
         private HttpClient _http;

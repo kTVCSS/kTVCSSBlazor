@@ -2,6 +2,7 @@ using System;
 using System.Net.Http.Json;
 using kTVCSS.Models.Models;
 using kTVCSSBlazor.Client.Services;
+using kTVCSSBlazor.Db.Models.Players;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
@@ -33,6 +34,7 @@ public partial class GameWindow
     public MMService Hub { get; set; }
 
     private bool disposed = false;
+    private bool showWarn = false;
 
     string hubUrl = "";
 
@@ -68,7 +70,7 @@ public partial class GameWindow
 #endif
 
 #if RELEASE
-        hubUrl = "https://mm.ktvcss.ru/";
+        hubUrl = "https://mm.ktvcss.com/";
 #endif
 
         Hub.Connection.On<GameHubConnectResult>("GetConnectResult", async (result) =>
@@ -123,6 +125,20 @@ public partial class GameWindow
                 UpdateCurrentSearchUsersCount(count);
 
                 await Task.Delay(TimeSpan.FromSeconds(30));
+            }
+        });
+
+        Task.Run(async () =>
+        {
+            if (!showWarn)
+            {
+                var player = await http.GetFromJsonAsync<PlayerInfo>($"/api/players/getplayerbyid?id={AuthProvider.CurrentUser.Id}");
+
+                if (player.BanMultiplier >= Behavior.Плохая)
+                {
+                    showWarn = true;
+                    await InvokeAsync(StateHasChanged);
+                }
             }
         });
     }

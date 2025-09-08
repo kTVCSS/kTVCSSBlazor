@@ -19,7 +19,7 @@ namespace kTVCSSBlazor.Client.Services
 #if RELEASE
 
             Connection = new HubConnectionBuilder()
-                .WithUrl(navManager.ToAbsoluteUri("https://mm.ktvcss.ru/gamehub"))
+                .WithUrl(navManager.ToAbsoluteUri("https://mm.ktvcss.com/gamehub"))
                 .WithAutomaticReconnect()
                 .Build();
 #endif
