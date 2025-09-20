@@ -15,6 +15,9 @@ namespace kTVCSSBlazor.Client.Pages.Players
         private kTVCSSBlazor.Db.Models.Players.Profile profile = new();
         private bool ready = false;
 
+        private bool needUpdatePassword = false;
+        private string originalLogin = string.Empty;
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
@@ -22,6 +25,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 Task.Run(async () =>
                 {
                     profile = await http.GetFromJsonAsync<kTVCSSBlazor.Db.Models.Players.Profile>($"/api/players/getplayerprofile?id={Id}");
+
+                    originalLogin = profile.Login;
 
                     ready = true;
 
@@ -44,7 +49,22 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
         private async Task Save()
         {
-            var response = await http.PostAsJsonAsync($"/api/players/saveprofile?id={Id}", profile);
+            if (needUpdatePassword)
+            {
+                if (!pswd.ValidatePassword(profile.Password))
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Чтобы изменить пароль Ваш пароль должен содержать хотя бы один спецсимвол, заглавную букву и цифру");
+                    return;
+                }
+            }
+
+            if (profile.Login.Length < 4)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Логин должен быть длиннее 3 символов");
+                return;
+            }
+
+            var response = await http.PostAsJsonAsync($"/api/players/saveprofile?id={Id}&updatePassword={needUpdatePassword}&newLogin={!originalLogin.Equals(profile.Login)}", profile);
 
             SaveProfileResult result = await response.Content.ReadFromJsonAsync<SaveProfileResult>();
 
@@ -61,6 +81,10 @@ namespace kTVCSSBlazor.Client.Pages.Players
             else if (result == SaveProfileResult.BadTelegram)
             {
                 NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "При привязке телеграма нужно использовать не ник, а ID - посмотрите внимательнее, пожалуйста");
+            }
+            else if (result == SaveProfileResult.LoginExists)
+            {
+                NotificationService.Notify(NotificationSeverity.Error, "Ошибка", "Такой логин уже используется на проекте");
             }
         }
 

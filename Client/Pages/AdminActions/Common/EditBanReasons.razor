@@ -13,7 +13,7 @@
 <CascadingAuthenticationState>
     <AuthorizeView>
         <Authorized>
-            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
+            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
             {
                 <RadzenDataGrid Responsive @ref="itemsGrid" AllowAlternatingRows="true" AllowVirtualization EditMode="@editMode"
                 Data="@items" TItem="BanReason" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">

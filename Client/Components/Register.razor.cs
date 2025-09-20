@@ -25,6 +25,12 @@ namespace kTVCSSBlazor.Client.Components
 
         private async Task OnRegister(LoginArgs args, string name)
         {
+            if (!pswd.ValidatePassword(args.Password))
+            {
+                notify.Notify(NotificationSeverity.Error, "Ваш пароль должен содержать хотя бы один спецсимвол, заглавную букву и цифру");
+                return;
+            }
+
             if (!IsValidLogin(args.Username))
             {
                 notify.Notify(new NotificationMessage()

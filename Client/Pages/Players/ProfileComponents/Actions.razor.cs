@@ -295,6 +295,8 @@ namespace kTVCSSBlazor.Client.Pages.Players.ProfileComponents
 
         private async Task SendReport()
         {
+            ns.Notify(NotificationSeverity.Info, "Подождите, мы создаем тикет...");
+
             var report = new Report()
             {
                 FromID = AuthProvider.CurrentUser.Id,
@@ -331,9 +333,11 @@ namespace kTVCSSBlazor.Client.Pages.Players.ProfileComponents
 
         private async Task UnbanRequest()
         {
+            ns.Notify(NotificationSeverity.Info, "Подождите, мы создаем тикет...");
+            
             var response = await http.PostAsJsonAsync("/api/players/unbanrequest", new InitialUnbanRequest()
             {
-                Message = _unbanRequestString,
+                Message = "заявка на разбан: " + _unbanRequestString,
                 PlayerID = AuthProvider.CurrentUser.Id,
                 PlayerName = AuthProvider.CurrentUser.Username
             });

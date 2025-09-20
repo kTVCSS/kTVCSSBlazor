@@ -34,6 +34,8 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
 
         private async Task CreateTicket()
         {
+            NotificationService.Notify(NotificationSeverity.Info, "Подождите, мы создаем тикет...");
+
             var response = await http.PostAsJsonAsync("/api/players/unbanrequest", new InitialUnbanRequest()
             {
                 Message = ticketText,

@@ -10,6 +10,7 @@
 @inject HttpClient http
 @inject WindowSizeService WindowSize
 @inject IMobileDetectionService mds
+@inject PasswordCheckService pswd
 
 <PageTitle>kTVCSS @@ Редактирования профиля игрока</PageTitle>
 
@@ -18,12 +19,14 @@
     <CascadingAuthenticationState>
         <AuthorizeView>
             <Authorized>
-                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.Id == Id)
+                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin ||
+                            AuthProvider.CurrentUser.Id == Id)
                 {
                     <RadzenStack JustifyContent="JustifyContent.Center">
                         <RadzenText TextStyle="TextStyle.DisplayH4" Text="Редактирование профиля" />
 
-                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || AuthProvider.CurrentUser.IsVip)
+                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin ||
+                                        AuthProvider.CurrentUser.IsVip)
                         {
                             <RadzenFormField Text="Ник" Style="width: 100%;">
                                 <RadzenTextBox @bind-Value="@profile.Login" />
@@ -36,9 +39,18 @@
                             </RadzenFormField>
                         }
 
-                        <RadzenFormField Text="Пароль" Style="width: 100%;">
-                            <RadzenPassword @bind-Value=@profile.Password aria-label="enter password" />
-                        </RadzenFormField>
+                        @if (!needUpdatePassword) {
+                            <RadzenButton Style="width: 200px" Variant="Variant.Text" Text="Изменить пароль" Click="@(() => { needUpdatePassword = true; })" />
+                        }
+
+                        @if (needUpdatePassword)
+                        {
+                            <RadzenButton Style="width: 200px" Variant="Variant.Text" Text="Не изменять пароль" Click="@(() => { needUpdatePassword = false; })" />
+
+                            <RadzenFormField Text="Пароль" Style="width: 100%;">
+                                <RadzenPassword @bind-Value=@profile.Password aria-label="enter password" />
+                            </RadzenFormField>
+                        }
 
                         @if (profile.Telegram.HasValue)
                         {
@@ -46,10 +58,13 @@
                             {
                                 <RadzenFormField Text="Telegram" Style="width: 100%;">
                                     <ChildContent>
-                                        <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram Placeholder="Введите Telegram ID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                        <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram
+                                            Placeholder="Введите Telegram ID"
+                                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
                                     </ChildContent>
                                     <Helper>
-                                        <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID. Нажмите сюда, чтобы узнать его!</RadzenLink>
+                                        <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID.
+                                            Нажмите сюда, чтобы узнать его!</RadzenLink>
                                     </Helper>
                                 </RadzenFormField>
                             }
@@ -58,10 +73,13 @@
                         {
                             <RadzenFormField Text="Telegram" Style="width: 100%;">
                                 <ChildContent>
-                                    <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram Placeholder="Введите Telegram ID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                    <RadzenNumeric ShowUpDown="false" TValue="long?" @bind-Value=@profile.Telegram
+                                        Placeholder="Введите Telegram ID"
+                                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
                                 </ChildContent>
                                 <Helper>
-                                    <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID. Нажмите сюда, чтобы узнать его</RadzenLink>
+                                    <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID.
+                                        Нажмите сюда, чтобы узнать его</RadzenLink>
                                 </Helper>
                             </RadzenFormField>
                         }
@@ -74,14 +92,14 @@
                             <RadzenColumn SizeMD="6" SizeXS="12">
                                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
                                     <RadzenUpload ChooseText="Изменить аватарку" Multiple="false" Auto Change=@OnClientChange
-                                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
                                     <RadzenButton Click="SetDefaultAvatar" Text="Сбросить аватар" />
                                 </RadzenStack>
                             </RadzenColumn>
                             <RadzenColumn SizeMD="6" SizeXS="12">
                                 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
                                     <RadzenUpload ChooseText="Изменить шапку" Multiple="false" Auto Change=@OnClientChangeHeader
-                                                  InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                                        InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
                                     <RadzenButton Click="SetDefaultHeader" Text="Сбросить шапку" />
                                 </RadzenStack>
                             </RadzenColumn>
@@ -95,9 +113,11 @@
                                 @foreach (var ach in profile.Achiviments)
                                 {
                                     <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                        <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close" Click="@(() => { profile.Achiviments.Remove(ach); })" />
+                                        <RadzenButton Style="width: 90px" Variant="Variant.Text" Icon="close"
+                                            Click="@(() => { profile.Achiviments.Remove(ach); })" />
                                         <RadzenFormField Text="Место" Style="width: 100%;">
-                                            <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
+                                            <RadzenNumeric Max="3" Min="1" @bind-Value=@ach.Place
+                                                InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
                                         </RadzenFormField>
                                         <RadzenFormField Text="Название турнира" Style="width: 100%;">
                                             <RadzenTextBox @bind-Value="@ach.Name" />
@@ -110,7 +130,7 @@
                         <RadzenFormField Text="Ссылка на VK" Style="width: 100%;">
                             <RadzenTextBox @bind-Value="@profile.VkId" />
                         </RadzenFormField>
-                         <RadzenFormField Text="Ссылка на YouTube" Style="width: 100%;">
+                        <RadzenFormField Text="Ссылка на YouTube" Style="width: 100%;">
                             <RadzenTextBox @bind-Value="@profile.YoutubeUrl" />
                         </RadzenFormField>
                         <RadzenFormField Text="Ссылка на Twitch" Style="width: 100%;">

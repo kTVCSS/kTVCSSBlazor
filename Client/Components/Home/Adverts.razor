@@ -1,15 +1,37 @@
 ﻿@using kTVCSS.Models.Db.Models.Common
 @using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Client.Services
 @inject HttpClient http
 @inject NavigationManager nm
 @inject StateProvider AuthProvider
+@inject MobileDetectionService mds
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-w-100">
-    @foreach (var adv in adverts)
+@if (ready)
+{
+    if (!isMobile)
     {
-        <RadzenLink Target="_blank" Path="@adv.Link">
-            @((MarkupString)adv.Html)
-        </RadzenLink>
-        <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center"
+            class="rz-w-100">
+            @foreach (var adv in adverts)
+            {
+                <RadzenLink Target="_blank" Path="@adv.Link">
+                    @((MarkupString)adv.Html)
+                </RadzenLink>
+                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+            }
+        </RadzenStack>
     }
-</RadzenStack>
+    else
+    {
+        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center"
+            class="rz-w-100">
+            @foreach (var adv in adverts)
+            {
+                <RadzenLink Target="_blank" Path="@adv.Link">
+                    @((MarkupString)adv.Html)
+                </RadzenLink>
+                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+            }
+        </RadzenStack>
+    }
+}

@@ -16,7 +16,7 @@
         {
             @foreach (var video in _videos)
             {
-                <RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4" SizeLG="3">
+                <RadzenColumn SizeXS="12" SizeSM="6" SizeMD="4">
                     <RadzenCard class="video-card" Style="padding-bottom: 8px;" @onclick="@(() => OnVideoClick(video.Id))">
                         <div>
                             <img src="@video.PreviewImage" alt="@video.Title" class="thumbnail" />

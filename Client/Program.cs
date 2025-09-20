@@ -54,6 +54,7 @@ builder.Services.AddScoped<ChatHubService>();
 builder.Services.AddScoped<MMService>();
 builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize
 builder.Services.AddScoped<IMobileDetectionService, MobileDetectionService>(); //@inject IMobileDetectionService MobileDetectionService
+builder.Services.AddScoped<PasswordCheckService>();
 
 var host = builder.Build();
 await host.RunAsync();

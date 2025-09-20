@@ -90,7 +90,7 @@
                                                 }
                                                 <RadzenProfileMenuItem Path="/vip-features" Text="VIP" Icon="diamond"></RadzenProfileMenuItem>
                                                 <RadzenProfileMenuItem Path="/clientsettings" Text="Настройки" Icon="settings"></RadzenProfileMenuItem>
-                                                <div @onclick=@(async (MouseEventArgs e) => AuthProvider.LogoutAsync())>
+                                                <div @onclick=@(async (MouseEventArgs e) => { await http.GetAsync($"/api/players/logout?id={AuthProvider.CurrentUser.Id}"); AuthProvider.LogoutAsync(); })>
                                                     <RadzenProfileMenuItem Text="Выйти" Icon="logout"></RadzenProfileMenuItem>
                                                 </div>
                                             </ChildContent>
@@ -135,7 +135,7 @@
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Редактор цитат" Path="/editcitations" Icon="comic_bubble"></RadzenPanelMenuItem>
                                         }
-                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.SuperAdmin)
+                                        @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                         {
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Редактор причин бана" Path="/editbanreasons" Icon="no_accounts"></RadzenPanelMenuItem>
                                             <RadzenPanelMenuItem Click=SidePanelClick Text="Редактор причин репортов" Path="/editreportreasons" Icon="report"></RadzenPanelMenuItem>
@@ -321,8 +321,8 @@ else
     ambience.loop = true;
 
     window.playAmbience = function () {
-        ambience.volume = 0.01;
-        ambience.play();
+        //ambience.volume = 0.01;
+        //ambience.play();
     }
 
     window.stopAmbience = function () {
@@ -422,6 +422,22 @@ else
             window.sendServiceWorkerMessage({ type: 'MANUAL_PING' });
         }
     });
+
+    window.startWorker = async () => {
+        setInterval(async () => {
+            console.log('416')
+            self.postMessage('keepalive');
+
+            if ('wakeLock' in navigator) {
+                try {
+                    const wakeLock = await navigator.wakeLock.request('screen');
+                    return wakeLock;
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
+                }
+            }
+        }, 30000); // каждые 30 секунд
+    }
 </script>
 
 @code {
@@ -438,6 +454,7 @@ else
 
     public void Dispose()
     {
+        NavigationManager.LocationChanged -= OnLocationChanged;
         disposed = true;
         mm.DisposeAsync();
         ChatHub.DisposeAsync();
@@ -509,6 +526,8 @@ else
 
             KeepAliveService.StartKeepAlive();
 
+            await JSRuntime.InvokeVoidAsync("startWorker");
+
             try
             {
                 await WindowSize.InitializeAsync(JSRuntime);
@@ -562,11 +581,14 @@ else
                                     <RadzenText>Для этого зайдите на сервер <span style="color: #00ff00;"><strong>connect ktvcss.com:12121</strong></span> и напишите в чат код <span style="text-decoration: underline; color: #ff0000;"><strong>@verifyCode</strong></span>.</RadzenText>
                                     <RadzenText><b>Если Вас кикнет с сервера, значит у Вас все получилось. И не забудьте обновить страницу!</b></RadzenText>
                                 </RadzenStack>
+                                <RadzenButton Text="Выйти из учетной записи" Click="@(async () => { await http.GetAsync($"/api/players/logout?id={AuthProvider.CurrentUser.Id}"); AuthProvider.LogoutAsync(); })" />
                             </RadzenStack>
     , options: new DialogOptions() { ShowClose = false, CloseDialogOnEsc = false, CloseDialogOnOverlayClick = false });
                     }
                     else
                     {
+                        NavigationManager.LocationChanged += OnLocationChanged;
+
                         sounds.Add(new() { Name = "PornHub", Value = "/sounds/pornhub.mp3" });
                         sounds.Add(new() { Name = "Seagull", Value = "/sounds/seagull.mp3" });
                         sounds.Add(new() { Name = "RockMeme", Value = "/sounds/rockmeme.mp3" });
@@ -766,6 +788,20 @@ else
     void SidebarToggleClick()
     {
         sidebarExpanded = !sidebarExpanded;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        string currentUri = e.Location;
+
+        HistoryPageRecord record = new HistoryPageRecord()
+        {
+            Page = e.Location,
+            PlayerId = AuthProvider.CurrentUser.Id,
+            PlayerName = AuthProvider.CurrentUser.Username
+        };
+
+        http.PostAsJsonAsync("/api/players/AddHistoryEntry", record);
     }
 
     private string _teamName = string.Empty;

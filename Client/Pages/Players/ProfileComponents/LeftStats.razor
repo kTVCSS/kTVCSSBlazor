@@ -1,5 +1,6 @@
 @using kTVCSSBlazor.Db.Models.Players
 @inject DialogService DialogService
+@inject TooltipService tooltipService 
 
 <RadzenCard Style="height: 655px; overflow: auto">
     <RadzenRow>
@@ -33,7 +34,7 @@
                         <RadzenIcon Icon="access_time" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
                         <RadzenStack Gap="0">
                             <RadzenText Text="Сыграно" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
-                            <RadzenText Style="word-break: break-all" Text="@(string.Concat(player.MainInfo.GameHours, " часов"))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
+                            <RadzenText MouseEnter="@(args => ShowTotalMatches(args, player.MainInfo.MatchesTotal.Value, new TooltipOptions(){ Style = "", Duration = null }))" Style="word-break: break-all" Text="@(string.Concat(player.MainInfo.GameHours, " часов"))" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenCard>
@@ -42,7 +43,7 @@
                 <RadzenCard Variant="Radzen.Variant.Outlined">
                     <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.NoWrap">
                         <RadzenIcon Icon="bubble_chart" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px" />
-                        <RadzenStack Style="cursor:pointer" @onclick="@((MouseEventArgs e) => { ShowDialog($"<p>Убийств: {player.MainInfo.Kills}<p>Смертей: {player.MainInfo.Deaths}"); })" Gap="0">
+                        <RadzenStack Style="cursor:pointer" MouseEnter="@(args => ShowTooltipWithHtml(args, player.MainInfo.Kills.Value, player.MainInfo.Deaths.Value, new TooltipOptions(){ Style = "", Duration = null }))" Gap="0">
                             <RadzenText Text="KDR" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
                             <RadzenText Style="word-break: break-all" Text="@player.MainInfo.KDR.ToString()" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H5" />
                         </RadzenStack>
@@ -147,6 +148,16 @@
 
 @code {
     [Parameter] public PlayerInfo player { get; set; }
+
+    void ShowTooltipWithHtml(ElementReference elementReference, int kills, int deaths, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
+    @<div>
+        <b>@kills/@deaths</b>
+    </div>, options);
+
+    void ShowTotalMatches(ElementReference elementReference, int matches, TooltipOptions options = null) => tooltipService.Open(elementReference, ds =>
+    @<div>
+        Сыграно матчей: <b>@matches</b>
+    </div>, options);
 
     async Task ShowDialog(string message)
     {

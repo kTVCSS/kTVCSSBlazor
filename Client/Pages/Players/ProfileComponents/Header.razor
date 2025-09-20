@@ -1,7 +1,8 @@
 @using kTVCSSBlazor.Db.Models.Players
 
 <RadzenStack>
-    <RadzenStack JustifyContent=JustifyContent.SpaceBetween AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+    <RadzenStack JustifyContent=JustifyContent.SpaceBetween AlignItems=AlignItems.Center
+        Orientation="Orientation.Horizontal">
         <RadzenText Text=@(string.Concat("#", player.MainInfo.Position)) />
         @if (player.RoleType > kTVCSS.Models.Db.Models.Roles.RoleType.None)
         {
@@ -16,29 +17,67 @@
             <RadzenText TextAlign=TextAlign.End Text="" />
         }
     </RadzenStack>
+    
 
-    <div style="margin: auto;width: 128px;height: 128px;">
-        <div>
-            @if (isOnline)
-            {
-                <img style="box-shadow: 0 0 3px 1px #00FF00; background-repeat: no-repeat; background-position: 50%;border-radius: 200px;" src="@player.MainInfo.PhotoUrl" width="128" height="128" />
-            }
-            else
-            {
-                <img style="box-shadow: 0 0 3px 1px #000; background-repeat: no-repeat; background-position: 50%;border-radius: 200px;" src="@player.MainInfo.PhotoUrl" width="128" height="128" />
-            }
+    @if (isOnline)
+    {
+        <div style="position: relative; margin: auto; width: 128px; height: 128px;">
+            <!-- Аватар -->
+            <img style="box-shadow: 0 0 3px 1px #000; 
+               background-repeat: no-repeat; 
+               background-position: 50%;
+               border-radius: 200px;" src="@player.MainInfo.PhotoUrl" width="128" height="128">
+
+            <!-- Индикатор статуса -->
+            <span title="Этот игрок сейчас в сети" style="
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                width: 20px;
+                height: 20px;
+                background-color: #52c37a; /* зеленый - онлайн */
+                border: 1px solid #8d8d8d; /* рамка */
+                border-radius: 50%;
+                display: inline-block;
+            "></span>
         </div>
-    </div>
+    }
+    else
+    {
+        <div style="position: relative; margin: auto; width: 128px; height: 128px;">
+            <!-- Аватар -->
+            <img style="box-shadow: 0 0 3px 1px #000; 
+               background-repeat: no-repeat; 
+               background-position: 50%;
+               border-radius: 200px;" src="@player.MainInfo.PhotoUrl" width="128" height="128">
+
+            <!-- Индикатор статуса -->
+            <span title="Этот игрок сейчас не в сети" style="
+                position: absolute;
+                bottom: 5px;
+                right: 5px;
+                width: 20px;
+                height: 20px;
+                background-color: #d30000; /* зеленый - онлайн */
+                border: 1px solid #8d8d8d; /* рамка */
+                border-radius: 50%;
+                display: inline-block;
+            "></span>
+        </div>
+    }
 
     <RadzenStack JustifyContent=JustifyContent.Center AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
         @if (!string.IsNullOrEmpty(player.TeamInfo.Name))
         {
-            <RadzenLink Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" class="rz-text-display-h4" Path="@string.Concat("/team/", player.TeamInfo.ID)">@player.TeamInfo.Name</RadzenLink>
-            <RadzenText Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" TextStyle=TextStyle.DisplayH4 Text=@(string.Concat(player.MainInfo.Name.Replace(player.TeamInfo.Name, null))) />
+            <RadzenLink Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" class="rz-text-display-h4"
+                Path="@string.Concat("/team/", player.TeamInfo.ID)">@player.TeamInfo.Name</RadzenLink>
+            <RadzenText Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" TextStyle=TextStyle.DisplayH4
+                Text=@(string.Concat(player.MainInfo.Name.Replace(player.TeamInfo.Name, null))) />
         }
         else
         {
-            <RadzenText Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" TextStyle=TextStyle.DisplayH4 Text=@(string.Concat(player.MainInfo.Name)) />
+            <RadzenText Style="text-shadow: 2px 2px 4px rgba(0, 0, 0);" TextStyle=TextStyle.DisplayH4
+                Text=@(string.Concat(player.MainInfo.Name)) />
         }
     </RadzenStack>
 
@@ -46,19 +85,22 @@
         @if (!string.IsNullOrEmpty(player.Social.VkId))
         {
             <RadzenLink Path="@player.Social.VkId" target="_blank">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAB/UlEQVR4nO2XP0gcURCHV5tUNuopNgH/YBGIKWySFCHlaa1i0ohNEIJdSJkolikUw0EQS0GwEJGzsbCx1limtfBUQiyEmIsk+WTwGcdl3rvd273Or5ydN/PbnffmzUbRPXUAtAMDwDAwBDwG2hqdtA+YBQ7w8xWYAXrzTNwJlIBLkiO+n4GOrMmfAcfUz3fgRb3Jx4Aq2ZEYo2mTP88p+Q2/E38Jrmt+Qv5IKQtJBJRoHItJjtplAwVIKXpCAmaNRVOyiYC3wB9nW3a2UbdZvyl/eYFp9+yNEe9jSMCBsaBLPS8720Zs3ZryLyn7SyPefqi9WrxSPq+dreoR8EM3H2DHiPcPaLUEPDHTw5byeQAcidEjYELZxvEzYAkoepz/Av3Kb8oQ8CX26QvAaUBAMY0Aoaz8moD3Zh1vfT4RppimBDeMhJLGYg0CF6QsQRthzoBHnoRLwIrsEWWb9MSxN6Hg7vMQh5Z6tQk3gWZlXzVi7MXX/8cNE7X4CbwDWtS6dfV8TtkfGus/RD6AXtcuk3AO7MoxNW7ObfdV4n1AYnd7BQhukmkU81EtgI6MU5CPinTbmgLUKJbnQPILeBqlgevbrJpT8sQ95A6iOmM5KqnfPI7r64spTgfOdyFxzZMgk4wME3KfBxLvyTmvedSyArS637Eh9Wtmt9d7ojBXvp4iavsovWMAAAAASUVORK5CYII=" alt="vk-circled">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAB/UlEQVR4nO2XP0gcURCHV5tUNuopNgH/YBGIKWySFCHlaa1i0ohNEIJdSJkolikUw0EQS0GwEJGzsbCx1limtfBUQiyEmIsk+WTwGcdl3rvd273Or5ydN/PbnffmzUbRPXUAtAMDwDAwBDwG2hqdtA+YBQ7w8xWYAXrzTNwJlIBLkiO+n4GOrMmfAcfUz3fgRb3Jx4Aq2ZEYo2mTP88p+Q2/E38Jrmt+Qv5IKQtJBJRoHItJjtplAwVIKXpCAmaNRVOyiYC3wB9nW3a2UbdZvyl/eYFp9+yNEe9jSMCBsaBLPS8720Zs3ZryLyn7SyPefqi9WrxSPq+dreoR8EM3H2DHiPcPaLUEPDHTw5byeQAcidEjYELZxvEzYAkoepz/Av3Kb8oQ8CX26QvAaUBAMY0Aoaz8moD3Zh1vfT4RppimBDeMhJLGYg0CF6QsQRthzoBHnoRLwIrsEWWb9MSxN6Hg7vMQh5Z6tQk3gWZlXzVi7MXX/8cNE7X4CbwDWtS6dfV8TtkfGus/RD6AXtcuk3AO7MoxNW7ObfdV4n1AYnd7BQhukmkU81EtgI6MU5CPinTbmgLUKJbnQPILeBqlgevbrJpT8sQ95A6iOmM5KqnfPI7r64spTgfOdyFxzZMgk4wME3KfBxLvyTmvedSyArS637Eh9Wtmt9d7ojBXvp4iavsovWMAAAAASUVORK5CYII="
+                    alt="vk-circled">
             </RadzenLink>
         }
         @if (!string.IsNullOrEmpty(player.Social.TwitchUrl))
         {
             <RadzenLink Path="@player.Social.TwitchUrl" target="_blank">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAi0lEQVR4nO2SyRGAIAwA04QNWKEdSEeWYg224Wcdf15xCCowTvYPuwmIOE6tAAMvY5E3wFwyoEs6qN9nDhhLB+zwAIlcq7Yx8yY54AHiT1DjJ7RQNAAIxQLYyIE+awCp8qsALegg0bDJYwM+k69EXBwjD5IKz0mb/A5l6gloJQecA/LJLwLyyp1fswBPPMP1pHZJ9gAAAABJRU5ErkJggg==" alt="twitch">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAi0lEQVR4nO2SyRGAIAwA04QNWKEdSEeWYg224Wcdf15xCCowTvYPuwmIOE6tAAMvY5E3wFwyoEs6qN9nDhhLB+zwAIlcq7Yx8yY54AHiT1DjJ7RQNAAIxQLYyIE+awCp8qsALegg0bDJYwM+k69EXBwjD5IKz0mb/A5l6gloJQecA/LJLwLyyp1fswBPPMP1pHZJ9gAAAABJRU5ErkJggg=="
+                    alt="twitch">
             </RadzenLink>
         }
         @if (!string.IsNullOrEmpty(player.Social.YoutubeUrl))
         {
             <RadzenLink Path="@player.Social.YoutubeUrl" target="_blank">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABJElEQVR4nO2WMW7CMBSGXcaObJAjVGydoKwoA1mQOrVHqApDxFoYEao6I0UZOvYCvUBn7tAzVG1Fh37IwoOFTIgDsTPklzxZ739f/JL4F6JWrSoKaAI94B6YAnNgCazUSoG3vZVq+0tVM1Ue0quZp3EDeAH+OL+k57PskQUwoXw9ZgGsHQCss47/2wHAj3EMQIA7tU0AHQuDd+DrBIArE0DfwuBWPgXwCvwXALgxAYQ2AFrdNfBhCTAwAURFAFTthTqVz5z1QxPAqCiA5nEJzIDfI/WjSgJEvkcQ+n4J+74/w47vH1GAO7Wqdxl5v46lgLEDgAdxSOzGIGPTpoTGG5UVD0eyvVDaBe6AGHgCFlroTAyhNNH2F6omVh7dXKG0Vi3hQVvzZaCVlhqldgAAAABJRU5ErkJggg==" alt="youtube-play--v1">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABJElEQVR4nO2WMW7CMBSGXcaObJAjVGydoKwoA1mQOrVHqApDxFoYEao6I0UZOvYCvUBn7tAzVG1Fh37IwoOFTIgDsTPklzxZ739f/JL4F6JWrSoKaAI94B6YAnNgCazUSoG3vZVq+0tVM1Ue0quZp3EDeAH+OL+k57PskQUwoXw9ZgGsHQCss47/2wHAj3EMQIA7tU0AHQuDd+DrBIArE0DfwuBWPgXwCvwXALgxAYQ2AFrdNfBhCTAwAURFAFTthTqVz5z1QxPAqCiA5nEJzIDfI/WjSgJEvkcQ+n4J+74/w47vH1GAO7Wqdxl5v46lgLEDgAdxSOzGIGPTpoTGG5UVD0eyvVDaBe6AGHgCFlroTAyhNNH2F6omVh7dXKG0Vi3hQVvzZaCVlhqldgAAAABJRU5ErkJggg=="
+                    alt="youtube-play--v1">
             </RadzenLink>
         }
     </RadzenStack>
