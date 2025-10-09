@@ -56,7 +56,7 @@
             </RadzenStack>
             <RadzenTextBox Placeholder="Название стрима" @bind-Value=@streamName Style="width: 100%;" />
             <RadzenTextBox Placeholder="Ссылка на Twitch канал" @bind-Value=@streamLink Style="width: 100%;" />
-            <RadzenNumeric Placeholder="ID игрока" @bind-Value=@profileId Style="width: 100%;" />
+            <RadzenTextBox Placeholder="ID игрока" @bind-Value=@profileId Style="width: 100%;" />
             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenButton Text="Создать" Click=@(() => { ds.Close(true); AddStream(); }) />

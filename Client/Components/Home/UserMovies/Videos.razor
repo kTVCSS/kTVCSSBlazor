@@ -7,7 +7,7 @@
 @if (ready)
 {
     <RadzenStack Style="padding-bottom: 8px" Orientation=@(isMobile? Orientation.Vertical: Orientation.Horizontal) JustifyContent="JustifyContent.SpaceBetween">
-        <RadzenText TextStyle=TextStyle.DisplayH4 Text="Хайлайты игроков проекта" />
+        <RadzenText TextStyle=TextStyle.DisplayH4 Text="Видео-центр" />
         <RadzenLink Text="Добавить новое видео" Path="/uploadvideo" />
     </RadzenStack>
 
@@ -37,7 +37,7 @@
         }
         else
         {
-            <RadzenAlert AlertStyle="AlertStyle.Warning" Text="Хайлайтов пока нет" />
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Text="Видеозаписей пока нет" />
         }
     </RadzenRow>
 }
@@ -45,7 +45,7 @@ else
 {
     <RadzenRow JustifyContent="JustifyContent.Center">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
-            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка хайлайтов" />
+            <Loader Size="ProgressBarCircularSize.Medium" Text="Идет загрузка видеозаписей" />
         </RadzenStack>
     </RadzenRow>
 }

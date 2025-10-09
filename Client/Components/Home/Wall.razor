@@ -49,6 +49,10 @@
                             <RadzenCard>
                                 <RadzenStack>
                                     <RadzenStack Orientation="Orientation.Horizontal">
+                                        @if (post.IsPinned) 
+                                        {
+                                            <RadzenIcon Icon="keep" />
+                                        }
                                         <img style="width: 60px;height: 60px; border-radius: 128px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                         <RadzenStack>
                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
@@ -77,6 +81,15 @@
                                         @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator || post.AuthorId == AuthProvider.CurrentUser.Id)
                                         {
                                             <RadzenButton Click="() => RemovePost(post.PostId)" Icon="remove_circle" Text="Удалить"></RadzenButton>
+                                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                                            {
+                                                @if (post.IsPinned) {
+                                                    <RadzenButton Click="() => Unpin(post.PostId)" Icon="keep_off" Text="Открепить"></RadzenButton>
+                                                }
+                                                else {
+                                                    <RadzenButton Click="() => Pin(post.PostId)" Icon="keep" Text="Закрепить"></RadzenButton>
+                                                }
+                                            }
                                         }
                                     </RadzenStack>
                                 </div>
@@ -189,8 +202,8 @@
     {
         await DialogService.OpenAsync("", ds =>
         @<RadzenStack Style="height: 100%;">
-            <RadzenImage Path="@currentFile" Style="width: 100%; height: 100%;object-fit:contain" />
+            <RadzenImage Click="@(() => { js.InvokeVoidAsync("window.open", currentFile, "_blank"); })" Path="@currentFile" Style="width: 100%; height: 100%;object-fit:contain" />
         </RadzenStack>
-    , options: new DialogOptions() { Width = windowWidth - 200 + "px", Height = windowHeight - 200 + "px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, ShowClose = true });
+    , options: new DialogOptions() { Width = windowWidth - 100 + "px", Height = windowHeight - 100 + "px", CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true, ShowClose = true });
     }
 }

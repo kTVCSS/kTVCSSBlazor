@@ -4,7 +4,7 @@
 @inject HttpClient http
 @inject NavigationManager nm
 @inject StateProvider AuthProvider
-@inject MobileDetectionService mds
+@inject IMobileDetectionService mds
 
 @if (ready)
 {
@@ -17,7 +17,15 @@
                 <RadzenLink Target="_blank" Path="@adv.Link">
                     @((MarkupString)adv.Html)
                 </RadzenLink>
-                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin) {
+                                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
             }
         </RadzenStack>
     }
@@ -30,7 +38,15 @@
                 <RadzenLink Target="_blank" Path="@adv.Link">
                     @((MarkupString)adv.Html)
                 </RadzenLink>
-                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin) {
+                                <RadzenButton Variant="Variant.Text" Text="Удалить" Click="@(() => { Remove(adv.Id); })" />
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
             }
         </RadzenStack>
     }

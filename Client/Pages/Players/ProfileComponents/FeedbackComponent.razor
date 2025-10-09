@@ -1,0 +1,116 @@
+﻿@using kTVCSS.Models.Db.Models.Players
+@using kTVCSSBlazor.Client.Authorization
+@using kTVCSSBlazor.Db.Models.Players
+@inject StateProvider AuthProvider
+@inject HttpClient http
+
+<RadzenText TextStyle="TextStyle.DisplayH6" Text="Отзывы об игроке" />
+
+@if (player.Feedback is not null)
+{
+    @if (player.Feedback.Count == 0)
+    {
+        @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
+        {
+            <RadzenText>Отзывы об игроке не найдены. Будьте первым, кто оставит отзыв!</RadzenText>
+        }
+        else
+        {
+            <RadzenText>О Вас пока никто не оставлял отзывы!</RadzenText>
+        }
+    }
+    else
+    {
+        <RadzenStack Gap="6px">
+            @foreach (var item in player.Feedback)
+            {
+                <RadzenCard class="rz-pa-3">
+                    <RadzenStack>
+                        <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                            <RadzenStack Gap="0px" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+                                <img class="rz-mr-2" src="@item.AuthorAvatar" style="width: 32px; height: 32px;border-radius:50%" />
+
+                                <RadzenText>
+                                    <RadzenLink Path="@string.Concat("/player/", item.AuthorId)" class="rz-font-weight-bold"
+                                        Text="@item.AuthorName" /> - @DateTime.Parse(item.DateTime.ToString()).ToShortDateString()
+                                    @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()
+                                </RadzenText>
+
+                                <CascadingAuthenticationState>
+                                    <AuthorizeView>
+                                        <Authorized>
+                                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                                            {
+                                                <RadzenButton class="rz-ml-2" Variant="Variant.Text"
+                                                    Click="@(() => { Remove(item.Id); })" Text="Удалить" />
+                                            }
+                                        </Authorized>
+                                    </AuthorizeView>
+                                </CascadingAuthenticationState>
+                            </RadzenStack>
+                        </RadzenStack>
+
+                        <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+                            <RadzenMarkdown AllowHtml Text="@item.Text" />
+                        </div>
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </RadzenStack>
+    }
+}
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
+            {
+                <RadzenCard class="rz-pa-4 rz-my-2">
+                    <RadzenText TextStyle="TextStyle.DisplayH6">Оставить отзыв об игроке</RadzenText>
+
+                    <RadzenStack>
+                        <RadzenTextArea Rows="5" @bind-Value=@text Placeholder="Ваш отзыв" />
+                        <RadzenButton Click="Send" Variant="Variant.Filled" class="mt-2" Text="Отправить" />
+                    </RadzenStack>
+                </RadzenCard>
+            }
+        </Authorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+
+    private string text = "";
+
+    private async Task Remove(int id)
+    {
+        await http.DeleteAsync("/api/players/removefeedback?id=" + id);
+
+        player.Feedback.RemoveAll(x => x.Id == id);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task Send()
+    {
+        Feedback feedback = new Feedback()
+        {
+            DateTime = DateTime.Now,
+            Text = text,
+            AuthorName = AuthProvider.CurrentUser.Username,
+            AuthorAvatar = AuthProvider.CurrentUser.AvatarUrl,
+            AuthorId = AuthProvider.CurrentUser.Id,
+            PlayerId = player.MainInfo.Id
+        };
+
+        player.Feedback.Add(feedback);
+
+        await http.PutAsJsonAsync($"/api/players/addfeedback/", feedback);
+
+        text = "";
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

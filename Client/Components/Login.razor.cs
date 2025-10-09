@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
 using Radzen;
 
 namespace kTVCSSBlazor.Client.Components
@@ -12,7 +13,7 @@ namespace kTVCSSBlazor.Client.Components
         private async Task OnLogin(LoginArgs args, string name)
         {
             var tArgs = args;
-            tArgs.Password = MD5.Calculate(Encoding.ASCII.GetBytes(args.Password));
+            tArgs.Password = Radzen.MD5.Calculate(Encoding.ASCII.GetBytes(args.Password));
 
             string result = await AuthProvider.LoginAsync(tArgs);
 
@@ -44,7 +45,8 @@ namespace kTVCSSBlazor.Client.Components
 
         void OnResetPassword(string value, string name)
         {
-            notify.Notify(NotificationSeverity.Info, "Долбаеб", $"Нехуй забывать пароль", TimeSpan.FromSeconds(5));
+            NavigationManager.NavigateTo("/contacts");
+            notify.Notify(NotificationSeverity.Info, "Инфо", $"Для восстановления пароля напишите кому-нибудь из модерации проекта", TimeSpan.FromSeconds(10));
         }
     }
 }

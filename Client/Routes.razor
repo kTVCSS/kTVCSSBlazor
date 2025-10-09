@@ -1,10 +1,28 @@
+@using Blazored.LocalStorage
+@using kTVCSSBlazor.Client.Authorization
 @using kTVCSSBlazor.Client.Services
 @inject HttpClient http
 @inject NavigationManager nm
 @inject DialogService DialogService
 @inject IMobileDetectionService mds
+@inject StateProvider AuthProvider
+@inject ILocalStorageService localStorage
 
-@if (isApiWorking && !isMaintenance && !locked)
+@if (adminLock) {
+    <PageTitle>kTVCSS @@ Admin Lock</PageTitle>
+    <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+            <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
+                <RadzenText Text="Введите пароль администратора" TextStyle="TextStyle.DisplayH3"
+                    style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
+                <RadzenStack JustifyContent="JustifyContent.Center">
+                    <RadzenPassword Style="width: 400px;margin:auto" Placeholder="Введите пароль"
+                        @bind-Value="adminLockPsw" />
+                    <RadzenButton Style="width: 300px;margin:auto" Click="VerifyAdmin" Text="Войти" />
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+}
+else if (isApiWorking && !isMaintenance && !locked)
 {
     <Router AppAssembly="@typeof(Program).Assembly">
         <Found Context="routeData">
@@ -52,14 +70,12 @@ else if (!isApiWorking)
 else if (isMaintenance)
 {
     <PageTitle>kTVCSS @@ Идет обновление</PageTitle>
-    <LayoutView Layout="@typeof(MainLayout)">
-        <RadzenRow>
+    <RadzenRow>
             <RadzenColumn Size="12" style="margin-top: 5rem; margin-bottom: 5rem">
                 <RadzenText Text="Сайт обновляется, вернитесь чуть позже" TextStyle="TextStyle.DisplayH3"
                     style="margin: 0; margin-bottom: 2rem" TextAlign="TextAlign.Center" />
             </RadzenColumn>
         </RadzenRow>
-    </LayoutView>
 }
 else if (locked)
 {
@@ -120,6 +136,20 @@ else if (locked)
     private string password;
     private bool passwordDisabled = false;
     private bool isMobile = false;
+    private bool adminLock = false;
+    private string adminLockPsw = "";
+
+    private async Task VerifyAdmin()
+    {
+        if (adminLockPsw == "!secret!")
+        {
+            adminLock = false;
+
+            localStorage.SetItemAsStringAsync("adm-psw", adminLockPsw);
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
 
     private async Task SendPassword()
     {
@@ -155,6 +185,25 @@ else if (locked)
             MaintenanceChecker();
 
             Locker();
+
+            Task.Run(async () => {
+                await Task.Delay(3000);
+                if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) 
+                {
+                    adminLock = true;
+
+                    var testPsw = await localStorage.GetItemAsStringAsync("adm-psw");
+
+                    if (!string.IsNullOrEmpty(testPsw)) 
+                    {
+                        adminLockPsw = testPsw;
+
+                        VerifyAdmin();
+                    }
+
+                    await InvokeAsync(StateHasChanged);
+                }
+            });
         }
     }
 

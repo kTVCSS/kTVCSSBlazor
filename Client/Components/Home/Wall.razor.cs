@@ -208,11 +208,31 @@ namespace kTVCSSBlazor.Client.Components.Home
 
             await InvokeAsync(StateHasChanged);
         }
+        
+        private async Task Pin(int postId)
+        {
+            await http.GetAsync($"/api/userposts/pinpost?id={postId}");
+            Posts.First(x => x.PostId == postId).IsPinned = true;
+
+            Posts = Posts.OrderByDescending(x => x.IsPinned).ToList();
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task Unpin(int postId)
+        {
+            await http.GetAsync($"/api/userposts/unpinpost?id={postId}");
+            Posts.First(x => x.PostId == postId).IsPinned = false;
+
+            Posts = Posts.OrderByDescending(x => x.IsPinned).ToList();
+
+            await InvokeAsync(StateHasChanged);
+        }
 
         public async ValueTask DisposeAsync()
         {
             Posts = null;
-            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged);
             //await WindowSize.DisposeAsync();
         }
     }

@@ -85,17 +85,17 @@ namespace kTVCSSBlazor.Client.Pages.Players
 
                         if (isMobile)
                         {
-                            windowHeight = h - 118;
+                            windowHeight = h - 140;
                         }
                         else
                         {
-                            windowHeight = h - 208;
+                            windowHeight = h - 258;
                         }
 
                         InvokeAsync(StateHasChanged);
                     };
 
-                    windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+                    windowHeight = WindowSize.GetHeight() - (isMobile ? 140 : 258);
                     dataSource = await http.GetFromJsonAsync<List<BannedUser>>("/api/players/getbannedlist");
                     _filtered.AddRange(dataSource);
                     ready = true;

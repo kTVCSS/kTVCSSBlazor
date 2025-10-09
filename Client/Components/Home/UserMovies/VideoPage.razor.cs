@@ -27,6 +27,17 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
             NavigationManager.NavigateTo("/#highlights");
         }
 
+        private async Task RemoveComment(int comId)
+        {
+            await http.DeleteAsync($"/api/VideoComments/{comId}");
+
+            NotificationService.Notify(NotificationSeverity.Success, "Комментарий удален!");
+
+            video.Comments.RemoveAll(x => x.Id == comId);
+
+            await InvokeAsync(StateHasChanged);
+        }
+
         private async Task Send()
         {
             video.Comments.Add(new()

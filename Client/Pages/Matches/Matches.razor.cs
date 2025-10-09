@@ -21,7 +21,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
         public async ValueTask DisposeAsync()
         {
-            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged); 
+            WindowSize.OnResized -= (w, h) => InvokeAsync(StateHasChanged);
             //await WindowSize.DisposeAsync();
             matches = null;
         }
@@ -37,17 +37,17 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
                     if (isMobile)
                     {
-                        windowHeight = h - 118;
+                        windowHeight = h - 140;
                     }
                     else
                     {
-                        windowHeight = h - 208;
+                        windowHeight = h - 258;
                     }
 
                     InvokeAsync(StateHasChanged);
                 };
 
-                windowHeight = WindowSize.GetHeight() - (isMobile ? 118 : 208);
+                windowHeight = WindowSize.GetHeight() - (isMobile ? 140 : 258);
 
                 matches = await http.GetFromJsonAsync<List<TotalMatch>>("/api/matches/getmatches");
 

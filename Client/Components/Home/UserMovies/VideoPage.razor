@@ -16,7 +16,7 @@
         <RadzenStack JustifyContent="JustifyContent.Center" Style="width: 85%;justify-self: center;">
         <div style="width: 100%;display: flex;justify-content: center;">
             <div style="width: 100%;display: flex; align-self: center;">
-                <video autoplay controls style="width: 100%; height: 100%" src="@video.Url" />
+                <video onloadstart="this.volume=0.25" autoplay controls style="width: 100%; height: 100%" src="@video.Url" />
             </div>
         </div>
 
@@ -36,7 +36,7 @@
         @if (!string.IsNullOrEmpty(video.Description))
         {
             <RadzenCard>
-                <RadzenText Text="@video.Description" />
+                <RadzenMarkdown AllowHtml Text="@video.Description" />
             </RadzenCard>
         }
 
@@ -72,6 +72,16 @@
                         <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
                             <RadzenText>@item.Text</RadzenText>
                         </div>
+
+                        <CascadingAuthenticationState>
+                            <AuthorizeView>
+                                <Authorized>
+                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
+                                        <RadzenButton Variant="Variant.Text" Click="@(() => { RemoveComment(item.Id); })" Text="Удалить" />
+                                    }
+                                </Authorized>
+                            </AuthorizeView>
+                        </CascadingAuthenticationState>
                     </RadzenCard>
                 }
             }

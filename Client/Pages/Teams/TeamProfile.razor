@@ -131,14 +131,10 @@
                                         <RadzenButton Click="@(async () => { await http.GetAsync($"/api/teams/unblockteam?id={Id}"); data = await http.GetFromJsonAsync<TeamPageData>($"/api/teams/getteam?id={Id}"); ShowSuccess("Состав команды был разблокирован!"); StateHasChanged(); })" Icon="lock_open" Text="Разблокировать состав"></RadzenButton>
                                     }
                                 }
-                                @if (AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID)
+                                @if (AuthProvider.CurrentUser.SteamId == data.Info.CapSteamID || AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                 {
                                     <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
                                     <RadzenButton Click="DeleteTeam" Icon="delete" Text="Удалить команду"></RadzenButton>
-                                }
-                                @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
-                                {
-                                    <RadzenButton Click="() => { OpenTeamEdit(); }" Icon="edit" Text="Редактировать профиль"></RadzenButton>
                                 }
                             </RadzenStack>
                         </RadzenCard>

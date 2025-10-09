@@ -90,6 +90,10 @@ namespace kTVCSSBlazor.Client.Pages.Teams
                 ShowSuccess("Вы удалили команду!");
                 NavigationManager.NavigateTo("/");
                 StateHasChanged();
+
+                await Task.Delay(1000);
+
+                NavigationManager.Refresh(true);
             }
         }
 

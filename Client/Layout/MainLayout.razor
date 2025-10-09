@@ -201,7 +201,7 @@
                     @if (!isMobile)
                     {
                         <RadzenPanelMenuItem Click=SidePanelClick Icon="download_for_offline" Path="/downloads" Text="Загрузки" />
-                        <RadzenPanelMenuItem Click=SidePanelClick Icon="deployed_code_history" Path="/github" Text="GitHub монитор" />
+                        @* <RadzenPanelMenuItem Click=SidePanelClick Icon="deployed_code_history" Path="/github" Text="GitHub монитор" /> *@
                     }
                 </RadzenPanelMenuItem>
             </RadzenPanelMenu>
@@ -345,10 +345,10 @@ else
         var audio = new Audio('/sounds/pornhub.mp3');
         try {
             const gameSound = JSON.parse(localStorage.getItem("GFSound"));
-
+            const gameSoundLevel = JSON.parse(localStorage.getItem("GFSoundLevel"));
             if (gameSound && gameSound.Value) {
                 audio = new Audio(gameSound.Value);
-                audio.volume = 1;
+                audio.volume = gameSoundLevel;
                 audio.play();
             } else {
                 audio.volume = 1;
@@ -606,6 +606,15 @@ else
                             localStorage.SetItemAsync("GFSound", new Sound() { Name = "PornHub", Value = "/sounds/pornhub.mp3" });
                         }
 
+                        var actualGameSoundLevel = await localStorage.GetItemAsync<double>("GFSoundLevel");
+
+                        JSRuntime.InvokeVoidAsync("console.log", actualGameSoundLevel);
+
+                        if (actualGameSoundLevel == 0) 
+                        {
+                            localStorage.SetItemAsync("GFSoundLevel", 0.5);
+                        }
+
                         JSRuntime.InvokeVoidAsync("console.log", actualGameSound.Name);
 
                         nt = await JSRuntime.InvokeAsync<bool>("getPermission");
@@ -771,12 +780,16 @@ else
                             }
                         });
 
-                        if (ChatHub.Connection.State != HubConnectionState.Connected)
+                        await ChatHub.StartAsync();
+
+                        ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
+
+                        @* if (ChatHub.Connection.State != HubConnectionState.Connected)
                         {
                             await ChatHub.StartAsync();
 
                             ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
-                        }
+                        } *@
                     }
                 }
             });

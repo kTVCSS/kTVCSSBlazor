@@ -1,4 +1,5 @@
 ﻿using kTVCSS.Models.Models;
+using kTVCSSBlazor.Client.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 using Radzen;
@@ -11,6 +12,7 @@ namespace kTVCSSBlazor.Client.Authorization
         private readonly UserService _userService;
         private readonly IJSRuntime _js;
         public User CurrentUser { get; private set; }
+        //private CryptoService _cryptoService { get; set; }
 
         public StateProvider(UserService userService, IJSRuntime js)
         {
@@ -25,6 +27,8 @@ namespace kTVCSSBlazor.Client.Authorization
 
             if (user is not null)
             {
+                //string encryptedPassword = await _cryptoService.EncryptAsync(user.Password);
+
                 var userInDatabase = await _userService.LookupUserInDatabaseAsync(new LoginArgs() { Username = user.Username, Password = user.Password });
 
                 if (userInDatabase is not null)
@@ -52,6 +56,7 @@ namespace kTVCSSBlazor.Client.Authorization
             var localStorageData = await _userService.FetchUserFromBrowserAsync();
             if (localStorageData != null)
             {
+                //string encryptedPassword = await _cryptoService.EncryptAsync(localStorageData.Password);
                 return await _userService.LookupUserInDatabaseAsync(new LoginArgs() { Username = localStorageData.Username, Password = localStorageData.Password });
             }
             else return null;
@@ -66,9 +71,13 @@ namespace kTVCSSBlazor.Client.Authorization
         {
             string error = string.Empty;
             var principal = new ClaimsPrincipal();
-            
+
             try
             {
+                //string encryptedPassword = await _cryptoService.EncryptAsync(args.Password);
+
+                //args.Password = encryptedPassword;
+
                 var user = await _userService.LookupUserInDatabaseAsync(args);
 
                 if (user is not null)

@@ -35,7 +35,7 @@ namespace kTVCSSBlazor.Client.Pages
                 case 0: return "wall";
                 case 1: return "news";
                 case 2: return "streams";
-                case 3: return "highlights";
+                case 3: return "videos";
                 case 4: return "configs";
                 case 5: return "suggestions";
                 case 6: return "halloffame";
@@ -50,7 +50,7 @@ namespace kTVCSSBlazor.Client.Pages
                 case "wall": return 0;
                 case "news": return 1;
                 case "streams": return 2;
-                case "highlights": return 3;
+                case "videos": return 3;
                 case "configs": return 4;
                 case "suggestions": return 5;
                 case "halloffame": return 6;

@@ -22,21 +22,28 @@
                 <RadzenText Text="БЕТА" TextStyle="TextStyle.Subtitle2" />
             </RadzenText>
 
-            <RadzenStack Gap="4px">
-                <RadzenLabel Text="Звук найденной игры" Component="DropDownTemplate" />
-                <RadzenDropDown @bind-Value=@selectedGameFoundSound Data=@sounds TextProperty="@nameof(Sound.Name)"
-                    Style="width: 250px;" Name="DropDownTemplate">
-                    <Template>
-                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                            <RadzenButton Size="ButtonSize.Small" Icon="play_circle"
-                                Click="@(() => { JSRuntime.InvokeVoidAsync("testSound", (context as Sound).Value); })" />
+            <RadzenStack Gap="1rem">
+                <RadzenStack Gap="4px" Orientation="Orientation.Vertical">
+                    <RadzenLabel Text="Звук найденной игры" Component="DropDownTemplate" />
+                    <RadzenDropDown @bind-Value=@selectedGameFoundSound Data=@sounds TextProperty="@nameof(Sound.Name)"
+                        Style="width: 250px;" Name="DropDownTemplate">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                                <RadzenButton Size="ButtonSize.Small" Icon="play_circle"
+                                    Click="@(() => { JSRuntime.InvokeVoidAsync("testSound", (context as Sound).Value); })" />
+                                @((context as Sound).Name)
+                            </RadzenStack>
+                        </Template>
+                        <ValueTemplate>
                             @((context as Sound).Name)
-                        </RadzenStack>
-                    </Template>
-                    <ValueTemplate>
-                        @((context as Sound).Name)
-                    </ValueTemplate>
-                </RadzenDropDown>
+                        </ValueTemplate>
+                    </RadzenDropDown>
+                </RadzenStack>
+                <RadzenStack Gap="4px" Orientation="Orientation.Vertical">
+                    <RadzenLabel Text="Громкость звука" Component="DropDownTemplate" />
+                    <RadzenNumeric Style="width: 250px;" Min="0" Max="1" Step="0,1" @bind-Value=@volume
+                        InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                </RadzenStack>
                 <RadzenButton Style="width: 250px" Text="Сделать тест найденной игры" Click="ShowGameReady" />
             </RadzenStack>
         </RadzenStack>
@@ -46,14 +53,30 @@
 <script>
     window.testSound = (track) => {
         let audio = new Audio(track)
-        audio.volume = 0.25
-        audio.play();
+        audio.volume = @volume
+            audio.play();
     }
 </script>
 
 @code {
     private List<string> citations = [];
     private List<Sound> sounds = [];
+
+    private double _volume = 0.5;
+    private double volume
+    {
+        get
+        {
+            return _volume;
+        }
+        set
+        {
+            _volume = value;
+
+            localStorage.SetItemAsync("GFSoundLevel", value);
+        }
+    }
+
     private Sound _selectedGameFoundSound;
     private Sound selectedGameFoundSound
     {
@@ -90,6 +113,19 @@
                 localStorage.SetItemAsync("GFSound", new Sound() { Name = "PornHub", Value = "/sounds/pornhub.mp3" });
                 selectedGameFoundSound = sounds[0];
             }
+
+            var actualVolume = await localStorage.GetItemAsync<double>("GFSoundLevel");
+
+            if (actualVolume == 0)
+            {
+                volume = 0.5;
+            }
+            else
+            {
+                volume = actualVolume;
+            }
+
+            localStorage.SetItemAsync("GFSoundLevel", volume);
 
             await InvokeAsync(StateHasChanged);
         }

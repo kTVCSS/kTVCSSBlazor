@@ -22,7 +22,7 @@ namespace kTVCSSBlazor.Client.Components.Home
 
         private string streamName = string.Empty;
         private string streamLink = string.Empty;
-        private int profileId;
+        private string profileId;
 
         private async Task RemoveStream(int id)
         {
@@ -41,7 +41,7 @@ namespace kTVCSSBlazor.Client.Components.Home
                 Name = streamName,
                 Type = StreamType.Twitch,
                 Url = streamLink,
-                PlayerId = profileId
+                PlayerId = int.Parse(profileId)
             };
 
             await http.PostAsJsonAsync("/api/userstreams", stream);

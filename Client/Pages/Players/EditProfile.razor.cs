@@ -64,6 +64,11 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 return;
             }
 
+            if (string.IsNullOrEmpty(originalLogin))
+            {
+                originalLogin = "debug";
+            }
+
             var response = await http.PostAsJsonAsync($"/api/players/saveprofile?id={Id}&updatePassword={needUpdatePassword}&newLogin={!originalLogin.Equals(profile.Login)}", profile);
 
             SaveProfileResult result = await response.Content.ReadFromJsonAsync<SaveProfileResult>();

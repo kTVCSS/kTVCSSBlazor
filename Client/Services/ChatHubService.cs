@@ -6,34 +6,50 @@ namespace kTVCSSBlazor.Client.Services
     public class ChatHubService : IAsyncDisposable
     {
         public HubConnection Connection { get; private set; }
+        private Uri _url { get; set; }
 
         public ChatHubService(NavigationManager navManager)
         {
 #if DEBUG
-            Connection = new HubConnectionBuilder()
-                .WithUrl(navManager.ToAbsoluteUri("http://localhost:4050/chathub"))
-                .WithAutomaticReconnect()
-                .Build();
+            _url = navManager.ToAbsoluteUri("http://localhost:4050/chathub");
 #endif
 #if RELEASE
+            _url = navManager.ToAbsoluteUri("https://chat.ktvcss.com/chathub");
+#endif
 
             Connection = new HubConnectionBuilder()
-                .WithUrl(navManager.ToAbsoluteUri("https://chat.ktvcss.com/chathub"))
+                .WithUrl(_url)
                 .WithAutomaticReconnect()
                 .Build();
-#endif
         }
 
         public async Task StartAsync()
         {
-            if (Connection.State == HubConnectionState.Disconnected)
+            if (Connection.State != HubConnectionState.Connected)
+            {
+                try
+                {
+                    await Connection.StopAsync();
+
+                    await Connection.DisposeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex.ToString());
+                }
+
+                Connection = new HubConnectionBuilder()
+                    .WithUrl(_url)
+                    .WithAutomaticReconnect()
+                    .Build();
+
                 await Connection.StartAsync();
+            } 
         }
 
         public async Task OnAfterConnect(int id)
         {
-            if (Connection.State == HubConnectionState.Disconnected)
-                await Connection.StartAsync();
+            await StartAsync();
 
             await Connection.InvokeAsync("OnAfterConnectAsync", id);
         }

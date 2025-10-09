@@ -5,6 +5,7 @@ using kTVCSSBlazor.Client.Services;
 using kTVCSSBlazor.Server.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.JSInterop;
 using Radzen;
 using RadzenBlazorDemos.Services;
@@ -40,10 +41,16 @@ builder.Services.AddScoped<MMService>();
 builder.Services.AddSingleton<WindowSizeService>(); // @inject WindowSizeService WindowSize
 builder.Services.AddScoped<IMobileDetectionService, MobileDetectionService>(); //@inject IMobileDetectionService MobileDetectionService
 builder.Services.AddScoped<PasswordCheckService>();
+builder.Services.AddScoped<CryptoService>();
 
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
