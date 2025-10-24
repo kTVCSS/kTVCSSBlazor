@@ -92,6 +92,11 @@
     }
 }
 
+@if (player.IsPlaying)
+{
+    <RadzenButton Text="Перейти к матчу" Click="@(() => { nm.NavigateTo($"/match/{player.CurrentMatchId}"); })" Icon="online_prediction" />
+}
+
 @code {
     private async Task MakeReport()
     {

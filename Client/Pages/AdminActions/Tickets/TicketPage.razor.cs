@@ -42,7 +42,7 @@ namespace kTVCSSBlazor.Client.Pages.AdminActions.Tickets
             if (string.IsNullOrEmpty(text))
                 return;
 
-            DateTime now = DateTime.UtcNow.AddHours(3);
+            DateTime now = DateTime.UtcNow;
 
             var msg = new TicketMessage
             {

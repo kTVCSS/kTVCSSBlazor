@@ -23,29 +23,29 @@
                         <div style="@($"display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;")">
                             @if (match.MatchDate == "LIVE")
                             {
-                                <div class="rz-text-display-h5" style="color: red;font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
+                                <div class="rz-text-h4" style="color: red;width:100%;text-align:center">@match.MatchDate</div>
                             }
                             else
                             {
-                                <div class="rz-text-display-h5" style="font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
+                                <div class="rz-text-h4" style="width:100%;text-align:center">@(DateTime.Parse(match.MatchDate).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
                             }
                             @if (!isMobile)
                             {
                                 <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
-                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>
-                                    <div class="rz-text-display-h5" style="font-weight: 600;display:flex;text-align:center;">@match.Score</div>
-                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.BTeam</div>
+                                    <div class="rz-text-h4" style="text-align: center;width: 45%;">@match.ATeam</div>
+                                    <div class="rz-text-h4" style="display:flex;text-align:center;">@match.Score</div>
+                                    <div class="rz-text-h4" style="text-align: center;width: 45%;">@match.BTeam</div>
                                 </div>
                             }
                             else
                             {
                                 <div style="display: flex;flex-direction:column;width: 100%;align-items: center;justify-content: space-between;">
-                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>
-                                    <div class="rz-text-display-h5" style="font-weight: 600;display:flex;text-align:center;">@match.Score</div>
-                                    <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.BTeam</div>
+                                    <div class="rz-text-h4" style="text-align: center;width: 45%;">@match.ATeam</div>
+                                    <div class="rz-text-h4" style="display:flex;text-align:center;">@match.Score</div>
+                                    <div class="rz-text-h4" style="text-align: center;width: 45%;">@match.BTeam</div>
                                 </div>
                             }
-                            <div style="font-weight: 600;" class="rz-text-display-h5">@match.MapName</div>
+                            <div style="" class="rz-text-h4">@match.MapName</div>
                         </div>
                     </a>
                 </Template>
@@ -85,7 +85,7 @@ else
         width: 100% !important;
     }
 
-    .rz-text-display-h5 {
+    .rz-text-h4 {
         float: inline-end !important;
     }
 

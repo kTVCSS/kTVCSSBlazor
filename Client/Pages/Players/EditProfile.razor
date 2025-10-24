@@ -54,7 +54,7 @@
 
                         @if (profile.Telegram.HasValue)
                         {
-                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin || profile.Telegram.Value == 0)
                             {
                                 <RadzenFormField Text="Telegram" Style="width: 100%;">
                                     <ChildContent>
@@ -63,7 +63,7 @@
                                             InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
                                     </ChildContent>
                                     <Helper>
-                                        <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID.
+                                        <RadzenLink Target="_blank" Path="https://yandex.ru/search/?text=как+узнать+свой+telegram+id&lr=138627&clid=10472851-71&win=719">Здесь используется Telegram ID.
                                             Нажмите сюда, чтобы узнать его!</RadzenLink>
                                     </Helper>
                                 </RadzenFormField>
@@ -78,7 +78,7 @@
                                         InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enter value" }})" />
                                 </ChildContent>
                                 <Helper>
-                                    <RadzenLink Target="_blank" Path="https://t.me/getmyid_bot">Здесь используется Telegram ID.
+                                    <RadzenLink Target="_blank" Path="https://yandex.ru/search/?text=как+узнать+свой+telegram+id&lr=138627&clid=10472851-71&win=719">Здесь используется Telegram ID.
                                         Нажмите сюда, чтобы узнать его</RadzenLink>
                                 </Helper>
                             </RadzenFormField>

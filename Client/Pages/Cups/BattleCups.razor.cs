@@ -60,7 +60,7 @@ namespace kTVCSSBlazor.Client.Pages.Cups
 
         private void CalculateTimeLeft()
         {
-            DateTime now = DateTime.UtcNow.AddHours(3);
+            DateTime now = DateTime.Now;
             DateTime target = now.Date.AddHours(18);
 
             if (now > target)

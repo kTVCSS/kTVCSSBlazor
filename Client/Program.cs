@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using kTVCSSBlazor;
 using kTVCSSBlazor.Client;
 using kTVCSSBlazor.Client.Authorization;
 using kTVCSSBlazor.Client.Extensions;
@@ -36,6 +37,12 @@ builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
 
 #endif
 
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = "kTVCSSTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+
 builder.Services.AddScoped(sp =>
 {
     var serverSelector = sp.GetRequiredService<ApiServerSelector>();
@@ -58,4 +65,7 @@ builder.Services.AddScoped<PasswordCheckService>();
 builder.Services.AddScoped<CryptoService>();
 
 var host = builder.Build();
+
+DateTimeExtensions.Initialize(host.Services.GetRequiredService<IJSRuntime>());
+
 await host.RunAsync();

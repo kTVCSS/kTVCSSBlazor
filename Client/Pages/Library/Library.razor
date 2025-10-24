@@ -40,7 +40,8 @@
                                     @foreach (var item in searchItems)
                                     {
                                         <RadzenLink Path="@(string.Concat("/libraryrecord/", item.Id))">@item.Title (от
-                                            @item.DateTime.ToShortDateString())</RadzenLink>
+                                            @item.DateTime.ToLocalFromMoscow().ToShortDateString())
+                                        </RadzenLink>
                                     }
                                 </RadzenStack>
                             }

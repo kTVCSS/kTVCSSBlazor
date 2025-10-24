@@ -18,7 +18,7 @@
             <div class="news-article-container">
                 <div class="rz-mb-4 rz-p-10">
                     <RadzenText TextStyle="TextStyle.DisplayH3" TextAlign="TextAlign.Center" Text="@article.Title" />
-                    <RadzenText TextAlign="TextAlign.Center">Дата публикации: @article.DateTime.ToString("dd.MM.yyyy") / @article.Views просмотров</RadzenText>
+                    <RadzenText TextAlign="TextAlign.Center">Дата публикации: @article.DateTime.ToLocalFromMoscow().ToString("dd.MM.yyyy") / @article.Views просмотров</RadzenText>
                     <CascadingAuthenticationState>
                         <AuthorizeView>
                             <Authorized>
@@ -51,7 +51,7 @@
                         @foreach (var item in article.ArticleComments)
                         {
                             <RadzenCard class="rz-pa-3 rz-my-2">
-                                <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+                                <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
 
                                 <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
                                     <RadzenText>@item.Text</RadzenText>

@@ -15,7 +15,7 @@
 
 @if (ready)
 {
-    <RadzenDataGrid Responsive AllowSorting AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@_filtered">
+    <RadzenDataGrid AllowSorting AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@_filtered">
         <HeaderTemplate>
             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.SpaceBetween" Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список игроков проекта"></RadzenText>
@@ -36,22 +36,49 @@
                         </RadzenStack>
                     </Template>
                 </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
+                    <Template>
+                        <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
+                <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
+                <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
+                <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
+                <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
+                <RadzenDataGridColumn Context="ctx" Title="AVG" Property="AVG" />
+                <RadzenDataGridColumn Context="ctx" Title="MMR" Property="MMR" />
+                <RadzenDataGridColumn Context="ctx" Title="Матчи" Property="MatchesTotal" />
+                <RadzenDataGridColumn Context="ctx" Title="Винрейт" Property="Winrate" />
             }
-            <RadzenDataGridColumn Width="200px" Title="Ник" Context="ctx">
-                <Template>
-                    <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
-                </Template>
-            </RadzenDataGridColumn>
-            @* <RadzenDataGridColumn Width="200px" Context="ctx" Title="STEAMID" Property="SteamID" /> *@
-            <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
-            <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
-            <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
-            <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
-            <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
-            <RadzenDataGridColumn Context="ctx" Title="AVG" Property="AVG" />
-            <RadzenDataGridColumn Context="ctx" Title="MMR" Property="MMR" />
-            <RadzenDataGridColumn Context="ctx" Title="Матчи" Property="MatchesTotal" />
-            <RadzenDataGridColumn Context="ctx" Title="Винрейт" Property="Winrate" />
+            else
+            {
+                <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                    <Template>
+                        <RadzenStack AlignItems=AlignItems.Center JustifyContent=JustifyContent.Center Orientation="Orientation.Horizontal">
+                            <div style="margin: auto;">@ctx.Position</div>
+                            <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.RankName" />
+                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.PhotoUrl' />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Width="150px" Title="Ник" Context="ctx">
+                    <Template>
+                        <RadzenLink Path="@string.Concat("/player/", ctx.Id)">@ctx.Name</RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Убийства" Property="Kills" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Смерти" Property="Deaths" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Хедшоты" Property="Headshots" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="KDR" Property="KDR" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="HSR" Property="HSR" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="AVG" Property="AVG" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="MMR" Property="MMR" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Матчи" Property="MatchesTotal" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Винрейт" Property="Winrate" />
+            }
         </Columns>
     </RadzenDataGrid>
 }

@@ -33,7 +33,7 @@
                 }
                 else
                 {
-                    <div class="rz-text-h5" style="font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
+                    <div class="rz-text-h5" style="font-weight: 600;width:100%;text-align:center">@(DateTime.Parse(match.MatchDate).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
                 }
                 <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
                     <div style="font-weight: 600;text-align: center;width: 45%;">
@@ -149,7 +149,7 @@
             </RadzenRow>
         }
 
-        <RadzenDataGrid Responsive Density="Density.Compact" Data="@match.ATeamGrid">
+        <RadzenDataGrid Density="Density.Compact" Data="@match.ATeamGrid">
             <Columns>
                 @if (!isMobile)
                 {
@@ -161,35 +161,72 @@
                             </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
+                        <Template>
+                            @if (ctx.SteamID == match.MVP)
+                            {
+                                <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                            else
+                            {
+                                <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
+                    <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
+                    <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
+                    <RadzenDataGridColumn Context="ctx" Title="У/Р" Property="KRR" />
+                    <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
+                    <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
+                    <RadzenDataGridColumn Context="ctx" Title="ADR" Property="ADR" />
+                    <RadzenDataGridColumn Context="ctx" Title="Урон" Property="Damage" />
+                    <RadzenDataGridColumn Context="ctx" Title="Энтри" Property="OpenFrags" />
+                    <RadzenDataGridColumn Context="ctx" Title="Триплы" Property="Triples" />
+                    <RadzenDataGridColumn Context="ctx" Title="Квадро" Property="Quadros" />
+                    <RadzenDataGridColumn Context="ctx" Title="Эйсы" Property="Aces" />
                 }
-                <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
-                    <Template>
-                        @if (ctx.SteamID == match.MVP)
-                        {
-                            <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
-                        }
-                        else
-                        {
-                            <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
-                        }
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
-                <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
-                <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
-                <RadzenDataGridColumn Context="ctx" Title="У/Р" Property="KRR" />
-                <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
-                <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
-                <RadzenDataGridColumn Context="ctx" Title="ADR" Property="ADR" />
-                <RadzenDataGridColumn Context="ctx" Title="Урон" Property="Damage" />
-                <RadzenDataGridColumn Context="ctx" Title="Энтри" Property="OpenFrags" />
-                <RadzenDataGridColumn Context="ctx" Title="Триплы" Property="Triples" />
-                <RadzenDataGridColumn Context="ctx" Title="Квадро" Property="Quadros" />
-                <RadzenDataGridColumn Context="ctx" Title="Эйсы" Property="Aces" />
+                else
+                {
+                    <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
+                                <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn Width="150px" Title="Ник" Context="ctx">
+                        <Template>
+                            @if (ctx.SteamID == match.MVP)
+                            {
+                                <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                            else
+                            {
+                                <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Убийства" Property="Kills" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Смерти" Property="Deaths" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Хедшоты" Property="Headshots" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="У/Р" Property="KRR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="KDR" Property="KDR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="HSR" Property="HSR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="ADR" Property="ADR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Урон" Property="Damage" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Энтри" Property="OpenFrags" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Триплы" Property="Triples" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Квадро" Property="Quadros" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Эйсы" Property="Aces" />
+                }
             </Columns>
         </RadzenDataGrid>
 
-        <RadzenDataGrid Responsive Density="Density.Compact" Data="@match.BTeamGrid">
+        <RadzenDataGrid Density="Density.Compact" Data="@match.BTeamGrid">
             <Columns>
                 @if (!isMobile)
                 {
@@ -201,31 +238,68 @@
                             </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
+                        <Template>
+                            @if (ctx.SteamID == match.MVP)
+                            {
+                                <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                            else
+                            {
+                                <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
+                    <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
+                    <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
+                    <RadzenDataGridColumn Context="ctx" Title="У/Р" Property="KRR" />
+                    <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
+                    <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
+                    <RadzenDataGridColumn Context="ctx" Title="ADR" Property="ADR" />
+                    <RadzenDataGridColumn Context="ctx" Title="Урон" Property="Damage" />
+                    <RadzenDataGridColumn Context="ctx" Title="Энтри" Property="OpenFrags" />
+                    <RadzenDataGridColumn Context="ctx" Title="Триплы" Property="Triples" />
+                    <RadzenDataGridColumn Context="ctx" Title="Квадро" Property="Quadros" />
+                    <RadzenDataGridColumn Context="ctx" Title="Эйсы" Property="Aces" />
                 }
-                <RadzenDataGridColumn Width="300px" Title="Ник" Context="ctx">
-                    <Template>
-                        @if (ctx.SteamID == match.MVP)
-                        {
-                            <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
-                        }
-                        else
-                        {
-                            <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
-                        }
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn Context="ctx" Title="Убийства" Property="Kills" />
-                <RadzenDataGridColumn Context="ctx" Title="Смерти" Property="Deaths" />
-                <RadzenDataGridColumn Context="ctx" Title="Хедшоты" Property="Headshots" />
-                <RadzenDataGridColumn Context="ctx" Title="У/Р" Property="KRR" />
-                <RadzenDataGridColumn Context="ctx" Title="KDR" Property="KDR" />
-                <RadzenDataGridColumn Context="ctx" Title="HSR" Property="HSR" />
-                <RadzenDataGridColumn Context="ctx" Title="ADR" Property="ADR" />
-                <RadzenDataGridColumn Context="ctx" Title="Урон" Property="Damage" />
-                <RadzenDataGridColumn Context="ctx" Title="Энтри" Property="OpenFrags" />
-                <RadzenDataGridColumn Context="ctx" Title="Триплы" Property="Triples" />
-                <RadzenDataGridColumn Context="ctx" Title="Квадро" Property="Quadros" />
-                <RadzenDataGridColumn Context="ctx" Title="Эйсы" Property="Aces" />
+                else
+                {
+                    <RadzenDataGridColumn Width="104px" Title="" Context="ctx">
+                        <Template>
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <img style="display: flex;justify-content: center;width: 28px;" src="@ctx.PictureUrl" />
+                                <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    <RadzenDataGridColumn Width="150px" Title="Ник" Context="ctx">
+                        <Template>
+                            @if (ctx.SteamID == match.MVP)
+                            {
+                                <RadzenLink Style="color: orange !important" Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                            else
+                            {
+                                <RadzenLink Path="@string.Concat("/player/", ctx.ID)">@ctx.Name</RadzenLink>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Убийства" Property="Kills" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Смерти" Property="Deaths" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Хедшоты" Property="Headshots" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="У/Р" Property="KRR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="KDR" Property="KDR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="HSR" Property="HSR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="ADR" Property="ADR" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Урон" Property="Damage" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Энтри" Property="OpenFrags" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Триплы" Property="Triples" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Квадро" Property="Quadros" />
+                    <RadzenDataGridColumn Width="50px" Context="ctx" Title="Эйсы" Property="Aces" />
+                }
             </Columns>
         </RadzenDataGrid>
 
@@ -248,7 +322,7 @@
                 @foreach (var item in match.Commentaries)
                 {
                     <RadzenCard class="rz-pa-3 rz-my-2">
-                        <RadzenText>@item.User - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+                        <RadzenText>@item.User - @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToShortTimeString()</RadzenText>
 
                         <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
                             <RadzenText>@item.Text</RadzenText>

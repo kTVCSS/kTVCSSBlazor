@@ -53,12 +53,11 @@
         </RadzenAccordion>
     </RadzenStack>
     <RadzenStack>
-        <RadzenText>Сейчас в поиске: @CurrentSearchUsersCount</RadzenText>
+        <RadzenText>В общем поиске: @CurrentSearchUsersCountAll</RadzenText>
+        <RadzenText>В HighRanked поиске: @CurrentSearchUsersCountHR</RadzenText>
         @if (showWarn) {
             <RadzenText Style="color: rgb(255, 123, 0)">Мы обнаружили, что у Вас бывали блокировки за то, что Вы не заходили на микс. Настоятельно рекомендуем подключить оповещения в телеграме, чтобы таких инцидентов не было.</RadzenText>
         }
-        <RadzenButton Disabled Text="1x1 фасткап" />
-        <RadzenButton Disabled Text="Капитанский мод" />
         @if (InSearch)
         {
             <RadzenButton ButtonStyle=ButtonStyle.Danger Click=Stop Text="Остановить" Disabled=!SearchButtonEnabled>
@@ -69,7 +68,11 @@
         }
         else
         {
-            <RadzenButton ButtonStyle=ButtonStyle.Success Click=Start Text="Обычный режим" Disabled=!SearchButtonEnabled />
+            <RadzenButton ButtonStyle=ButtonStyle.Success Click=@(() => { Start(GameType.All); }) Text="Обычный режим" Disabled=!SearchButtonEnabled />
+            @if (AuthProvider.CurrentUser.CurrentMMR >= 1701)
+            {
+                <RadzenButton ButtonStyle=ButtonStyle.Primary Click=@(() => { Start(GameType.HighRanked); }) Text="High-Ranked режим" Disabled=!SearchButtonEnabled />
+            }
         }
     </RadzenStack>
 </RadzenStack>

@@ -8,6 +8,7 @@
 @inject StateProvider AuthProvider
 @inject NotificationService ns
 @inject IMobileDetectionService mds
+@inject IJSRuntime js
 
 <PageTitle>kTVCSS @@ @config.Name</PageTitle>
 
@@ -37,7 +38,7 @@
                 <strong>Автор: </strong> @config.AuthorName (TOP-@(player.MainInfo.Position) • @(Math.Round(player.MainInfo.KDR.Value, 2)) KDR • @(Math.Round(player.MainInfo.AVG.Value, 2)) AVG • @(player.MainInfo.MMR) ELO)
             </RadzenText>
             <RadzenText>
-                <strong>Дата публикации: </strong> @config.DateTime.ToLongDateString()
+                <strong>Дата публикации: </strong> @config.DateTime.ToLocalFromMoscow().ToLongDateString()
             </RadzenText>
             <RadzenText>
                 <strong>Просмотров: </strong> @config.Views
@@ -130,7 +131,7 @@
             @foreach (var item in config.GameConfigsComments)
             {
                 <RadzenCard class="rz-pa-3 rz-my-2">
-                    <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+                    <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToShortTimeString()</RadzenText>
 
                     <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
                         <RadzenText>@item.Text</RadzenText>

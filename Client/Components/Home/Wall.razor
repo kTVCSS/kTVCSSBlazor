@@ -28,7 +28,7 @@
                             }
                             else
                             {
-                                <RadzenTextBox @bind-Value="@newPostContent" />
+                                <RadzenTextBox Immediate="true" @bind-Value="@newPostContent" />
                             }
                         </RadzenFormField>
                         @if (Posts.Any())
@@ -56,12 +56,12 @@
                                         <img style="width: 60px;height: 60px; border-radius: 128px" src="@post.AuthorAvatar" class="rz-avatar" alt="Аватар" />
                                         <RadzenStack>
                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", post.AuthorId))">@post.AuthorName</RadzenLink>
-                                            <small>@post.PostDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                            <small>@post.PostDate.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")</small>
                                         </RadzenStack>
                                     </RadzenStack>
                                 </RadzenStack>
                                 <div class="post-content">
-                                    <p><RadzenMarkdown AllowHtml Text="@post.Content" /></p>
+                                    <p><RadzenMarkdown Text="@post.Content" /></p>
                                 </div>
                                 @if (!string.IsNullOrEmpty(post.MediaUrl))
                                 {
@@ -108,7 +108,7 @@
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
                                                             <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                                <small>@comment.CommentDate.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")</small>
                                                                 @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
                                                                     <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
                                                                 }
@@ -129,7 +129,7 @@
                                                                         <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                                         <div>@comment.Content</div>
                                                                         <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                            <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                                            <small>@comment.CommentDate.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")</small>
                                                                             @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
                                                                                 <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
                                                                             }
@@ -153,7 +153,7 @@
                                                             <RadzenLink Style="color: var(--rz-white);" Path="@(string.Concat("/player/", comment.AuthorId))">@comment.AuthorName</RadzenLink>
                                                             <div>@comment.Content</div>
                                                             <RadzenStack AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
-                                                                <small>@comment.CommentDate.ToString("dd.MM.yyyy HH:mm")</small>
+                                                                <small>@comment.CommentDate.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")</small>
                                                                 @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
                                                                     <RadzenButton Click="@(() => { DeleteComment(post, comment); })" Size="ButtonSize.Small" Variant="Variant.Text" Text="Удалить" />
                                                                 }

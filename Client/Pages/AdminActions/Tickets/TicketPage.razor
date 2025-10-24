@@ -29,7 +29,7 @@
                         <RadzenCard>
                             <RadzenStack Gap="2px">
                                 <RadzenText>Источник: <RadzenLink Target="_blank" Path="@($"/player/{_ticket.PlayerId}")" Text="@_ticket.PlayerInfo.MainInfo.Name"></RadzenLink></RadzenText>
-                                <RadzenMarkdown AllowHtml Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
+                                <RadzenMarkdown Text="@string.Concat("Проблема: ", _ticket.Messages.FirstOrDefault().MessageText)" />
                                 @* <RadzenText Text="@string.Concat("Дата регистрации обращения: ", _ticket.CreatedAt.ToShortDateString())" /> *@
 
                                 @switch (_ticket.Status)
@@ -89,8 +89,8 @@
                                                     {
                                                         <div>@msg.UserName</div>
                                                     }
-                                                    <div class="text"><RadzenMarkdown AllowHtml Text="@msg.MessageText" /></div>
-                                                    <div class="time">@msg.CreatedAt.ToString("dd.MM.yy HH:mm")</div>
+                                                    <div class="text"><RadzenMarkdown Text="@msg.MessageText" /></div>
+                                                    <div class="time">@msg.CreatedAt.ToLocalFromMoscow().ToString("dd.MM.yy HH:mm")</div>
                                                 </div>
                                             </RadzenStack>
                                         </RadzenCard>
@@ -101,7 +101,7 @@
                             <div class="chat-input">
                                 <RadzenStack Style="width: 100%;">
                                     <RadzenStack AlignItems=AlignItems.Center Orientation="@(isMobile? Orientation.Vertical: Orientation.Horizontal)">
-                                        <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="@(isMobile ? "width: 100%;flex:1; min-height:100px;" : "width: 70%;flex:1; min-height:50px;")" />
+                                        <RadzenTextArea Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) @bind-Value="NewMessage" Placeholder="Введите сообщение" Style="@(isMobile ? "width: 100%;flex:1; min-height:100px;" : "width: 70%;flex:1; min-height:200px;")" />
                                         <RadzenButton Disabled=@(_ticket.Status == kTVCSS.Models.Db.Models.Statuses.TicketStatus.Closed) Text="Отправить" Style="@(isMobile ? "width: 100%;height: 40px;" : "width: 175px;height: 10px;margin-left:10px;")" Click="@SendMessage" />
                                     </RadzenStack>
                                     @if (!(AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator))

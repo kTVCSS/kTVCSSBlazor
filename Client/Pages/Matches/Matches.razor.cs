@@ -16,7 +16,7 @@ namespace kTVCSSBlazor.Client.Pages.Matches
             var x = args.Data;
 
             args.Attributes.Add("class", "row-ktv");
-            args.Attributes.Add("Style", "display: grid;margin-bottom: 5px;background-image: url(/images/mapsbackgrs/" + x.MapName + ".jpg);height: " + (isMobile ? "175" : "130") + "px;background-size: 100% auto; background-position: center; background-blend-mode: multiply");
+            args.Attributes.Add("Style", "display: grid;background-image: url(/images/mapsbackgrs/" + x.MapName + ".jpg);px;background-size: 100% auto; background-position: center; background-blend-mode: multiply");
         }
 
         public async ValueTask DisposeAsync()

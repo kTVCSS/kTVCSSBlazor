@@ -60,9 +60,9 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
         private void UpdateCountdown(object sender, ElapsedEventArgs e)
         {
-            if (DateTime.Now < mix.DtStart)
+            if (DateTime.Now < mix.DtStart.ToLocalFromMoscow())
             {
-                timeLeftString = "До начала матча: " + FormatTime(mix.DtStart.Subtract(DateTime.Now));
+                timeLeftString = "До начала матча: " + FormatTime(mix.DtStart.ToLocalFromMoscow().Subtract(DateTime.Now));
                 InvokeAsync(StateHasChanged);
             }
             else
@@ -97,13 +97,13 @@ namespace kTVCSSBlazor.Client.Pages.Matches
 
                 await InvokeAsync(StateHasChanged);
 
-                if (DateTime.Now > mix.DtStart)
+                if (DateTime.Now > mix.DtStart.ToLocalFromMoscow())
                 {
                     timeLeftString = "Микс начался";
                 }
                 else
                 {
-                    timeLeftString = "До начала матча: " + FormatTime(mix.DtStart.Subtract(DateTime.Now));
+                    timeLeftString = "До начала матча: " + FormatTime(mix.DtStart.ToLocalFromMoscow().Subtract(DateTime.Now));
                     countdownTimer = new System.Timers.Timer(1000);
                     countdownTimer.Elapsed += UpdateCountdown;
                     countdownTimer.Start();

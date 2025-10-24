@@ -27,6 +27,12 @@ builder.Services.AddScoped<KeepAliveService>();
 builder.Services.AddRazorComponents()
       .AddInteractiveWebAssemblyComponents();
 
+builder.Services.AddRadzenCookieThemeService(options =>
+{
+    options.Name = "kTVCSSTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpClient("default", c => c.Timeout = TimeSpan.FromMinutes(1));

@@ -25,10 +25,15 @@ public partial class GameWindow
     public EventCallback<bool> SearchButtonEnabledChanged { get; set; }
 
     [Parameter]
-    public int CurrentSearchUsersCount { get; set; } = 0;
+    public int CurrentSearchUsersCountAll { get; set; } = 0;
 
     [Parameter]
-    public EventCallback<int> CurrentSearchUsersCountChanged { get; set; }
+    public int CurrentSearchUsersCountHR { get; set; } = 0;
+
+    [Parameter]
+    public EventCallback<int> CurrentSearchUsersCountAllChanged { get; set; }
+    [Parameter]
+    public EventCallback<int> CurrentSearchUsersCountHRChanged { get; set; }
 
     [Parameter]
     public MMService Hub { get; set; }
@@ -55,10 +60,18 @@ public partial class GameWindow
         await SearchButtonEnabledChanged.InvokeAsync(SearchButtonEnabled);
     }
 
-    private async Task UpdateCurrentSearchUsersCount(int newValue)
+    private async Task UpdateCurrentSearchUsersCountAll(int newValue)
     {
-        CurrentSearchUsersCount = newValue;
-        await CurrentSearchUsersCountChanged.InvokeAsync(CurrentSearchUsersCount);
+        CurrentSearchUsersCountAll = newValue;
+        await CurrentSearchUsersCountAllChanged.InvokeAsync(CurrentSearchUsersCountAll);
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task UpdateCurrentSearchUsersCountHR(int newValue)
+    {
+        CurrentSearchUsersCountHR = newValue;
+        await CurrentSearchUsersCountHRChanged.InvokeAsync(CurrentSearchUsersCountHR);
 
         await InvokeAsync(StateHasChanged);
     }
@@ -120,9 +133,11 @@ public partial class GameWindow
             {
                 if (disposed) return;
 
-                int count = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscount");
+                int countA = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscountall");
+                var countB = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscounthr");
 
-                UpdateCurrentSearchUsersCount(count);
+                UpdateCurrentSearchUsersCountAll(countA);
+                UpdateCurrentSearchUsersCountHR(countB);
 
                 await Task.Delay(TimeSpan.FromSeconds(30));
             }
@@ -143,9 +158,11 @@ public partial class GameWindow
         });
     }
 
-    public async Task Start()
+    public async Task Start(GameType gameType)
     {
         UpdateSearchButtonEnabled(false);
+
+        AuthProvider.CurrentUser.GameType = gameType;
 
         await InvokeAsync(StateHasChanged);
 
@@ -154,7 +171,7 @@ public partial class GameWindow
             await Hub.StartAsync();
             await Hub.OnAfterConnect(AuthProvider.CurrentUser);
 
-            js.InvokeVoidAsync("playAmbience");
+            //js.InvokeVoidAsync("playAmbience");
 
             RefreshCount();
         }
@@ -182,7 +199,7 @@ public partial class GameWindow
 
         await Hub.Connection.StopAsync();
 
-        js.InvokeVoidAsync("stopAmbience");
+        //js.InvokeVoidAsync("stopAmbience");
 
         UpdateInSearch(false);
 
@@ -204,9 +221,11 @@ public partial class GameWindow
     {
         try
         {
-            int count = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscount");
+            int countA = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscountall");
+            var countB = await http.GetFromJsonAsync<int>(hubUrl + "api/getplayerscounthr");
 
-            UpdateCurrentSearchUsersCount(count);
+            UpdateCurrentSearchUsersCountAll(countA);
+            UpdateCurrentSearchUsersCountHR(countB);
         }
         catch (Exception ex)
         {

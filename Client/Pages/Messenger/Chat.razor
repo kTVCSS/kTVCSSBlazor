@@ -52,7 +52,7 @@
                                                     @dialog.Name
                                                     @if (dialog.LastMessage is not null)
                                                     {
-                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     }
                                                 }
                                                 else if (dialog.Participants.Any())
@@ -60,7 +60,7 @@
                                                     @dialog.Participants.First().Login
                                                     @if (dialog.LastMessage is not null) 
                                                     {
-                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     }
                                                 }
                                             </div>
@@ -115,7 +115,7 @@
                                                 }
                                                 else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
                                                 {
-                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToLocalTimeFromUtc().ToString("dd.MM.yyyy HH:mm")</span>
                                                 }
                                             </div>
                                         </div>
@@ -147,7 +147,7 @@
                                                 <div class="message-text">@message.Content</div>
                                                 
                                                 <div class="message-meta">
-                                                    <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
+                                                    <span class="message-time">@message.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     @if (message.IsEdited)
                                                     {
                                                         <span class="edited-indicator">изменено</span>
@@ -269,7 +269,7 @@
                                                     @dialog.Name
                                                     @if (dialog.LastMessage is not null)
                                                     {
-                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     }
                                                 }
                                                 else if (dialog.Participants.Any())
@@ -277,7 +277,7 @@
                                                     @dialog.Participants.First().Login
                                                     @if (dialog.LastMessage is not null) 
                                                     {
-                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToString("HH:mm")</span>
+                                                        <span class="last-message-time">@dialog.LastMessage.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     }
                                                 }
                                             </div>
@@ -330,7 +330,7 @@
                                                 }
                                                 else if (selectedDialog.Participants.First().LastSeenAt.HasValue)
                                                 {
-                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                                                    <span class="offline">был(а) в сети @selectedDialog.Participants.First().LastSeenAt.Value.ToLocalTimeFromUtc().ToString("dd.MM.yyyy HH:mm")</span>
                                                 }
                                             </div>
                                         </div>
@@ -362,7 +362,7 @@
                                                 <div class="message-text">@message.Content</div>
                                                 
                                                 <div class="message-meta">
-                                                    <span class="message-time">@message.SentAt.ToString("HH:mm")</span>
+                                                    <span class="message-time">@message.SentAt.ToLocalTimeFromUtc().ToString("HH:mm")</span>
                                                     @if (message.IsEdited)
                                                     {
                                                         <span class="edited-indicator">изменено</span>

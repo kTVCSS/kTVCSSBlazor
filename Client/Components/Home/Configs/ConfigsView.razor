@@ -24,7 +24,7 @@
                         <RadzenStack Style="width: 100%">
                             <RadzenLink Style="color: white" Text="@config.Name" Path="@string.Concat("/config/", config.Id)" />
                             <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
-                            <RadzenText Text="@(string.Concat("Опубликован: ", config.DateTime.ToShortDateString()))" />
+                            <RadzenText Text="@(string.Concat("Опубликован: ", config.DateTime.ToLocalFromMoscow().ToShortDateString()))" />
                             <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
                             <RadzenText Text="@(string.Concat("Просмотров: ", config.Views, " • Скачиваний: ", config.Downloads))" />
                         </RadzenStack>

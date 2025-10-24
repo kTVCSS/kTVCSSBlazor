@@ -291,7 +291,7 @@
                         <Template Context="ctx">
                             <a href="/match/@ctx.ID">
                                 <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: center;">
-                                    <div style="font-size: 22px;font-weight: 600;width:100%;text-align:center">@ctx.DateTime</div>
+                                    <div style="font-size: 22px;font-weight: 600;width:100%;text-align:center">@ctx.DateTime.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")</div>
                                     <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: center;">
                                         <div style="font-size: 22px;font-weight: 600;display:flex;text-align:center;">@ctx.Result</div>
                                     </div>

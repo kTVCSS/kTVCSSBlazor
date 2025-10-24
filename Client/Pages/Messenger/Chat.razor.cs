@@ -105,34 +105,40 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
             // Обработчики событий
             var rm = ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
             {
-                try
+                if (nm.Uri.ToLower().Contains("/chat"))
                 {
-                    await LoadDialogs(); // Обновляем список диалогов
-                    await InvokeAsync(StateHasChanged);
-                    Console.WriteLine(message.DialogId);
-                    if (selectedDialog?.Id != message.DialogId)
+                    try
                     {
-                        var needed = dialogs.FirstOrDefault(x => x.Id == message.DialogId);
-                        if (needed is not null)
+                        await LoadDialogs(); // Обновляем список диалогов
+                        await InvokeAsync(StateHasChanged);
+                        Console.WriteLine(message.DialogId);
+                        if (selectedDialog?.Id != message.DialogId)
                         {
-                            needed.UnreadCount += 1;
+                            if (message.Sender.Login != AuthProvider.CurrentUser.Username)
+                            {
+                                var needed = dialogs.FirstOrDefault(x => x.Id == message.DialogId);
+                                if (needed is not null)
+                                {
+                                    needed.UnreadCount += 1;
+                                }
+                                JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+                                await InvokeAsync(StateHasChanged);
+                            }
                         }
-                        JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
-                        await InvokeAsync(StateHasChanged);
+                        if (selectedDialog?.Id == message.DialogId)
+                        {
+                            messages?.Add(message);
+                            selectedDialog.UnreadCount = 0;
+                            ChatHub.Connection.InvokeAsync("MarkAsRead", message.DialogId, AuthProvider.CurrentUser.Id);
+                            // Обновляем UI для отображения прочитанных сообщений
+                            await InvokeAsync(StateHasChanged);
+                            await ScrollToBottom();
+                        }
                     }
-                    if (selectedDialog?.Id == message.DialogId)
+                    catch (Exception ex)
                     {
-                        messages?.Add(message);
-                        selectedDialog.UnreadCount = 0;
-                        ChatHub.Connection.InvokeAsync("MarkAsRead", message.DialogId, AuthProvider.CurrentUser.Id);
-                        // Обновляем UI для отображения прочитанных сообщений
-                        await InvokeAsync(StateHasChanged);
-                        await ScrollToBottom();
+                        Console.Error.WriteLine(ex.ToString());
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine(ex.ToString());
                 }
             });
 
@@ -181,7 +187,7 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
                 // Обновляем статус пользователей в диалогах
                 if (dialogs != null)
                 {
-                    DateTime now = DateTime.UtcNow.AddHours(3);
+                    DateTime now = DateTime.Now;
 
                     foreach (var dialog in dialogs)
                     {
@@ -199,7 +205,7 @@ namespace kTVCSSBlazor.Client.Pages.Messenger
                 }
             });
 
-            disposables.Add(rm);
+            //disposables.Add(rm);
             disposables.Add(du);
             disposables.Add(dr);
             disposables.Add(ust);

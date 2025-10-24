@@ -5,7 +5,7 @@
                 <Columns>
                     <RadzenDataGridColumn Title="Дата" Context="ctx">
                         <Template>
-                            <div>@ctx.DateTime.ToShortDateString()</div>
+                            <div>@ctx.DateTime.ToLocalFromMoscow().ToShortDateString()</div>
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Context="ctx" Title="Админ" Property="UserName" />
@@ -33,7 +33,7 @@
                             </ChildContent>
                             <TooltipTemplate Context="Data">
                                 <div>
-                                    Ответов в тикетах за <span>@Data.DateTime.ToShortDateString()</span>:
+                                    Ответов в тикетах за <span>@Data.DateTime.ToLocalFromMoscow().ToShortDateString()</span>:
                                     <strong>@Data.Count</strong>
                                 </div>
                             </TooltipTemplate>

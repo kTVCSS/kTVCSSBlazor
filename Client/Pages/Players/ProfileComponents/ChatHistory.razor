@@ -1,0 +1,25 @@
+﻿@using kTVCSSBlazor.Db.Models.Players
+
+<RadzenAccordion>
+    <Items>
+        <RadzenAccordionItem Text="История чата" Icon="chat">
+            <RadzenStack Style="height: 350px;overflow:auto" Gap="0px" Orientation="Orientation.Vertical">
+                @if (player.Chat.Any())
+                {
+                    @foreach (var message in player.Chat.OrderByDescending(x => x.DateTime))
+                    {
+                        <RadzenText>@message.DateTime.ToLocalFromMoscow() - @message.Message</RadzenText>
+                    }
+                }
+                else
+                {
+                    <RadzenText>Истории чата нет</RadzenText>
+                }
+            </RadzenStack>
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+
+@code {
+    [Parameter] public PlayerInfo player { get; set; }
+}

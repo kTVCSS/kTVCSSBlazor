@@ -27,7 +27,7 @@
                                 <img src="@video.AuthorAvatar" class="channel-avatar" />
                                 <div style="flex:1;">
                                     <div style="font-weight:500; font-size:14px; line-height:1.2; margin-bottom:4px;">@video.Title</div>
-                                    <div class="video-meta">@video.AuthorName • @video.Views просмотров • @video.DateTime.ToShortDateString()</div>
+                                    <div class="video-meta">@video.AuthorName • @video.Views просмотров • @video.DateTime.ToLocalFromMoscow().ToShortDateString()</div>
                                 </div>
                             </div>
                         </div>

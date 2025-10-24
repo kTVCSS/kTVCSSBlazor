@@ -31,20 +31,20 @@
             @if (string.IsNullOrEmpty(player.HeaderPicture))
             {
                 <RadzenCard Style=@(string.Concat("background-image: url('", player.HeaderPicture, "') !important; height: auto;"))>
-                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline player="player" />
+                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline isInSearch=isInSearch player="player" />
                 </RadzenCard>
             }
             else
             {
                 <RadzenCard Style=@(string.Concat("background-image: url('", player.HeaderPicture, "') !important; height: auto; background-color: rgb(0 0 0 / 30%); background-blend-mode: overlay;"))>
-                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline player="player" />
+                    <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.Header isOnline=isOnline isInSearch=isInSearch player="player" />
                 </RadzenCard>
             }
         }
 
         @if (player.MainInfo.Block == 1)
         {
-            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose=false Text="@string.Concat("Игрок заблокирован: ", player.MainInfo.BlockReason, " (истекает: ", player.BanExpires, ")")" />
+            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose=false Text="@string.Concat("Игрок заблокирован: ", player.MainInfo.BlockReason, " (истекает: ", DateTime.Parse(player.BanExpires).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"), ")")" />
         }
 
         <CascadingAuthenticationState>
@@ -159,7 +159,11 @@
                 </RadzenStack>
             </HeaderTemplate>
             <Columns>
-                <RadzenDataGridColumn Width="250px" Context="ctx" Title="Дата" Property="DateTime" />
+                <RadzenDataGridColumn Width="250px" Context="ctx" Title="Дата">
+                    <Template>
+                        @ctx.DateTime.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn Title="Матч" Context="ctx">
                     <Template>
                         <RadzenLink Path="@(string.Concat("/match/", ctx.ID))" Text="@ctx.Result" />
@@ -183,6 +187,17 @@
                 <RadzenDataGridColumn Width="250px" Context="ctx" Title="Карта" Property="MapName" />
             </Columns>
         </RadzenDataGrid>
+
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                    {
+                        <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.ChatHistory player="player" />
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
 
         <kTVCSSBlazor.Client.Pages.Players.ProfileComponents.FeedbackComponent player="@player" />
     </RadzenStack>

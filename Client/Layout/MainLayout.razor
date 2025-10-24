@@ -1,5 +1,6 @@
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.Extensions.Options
 @using kTVCSS.Models.Db.Models.Chat.DTOs
 @using kTVCSS.Models.Db.Models.Common
 @using kTVCSS.Models.Db.Models.Teams
@@ -27,12 +28,9 @@
 @inject IMobileDetectionService mds
 @inject WindowSizeService WindowSize
 @inject ILocalStorageService localStorage
+@inject CookieThemeService CookieThemeService
 
 <RadzenComponents />
-<RadzenDialog />
-<RadzenNotification />
-<RadzenTooltip />
-<RadzenContextMenu />
 
 <script src="scripts/layout.js"></script>
 
@@ -54,11 +52,23 @@
                                 </Authorizing>
                                 <Authorized>
                                     <RadzenStack Orientation="Orientation.Horizontal">
-                                        @if (!isMobile) {
-                                            <RadzenButton Style="height: 32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="Играть" Icon="globe" />
+                                        @if (string.IsNullOrEmpty(mixRoomId))
+                                        {
+                                            @if (!isMobile) {
+                                                <RadzenButton Style="height: 32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="Играть" Icon="globe" />
+                                            }
+                                            else {
+                                                <RadzenButton Style="height: 32px;width:32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="" Icon="globe" />
+                                            }
                                         }
-                                        else {
-                                            <RadzenButton Style="height: 32px;width:32px;align-self:center;" Size="ButtonSize.Small" Click="ShowMM" Text="" Icon="globe" />
+                                        else
+                                        {
+                                            @if (!isMobile) {
+                                                <RadzenButton Style="height: 32px;align-self:center;" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(() => { NavigationManager.NavigateTo($"mixroom/{mixRoomId}", true); })" Text="Вы в матче" Icon="globe" />
+                                            }
+                                            else {
+                                                <RadzenButton Style="height: 32px;width:32px;align-self:center;" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(() => { NavigationManager.NavigateTo($"mixroom/{mixRoomId}", true); })" Text="" Icon="globe" />
+                                            }
                                         }
                                         <NotificationBell />
                                         <RadzenProfileMenu Style="position: relative">
@@ -283,6 +293,14 @@ else
     .rz-fileupload-content {
         display: none;
     }
+
+    ul.rz-profile-menu {
+        background-color: transparent !important;
+    }
+
+    video {
+        border-radius: 16px;
+    }
 </style>
 
 <style>
@@ -326,7 +344,7 @@ else
     }
 
     window.stopAmbience = function () {
-        ambience.pause();
+        //ambience.pause();
     }
 
     document.addEventListener('click', function enableNoSleep() {
@@ -438,18 +456,36 @@ else
             }
         }, 30000); // каждые 30 секунд
     }
+
+    window.getTimezoneOffset = () => {
+        return new Date().getTimezoneOffset();
+    };
+
+    window.convertMoscowToLocal = (moscowDateTimeString) => {
+        const moscowDate = new Date(moscowDateTimeString + '+03:00');
+    
+        return moscowDate.toISOString();
+    };
 </script>
 
 @code {
+    [Inject]
+    private ThemeService ThemeService { get; set; }
+    
+    [Inject]
+    private IOptions<CookieThemeServiceOptions> Options { get; set; }
+    
     private bool sidebarExpanded = true;
     private bool disposed = false;
     private bool isMobile = false;
     private bool ready = false;
     private List<string> citations = [];
+    private string mixRoomId = "";
 
     private bool inSearch = false;
     private bool searchButtonEnabled = true;
-    private int currentSearchUsersCount = 0;
+    private int currentSearchUsersCountAll = 0;
+    private int currentSearchUsersCountHR = 0;
     private string globalStyles = string.Empty;
 
     public void Dispose()
@@ -487,10 +523,17 @@ else
             StateHasChanged();
         }));
 
-        parameters.Add("CurrentSearchUsersCount", currentSearchUsersCount);
-        parameters.Add("CurrentSearchUsersCountChanged", EventCallback.Factory.Create<int>(this, value => 
+        parameters.Add("CurrentSearchUsersCountAll", currentSearchUsersCountAll);
+        parameters.Add("CurrentSearchUsersCountAllChanged", EventCallback.Factory.Create<int>(this, value => 
         {
-            currentSearchUsersCount = value;
+            currentSearchUsersCountAll = value;
+            StateHasChanged();
+        }));
+
+        parameters.Add("CurrentSearchUsersCountHR", currentSearchUsersCountHR);
+        parameters.Add("CurrentSearchUsersCountHRChanged", EventCallback.Factory.Create<int>(this, value => 
+        {
+            currentSearchUsersCountHR = value;
             StateHasChanged();
         }));
 
@@ -518,10 +561,33 @@ else
     private List<Sound> sounds = [];
     private Sound selectedGameFoundSound;
 
+    private async Task CleanMixRoomString()
+    {
+        await Task.Delay(TimeSpan.FromMinutes(4));
+
+        mixRoomId = null;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            var theme = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "kTVCSSTheme");
+
+            if (!string.IsNullOrEmpty(theme))
+            {
+                ThemeService.SetTheme(theme, false);
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "kTVCSSTheme", "material3-dark");
+                ThemeService.SetTheme("material3-dark", false);
+            }
+
+            StateHasChanged();
+            
             bool nt = false;
 
             KeepAliveService.StartKeepAlive();
@@ -595,6 +661,7 @@ else
                         sounds.Add(new() { Name = "Nani?", Value = "/sounds/nani.mp3" });
                         sounds.Add(new() { Name = "Max Verstappen", Value = "/sounds/max-verstappen.mp3" });
                         sounds.Add(new() { Name = "Lobotomy", Value = "/sounds/lobotomy.mp3" });
+                        sounds.Add(new() { Name = "NeDodgeYebok", Value = "/sounds/eblan.mp3" });
 
                         var actualGameSound = await localStorage.GetItemAsync<Sound>("GFSound");
 
@@ -626,7 +693,7 @@ else
                                             <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
                                             <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
                                         </RadzenStack>
-                            , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+    , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
 
                             JSRuntime.InvokeVoidAsync("requestNotificationPermission");
                         }
@@ -634,6 +701,40 @@ else
                         globalStyles = await http.GetStringAsync("/api/players/getstyles?id=" + AuthProvider.CurrentUser.Id);
 
                         await InvokeAsync(StateHasChanged);
+
+                        Task.Run(async () => 
+                        {
+                            try
+                            {
+                                var url = "";
+
+                                using (var http = new HttpClient())
+                                {
+                #if DEBUG
+                                    url = "http://localhost:5175/api/";
+                #endif
+                #if RELEASE
+
+                                url = "https://mm.ktvcss.com/api/";
+                #endif
+
+                                    var mixes = await http.GetFromJsonAsync<List<Mix>>(url + $"getmixes");
+
+                                    if (mixes.Any(x => x.MixPlayers.Any(x => x.Id == AuthProvider.CurrentUser.Id)))
+                                    {
+                                        mixRoomId = mixes.First(x => x.MixPlayers.Any(y => y.Id == AuthProvider.CurrentUser.Id)).Guid.ToString();
+
+                                        CleanMixRoomString();
+
+                                        await InvokeAsync(StateHasChanged);
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.Error.WriteLine(ex.Message);
+                            }
+                        });
 
                         Task.Run(async () => {
                             try {
@@ -708,6 +809,7 @@ else
 
                                 }
                             }
+                            mixRoomId = "";
                             NotificationService.Notify(NotificationSeverity.Success, "Матч закончился! Ждем Вас снова!");
                             inSearch = false;
                             await InvokeAsync(StateHasChanged);
@@ -767,22 +869,28 @@ else
                             }
                         });
 
-                        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
-                        {
-                            if (!NavigationManager.Uri.ToLower().Contains("/chat"))
-                            {
-                                JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
-
-                                NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
-                                {
-                                    NavigationManager.NavigateTo("/chat/" + message.DialogId);
-                                });
-                            }
-                        });
-
                         await ChatHub.StartAsync();
 
                         ChatHub.OnAfterConnect(AuthProvider.CurrentUser.Id);
+
+                        ChatHub.Connection.On<MessageDto>("ReceiveMessage", async (message) =>
+                        {
+                            Console.WriteLine("debug message received " + message.Sender.Login);
+
+                            if (!NavigationManager.Uri.ToLower().Contains("/chat"))
+                            {
+                                if (message.Sender.Login != AuthProvider.CurrentUser.Username) 
+                                {
+                                    JSRuntime.InvokeVoidAsync("showNotification", message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, message.Sender.AvatarUrl);
+
+                                    NotificationService.Notify(NotificationSeverity.Info, message.Sender.Login, message.Content.Length > 20 ? message.Content[0..20] : message.Content, duration: 5000, payload: DateTime.Now, click: (msg) =>
+                                    {
+                                        NavigationManager.NavigateTo("/chat/" + message.DialogId);
+                                    });
+                                }
+                                
+                            }
+                        });
 
                         @* if (ChatHub.Connection.State != HubConnectionState.Connected)
                         {

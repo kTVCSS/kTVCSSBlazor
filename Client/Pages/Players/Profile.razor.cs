@@ -18,6 +18,7 @@ namespace kTVCSSBlazor.Client.Pages.Players
         private bool disposed = false;
 
         private bool isOnline = false;
+        private bool isInSearch = false;
 
         private bool isMeAFriend = false;
 
@@ -82,6 +83,8 @@ namespace kTVCSSBlazor.Client.Pages.Players
                 }
 
                 isOnline = await http.GetFromJsonAsync<bool>($"/api/players/isonline?id={Id}");
+
+                isInSearch = await http.GetFromJsonAsync<bool>($"/api/players/IsInSearch?id={Id}");
 
                 ready = true;
 

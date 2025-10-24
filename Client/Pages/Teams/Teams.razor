@@ -16,7 +16,7 @@
 
 @if (ready)
 {
-    <RadzenDataGrid Responsive AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@dataSource">
+    <RadzenDataGrid AllowVirtualization Style="@($"height: {windowHeight}px")" Density="Density.Default" Data="@dataSource">
         <HeaderTemplate>
             <RadzenStack Style="width: 100%" JustifyContent="JustifyContent.Start" Orientation="@(isMobile ? Orientation.Vertical : Orientation.Horizontal)">
                 <RadzenText class="rz-pl-4" Style="margin-top: auto;" TextStyle="TextStyle.DisplayH5" Text="Список команд проекта"></RadzenText>
@@ -33,17 +33,40 @@
                         </RadzenStack>
                     </Template>
                 </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Width="200px" Title="Команда" Context="ctx">
+                    <Template>
+                        <RadzenLink Path="@string.Concat("/team/", ctx.Id)">@ctx.Name</RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Context="ctx" Title="Сыграно" Property="MatchesPlayed" />
+                <RadzenDataGridColumn Context="ctx" Title="Победы" Property="MatchesWins" />
+                <RadzenDataGridColumn Context="ctx" Title="Поражения" Property="MatchesLosts" />
+                <RadzenDataGridColumn Context="ctx" Title="Рейтинг" Property="Rating" />
+                <RadzenDataGridColumn Context="ctx" Title="Игроки" Property="PlayersCount" />
             }
-            <RadzenDataGridColumn Width="200px" Title="Команда" Context="ctx">
-                <Template>
-                    <RadzenLink Path="@string.Concat("/team/", ctx.Id)">@ctx.Name</RadzenLink>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Context="ctx" Title="Сыграно" Property="MatchesPlayed" />
-            <RadzenDataGridColumn Context="ctx" Title="Победы" Property="MatchesWins" />
-            <RadzenDataGridColumn Context="ctx" Title="Поражения" Property="MatchesLosts" />
-            <RadzenDataGridColumn Context="ctx" Title="Рейтинг" Property="Rating" />
-            <RadzenDataGridColumn Context="ctx" Title="Игроки" Property="PlayersCount" />
+            else
+            {
+                <RadzenDataGridColumn Width="144px" Title="" Context="ctx">
+                    <Template>
+                        <RadzenStack JustifyContent="JustifyContent.Center" AlignItems=AlignItems.Center Orientation="Orientation.Horizontal">
+                            <div style="margin:auto">@ctx.Position</div>
+                            <img style='display: flex;justify-content: center;background-repeat: no-repeat; background-position: 50%; border-radius: 50%; width: 25px; height: 25px;' src='@ctx.AvatarUrl' />
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+                <RadzenDataGridColumn Width="150px" Title="Команда" Context="ctx">
+                    <Template>
+                        <RadzenLink Path="@string.Concat("/team/", ctx.Id)">@ctx.Name</RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Сыграно" Property="MatchesPlayed" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Победы" Property="MatchesWins" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Поражения" Property="MatchesLosts" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Рейтинг" Property="Rating" />
+                <RadzenDataGridColumn Width="100px" Context="ctx" Title="Игроки" Property="PlayersCount" />
+            }
         </Columns>
     </RadzenDataGrid>
 }

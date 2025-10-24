@@ -30,13 +30,13 @@
                 <img style="height: 40px;border-radius: 128px;" src="@video.AuthorAvatar" />
                 <RadzenText Text="@video.AuthorName" />
             </RadzenStack>
-            <RadzenText Text="@(string.Concat("Дата публикации: ", video.DateTime.ToShortDateString()))" />
+            <RadzenText Text="@(string.Concat("Дата публикации: ", video.DateTime.ToLocalFromMoscow().ToShortDateString()))" />
         </RadzenStack>
 
         @if (!string.IsNullOrEmpty(video.Description))
         {
             <RadzenCard>
-                <RadzenMarkdown AllowHtml Text="@video.Description" />
+                <RadzenMarkdown Text="@video.Description" />
             </RadzenCard>
         }
 
@@ -67,7 +67,7 @@
                 @foreach (var item in video.Comments)
                 {
                     <RadzenCard class="rz-pa-3 rz-my-2">
-                        <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()</RadzenText>
+                        <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLocalFromMoscow().ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToLocalFromMoscow().ToShortTimeString()</RadzenText>
 
                         <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
                             <RadzenText>@item.Text</RadzenText>

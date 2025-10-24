@@ -12,39 +12,51 @@
 @inject IMobileDetectionService mds
 @inject ILocalStorageService localStorage
 @inject HttpClient http
+@inject ThemeService ThemeService
 
 <PageTitle>kTVCSS @@ Настройки</PageTitle>
 
 <RadzenRow JustifyContent="JustifyContent.Center">
     <RadzenColumn SizeXS="12" SizeSM="8">
         <RadzenStack>
-            <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4">Настройки сайта
+            <RadzenText TextAlign="TextAlign.Center" TextStyle="TextStyle.DisplayH4">
+                Настройки сайта
                 <RadzenText Text="БЕТА" TextStyle="TextStyle.Subtitle2" />
             </RadzenText>
 
-            <RadzenStack Gap="1rem">
-                <RadzenStack Gap="4px" Orientation="Orientation.Vertical">
-                    <RadzenLabel Text="Звук найденной игры" Component="DropDownTemplate" />
-                    <RadzenDropDown @bind-Value=@selectedGameFoundSound Data=@sounds TextProperty="@nameof(Sound.Name)"
-                        Style="width: 250px;" Name="DropDownTemplate">
-                        <Template>
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                                <RadzenButton Size="ButtonSize.Small" Icon="play_circle"
-                                    Click="@(() => { JSRuntime.InvokeVoidAsync("testSound", (context as Sound).Value); })" />
-                                @((context as Sound).Name)
-                            </RadzenStack>
-                        </Template>
-                        <ValueTemplate>
-                            @((context as Sound).Name)
-                        </ValueTemplate>
-                    </RadzenDropDown>
-                </RadzenStack>
-                <RadzenStack Gap="4px" Orientation="Orientation.Vertical">
-                    <RadzenLabel Text="Громкость звука" Component="DropDownTemplate" />
-                    <RadzenNumeric Style="width: 250px;" Min="0" Max="1" Step="0,1" @bind-Value=@volume
-                        InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
-                </RadzenStack>
-                <RadzenButton Style="width: 250px" Text="Сделать тест найденной игры" Click="ShowGameReady" />
+            <RadzenStack class="rz-p-2 rz-p-md-4 rz-p-lg-6">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenStack Orientation="Orientation.Horizontal" Wrap=FlexWrap.Wrap>
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" Wrap=FlexWrap.Wrap class="rz-p-sm-2">
+                            <RadzenLabel Text="Звук найденной игры" Component="DropDownTemplate" />
+                            <RadzenDropDown @bind-Value=@selectedGameFoundSound Data=@sounds TextProperty="@nameof(Sound.Name)"
+                                            Style="width: 250px;" Name="DropDownTemplate">
+                                <ValueTemplate>
+                                    @((context as Sound).Name)
+                                </ValueTemplate>
+                            </RadzenDropDown>
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
+                            <RadzenLabel Text="Громкость звука" Component="DropDownTemplate" />
+                            <RadzenNumeric Style="width: 250px;" Min="0" Max="1" Step="0,1" @bind-Value=@volume
+                                           InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "enter value" } })" />
+                        </RadzenStack>
+                    </RadzenStack>
+
+                    <RadzenButton Style="display: flex;justify-self: end;margin-top: 2%;" Text="Сделать тест найденной игры" Click="ShowGameReady" />
+                </RadzenCard>
+            </RadzenStack>
+
+            <RadzenStack class="rz-p-2 rz-p-md-4 rz-p-lg-6">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" class="rz-p-sm-2">
+                            <RadzenLabel Text="Текущая тема оформления сайта" />
+                            <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.All.Where(x => x.Text.Contains("Dark"))" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+                            </RadzenDropDown>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
             </RadzenStack>
         </RadzenStack>
     </RadzenColumn>
@@ -52,9 +64,10 @@
 
 <script>
     window.testSound = (track) => {
-        let audio = new Audio(track)
-        audio.volume = @volume
-            audio.play();
+        console.log(@(volume));
+        let audio = new Audio(track);
+        audio.volume = @(volume)
+        audio.play();
     }
 </script>
 
@@ -101,6 +114,7 @@
             sounds.Add(new() { Name = "Nani?", Value = "/sounds/nani.mp3" });
             sounds.Add(new() { Name = "Max Verstappen", Value = "/sounds/max-verstappen.mp3" });
             sounds.Add(new() { Name = "Lobotomy", Value = "/sounds/lobotomy.mp3" });
+            sounds.Add(new() { Name = "NeDodgeYebok", Value = "/sounds/eblan.mp3" });
 
             var actualGameSound = await localStorage.GetItemAsync<Sound>("GFSound");
 
@@ -143,7 +157,7 @@
 
         DialogService.OpenAsync("", ds =>
         @<RadzenStack Style="height: 100vh;max-height: 100%;overflow: hidden;" JustifyContent="JustifyContent.Center"
-            AlignItems="AlignItems.Center">
+                              AlignItems="AlignItems.Center">
             <GameFound Strings="citations" />
         </RadzenStack>,
         new DialogOptions()
@@ -167,5 +181,12 @@
     {
         public string Name { get; set; }
         public string Value { get; set; }
+    }
+
+    void ChangeTheme(string value)
+    {
+        ThemeService.SetTheme(value);
+
+        JSRuntime.InvokeVoidAsync("localStorage.setItem", "kTVCSSTheme", value);
     }
 }

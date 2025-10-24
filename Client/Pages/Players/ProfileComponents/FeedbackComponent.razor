@@ -32,8 +32,8 @@
 
                                 <RadzenText>
                                     <RadzenLink Path="@string.Concat("/player/", item.AuthorId)" class="rz-font-weight-bold"
-                                        Text="@item.AuthorName" /> - @DateTime.Parse(item.DateTime.ToString()).ToShortDateString()
-                                    @DateTime.Parse(item.DateTime.ToString()).ToShortTimeString()
+                                        Text="@item.AuthorName" /> - @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToShortDateString()
+                                    @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToShortTimeString()
                                 </RadzenText>
 
                                 <CascadingAuthenticationState>
@@ -51,7 +51,7 @@
                         </RadzenStack>
 
                         <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
-                            <RadzenMarkdown AllowHtml Text="@item.Text" />
+                            <RadzenMarkdown Text="@item.Text" />
                         </div>
                     </RadzenStack>
                 </RadzenCard>

@@ -54,7 +54,11 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Width="200px" Context="ctx" Title="STEAMID" Property="SteamID" />
-                <RadzenDataGridColumn Context="ctx" Title="Истекает" Property="BanExpires" />
+                <RadzenDataGridColumn Context="ctx" Title="Истекает">
+                    <Template>
+                        @DateTime.Parse(ctx.BanExpires).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn CssClass="rz-text-wrap" Width="300px" Context="ctx" Title="Причина" Property="Reason" />
                 <RadzenDataGridColumn Context="ctx" Title="Выдан" Property="BannedBy" />
             </Columns>

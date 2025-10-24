@@ -28,14 +28,14 @@ namespace kTVCSSBlazor.Client.Pages.Cups
                     {
                         CupId = Cup.Id,
                         Stage = stage,
-                        StartTime = Cup.Matches.First().StartTime.Date.AddHours(21),
+                        StartTime = Cup.Matches.First().StartTime.Date.ToLocalFromMoscow().AddHours(21),
                         Status = MatchStatus.Pending
                     },
                     new MatchDto()
                     {
                         CupId = Cup.Id,
                         Stage = stage,
-                        StartTime = Cup.Matches.First().StartTime.Date.AddHours(21),
+                        StartTime = Cup.Matches.First().StartTime.Date.ToLocalFromMoscow().AddHours(21),
                         Status = MatchStatus.Pending
                     },
                 };
@@ -48,7 +48,7 @@ namespace kTVCSSBlazor.Client.Pages.Cups
                     {
                         CupId = Cup.Id,
                         Stage = stage,
-                        StartTime = Cup.Matches.First().StartTime.Date.AddHours(22),
+                        StartTime = Cup.Matches.First().StartTime.Date.ToLocalFromMoscow().AddHours(22),
                         Status = MatchStatus.Pending
                     },
                 };

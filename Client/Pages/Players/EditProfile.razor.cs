@@ -1,9 +1,10 @@
-﻿using kTVCSS.Models.Models;
-using Microsoft.AspNetCore.Components.Forms;
+﻿using kTVCSS.Models.Db.Models.Statuses;
+using kTVCSS.Models.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Radzen;
 using System.Net.Http.Json;
-using kTVCSS.Models.Db.Models.Statuses;
+using System.Text.RegularExpressions;
 
 namespace kTVCSSBlazor.Client.Pages.Players
 {
@@ -47,6 +48,19 @@ namespace kTVCSSBlazor.Client.Pages.Players
             NotificationService.Notify(NotificationSeverity.Success, "Успех", "Текущая шапка установлена на стандартную! Не забудьте сохранить изменения!");
         }
 
+        public bool IsValidLogin(string login)
+        {
+            if (string.IsNullOrEmpty(login))
+                return false;
+
+            if (login.Length > 30)
+                return false;
+
+            // Регулярное выражение: от 1 до 30 символов, каждый из которых – буква, цифра, '_' или '-'
+            const string pattern = @"^[A-Za-z0-9_-]+$";
+            return Regex.IsMatch(login, pattern);
+        }
+
         private async Task Save()
         {
             if (needUpdatePassword)
@@ -61,6 +75,21 @@ namespace kTVCSSBlazor.Client.Pages.Players
             if (profile.Login.Length < 4)
             {
                 NotificationService.Notify(NotificationSeverity.Error, "Логин должен быть длиннее 3 символов");
+                return;
+            }
+
+            if (!IsValidLogin(profile.Login))
+            {
+                NotificationService.Notify(new NotificationMessage()
+                {
+                    CloseOnClick = true,
+                    Detail = "Логин содержит недопустимые знаки!",
+                    Summary = "Ошибка регистрации",
+                    Severity = NotificationSeverity.Error,
+                    Duration = 5000,
+                    Payload = DateTime.Now
+                });
+
                 return;
             }
 

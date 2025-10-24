@@ -2,6 +2,7 @@
 @using kTVCSSBlazor.Client.Services
 @inject NavigationManager NavigationManager
 @inject IMobileDetectionService mds
+@inject DialogService DialogService
 
 @if (ready)
 {
@@ -45,11 +46,26 @@
                     <RadzenText Style="margin:initial; font-size: 14px;" Text="@ctx.PlayerInfo?.MainInfo.Name" />
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата создания" Property="CreatedAt" />
-            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата обновления" Property="UpdatedAt" />
+            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата создания">
+                <Template>
+                    @ctx.CreatedAt.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="16%" Context="ctx" Title="Дата обновления">
+                <Template>
+                    @ctx.UpdatedAt.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm")
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn Title="" Context="ctx">
                 <Template>
-                    <RadzenButton Text="Перейти" Click="@(() => { NavigationManager.NavigateTo($"/ticket/{ctx.TicketId}"); })" />
+                    @if (isMobile)
+                    {
+                        <RadzenButton Text="Перейти" Click="@(() => { NavigationManager.NavigateTo($"/ticket/{ctx.TicketId}"); })" />
+                    }
+                    else
+                    {
+                        <RadzenButton Text="Открыть" Click="@(() => { ShowTicket(ctx.TicketId); })" />
+                    }
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -77,5 +93,13 @@ else
 
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private async Task ShowTicket(int id)
+    {
+        await DialogService.OpenAsync("Тикет #" + id, ds =>
+                            @<TicketPage Id="@id" />
+        , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = false, Width = "1280px", Height = "720px" });
+    }
     }
 }

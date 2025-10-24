@@ -35,13 +35,22 @@ namespace kTVCSSBlazor.Client.Pages.Players.ProfileComponents
             ban.DaysAdder = 0;
             ban.Reason = unbanReason;
 
-            await http.PostAsJsonAsync("/api/admins/unban", ban);
+            var request = await http.PostAsJsonAsync("/api/admins/unban", ban);
 
-            ns.Notify(NotificationSeverity.Success, "Успех", "Игрок был разблокирован!");
+            var response = await request.Content.ReadFromJsonAsync<UnbanResponse>();
 
-            await Task.Delay(1000);
+            if (response == UnbanResponse.Ok)
+            {
+                ns.Notify(NotificationSeverity.Success, "Игрок был разблокирован!");
 
-            nm.Refresh(true);
+                await Task.Delay(1000);
+
+                nm.Refresh(true);
+            }
+            else
+            {
+                ns.Notify(NotificationSeverity.Error, "У Вас не хватает прав для разбана данного игрока!");
+            }
         }
 
         private BanReason _selectedReason;
