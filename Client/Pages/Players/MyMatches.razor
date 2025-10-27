@@ -17,13 +17,13 @@
                 <Template Context="match">
                     <a href="@(string.Concat("/match/", match.Id))">
                         <div style="display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;">
-                            @if (match.MatchDate == "LIVE")
+                            @if (match.MatchDate == DateTime.MinValue)
                             {
-                                <div class="rz-text-display-h5" style="color: red;font-weight: 600;width:100%;text-align:center">@match.MatchDate</div>
+                                <div class="rz-text-display-h5" style="color: red;font-weight: 600;width:100%;text-align:center">LIVE</div>
                             }
                             else
                             {
-                                <div class="rz-text-display-h5" style="font-weight: 600;width:100%;text-align:center">@(DateTime.Parse(match.MatchDate).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
+                                <div class="rz-text-display-h5" style="font-weight: 600;width:100%;text-align:center">@(match.MatchDate.Value.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
                             }
                             <div style="display: flex;flex-direction:row;width: 100%;align-items: center;justify-content: space-between;">
                                 <div class="rz-text-display-h5" style="font-weight: 600;text-align: center;width: 45%;">@match.ATeam</div>

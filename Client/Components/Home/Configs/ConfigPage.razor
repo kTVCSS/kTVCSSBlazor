@@ -131,11 +131,7 @@
             @foreach (var item in config.GameConfigsComments)
             {
                 <RadzenCard class="rz-pa-3 rz-my-2">
-                    <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToLongDateString() @DateTime.Parse(item.DateTime.ToLocalFromMoscow().ToString()).ToShortTimeString()</RadzenText>
-
-                    <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
-                        <RadzenText>@item.Text</RadzenText>
-                    </div>
+                    <CommentComponent AuthorId="@item.UserId" AuthorName="@item.UserName" AvatarUrl="@item.UserAvatar" Text="@item.Text" DateTime="item.DateTime" />
                 </RadzenCard>
             }
         }

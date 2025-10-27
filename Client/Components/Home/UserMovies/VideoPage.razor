@@ -67,21 +67,7 @@
                 @foreach (var item in video.Comments)
                 {
                     <RadzenCard class="rz-pa-3 rz-my-2">
-                        <RadzenText>@item.UserName - @DateTime.Parse(item.DateTime.ToString()).ToLocalFromMoscow().ToLongDateString() @DateTime.Parse(item.DateTime.ToString()).ToLocalFromMoscow().ToShortTimeString()</RadzenText>
-
-                        <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
-                            <RadzenText>@item.Text</RadzenText>
-                        </div>
-
-                        <CascadingAuthenticationState>
-                            <AuthorizeView>
-                                <Authorized>
-                                    @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator) {
-                                        <RadzenButton Variant="Variant.Text" Click="@(() => { RemoveComment(item.Id); })" Text="Удалить" />
-                                    }
-                                </Authorized>
-                            </AuthorizeView>
-                        </CascadingAuthenticationState>
+                        <CommentComponent AuthorId="@item.UserId" AuthorName="@item.UserName" AvatarUrl="@item.UserAvatar" Text="@item.Text" DateTime="item.DateTime" UseDeletion=true RemoveEvent="@(() => { RemoveComment(item.Id); })" />
                     </RadzenCard>
                 }
             }

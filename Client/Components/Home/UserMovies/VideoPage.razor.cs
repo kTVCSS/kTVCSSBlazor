@@ -44,6 +44,8 @@ namespace kTVCSSBlazor.Client.Components.Home.UserMovies
             {
                 Id = 0,
                 Text = text,
+                UserAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                UserId = AuthProvider.CurrentUser.Id,
                 UserName = AuthProvider.CurrentUser.Username
             });
 

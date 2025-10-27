@@ -33,13 +33,15 @@ builder.Services.AddRadzenCookieThemeService(options =>
     options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
 });
 
+builder.Services.AddScoped<AntiFreezeService>();
+
 builder.Services.AddControllers();
 builder.Services.AddRadzenComponents();
 builder.Services.AddHttpClient("default", c => c.Timeout = TimeSpan.FromMinutes(1));
 builder.Services.AddBlazoredLocalStorage();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<StateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<StateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 
 builder.Services.AddScoped<GitHubService>();
 builder.Services.AddScoped<ChatHubService>();
@@ -94,5 +96,7 @@ app.MapGet("/api/DeleteMixMemory", async (string guid) =>
 
     return "cleared";
 });
+
+app.MapGet("/api/ping", () => Results.Ok(new { timestamp = DateTimeOffset.UtcNow }));
 
 app.Run();

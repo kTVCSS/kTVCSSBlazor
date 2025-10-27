@@ -37,6 +37,8 @@ namespace kTVCSSBlazor.Client.Pages.Articles
                 //Article = article,
                 Id = 0,
                 Text = text,
+                UserAvatar = AuthProvider.CurrentUser.AvatarUrl,
+                UserId = AuthProvider.CurrentUser.Id,
                 UserName = AuthProvider.CurrentUser.Username
             });
 

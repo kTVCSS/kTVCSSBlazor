@@ -37,6 +37,8 @@ builder.Services.AddSingleton(new ApiServerSelector(apiEndpoints.ToArray()));
 
 #endif
 
+builder.Services.AddScoped<AntiFreezeService>();
+
 builder.Services.AddRadzenCookieThemeService(options =>
 {
     options.Name = "kTVCSSTheme"; // The name of the cookie
@@ -51,9 +53,9 @@ builder.Services.AddScoped(sp =>
 });
 
 builder.Services.AddScoped<GitHubService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<StateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
+builder.Services.AddSingleton<UserService>();
+builder.Services.AddSingleton<StateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider>(sp => sp.GetRequiredService<StateProvider>());
 builder.Services.AddAuthorizationCore();
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<KeepAliveService>();

@@ -17,9 +17,9 @@ public class KeepAliveService
         _timer = new Timer(async _ => 
         {
             await SendKeepAliveMessage();
-        }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(20));
 
-        //await _jsRuntime.InvokeVoidAsync("startKeepAliveActivities");
+        await _jsRuntime.InvokeVoidAsync("startKeepAliveActivities");
     }
 
     public async Task SendKeepAliveMessage()

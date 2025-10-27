@@ -28,6 +28,7 @@
 @inject IMobileDetectionService mds
 @inject WindowSizeService WindowSize
 @inject ILocalStorageService localStorage
+@inject AntiFreezeService AntiFreeze
 @inject CookieThemeService CookieThemeService
 
 <RadzenComponents />
@@ -131,6 +132,7 @@
                                 <RadzenPanelMenuItem Expanded=false Text="Админ" Icon="shield_person">
                                     <RadzenPanelMenuItem Click=SidePanelClick Text="Тикеты" Path="/tickets" Icon="import_contacts"></RadzenPanelMenuItem>
                                     <RadzenPanelMenuItem Click=SidePanelClick Text="База знаний" Path="/library" Icon="library_books"></RadzenPanelMenuItem>
+                                    <RadzenPanelMenuItem Click=Sherlock Text="Найти игрока" Icon="mystery"></RadzenPanelMenuItem>
                                     @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Admin)
                                     {
                                         <RadzenPanelMenuItem Click=SidePanelClick Text="Управление админами" Path="/editadmins" Icon="manage_accounts"></RadzenPanelMenuItem>
@@ -428,6 +430,79 @@ else
         }, 60000);
     };
 
+    // wwwroot/js/antiFreeze.js
+    window.antiFreeze = {
+        timers: [],
+    
+        start: function() {
+            // Множественные таймеры для надежности
+            this.timers.push(setInterval(() => {
+                // Микро-манипуляция DOM
+                document.body.style.opacity = document.body.style.opacity || '1';
+            }, 15000));
+        
+            this.timers.push(setInterval(() => {
+                // Фейковый fetch к blob URL (не требует сети)
+                fetch('data:text/plain,ping').catch(() => {});
+            }, 20000));
+        
+            this.timers.push(setInterval(() => {
+                // localStorage операция
+                const key = '_keepAlive';
+                localStorage.setItem(key, Date.now().toString());
+            }, 25000));
+        
+            // Перехват visibilitychange
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) {
+                    window.dotNetRef?.invokeMethodAsync('OnTabActivated');
+                }
+            });
+        
+            // Перехват focus
+            window.addEventListener('focus', () => {
+                window.dotNetRef?.invokeMethodAsync('OnTabActivated');
+            });
+        
+            // Web Locks API (Chrome/Edge) - держит вкладку "активной"
+            if ('locks' in navigator) {
+                navigator.locks.request('app_active', {mode: 'shared'}, async lock => {
+                    // Удерживаем лOK бесконечно
+                    return new Promise(() => {});
+                });
+            }
+        
+            // Wake Lock API (предотвращает засыпание)
+            this.requestWakeLock();
+        },
+    
+        requestWakeLock: async function() {
+            if ('wakeLock' in navigator) {
+                try {
+                    const wakeLock = await navigator.wakeLock.request('screen');
+                
+                    // Переподключение при потере
+                    document.addEventListener('visibilitychange', async () => {
+                        if (!document.hidden && wakeLock.released) {
+                            await this.requestWakeLock();
+                        }
+                    });
+                } catch (err) {
+                    console.log('WakeLock not supported');
+                }
+            }
+        },
+    
+        stop: function() {
+            this.timers.forEach(t => clearInterval(t));
+            this.timers = [];
+        },
+    
+        setDotNetRef: function(ref) {
+            window.dotNetRef = ref;
+        }
+    };
+
     window.sendServiceWorkerMessage = (message) => {
         if (navigator.serviceWorker && navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage(message);
@@ -471,10 +546,10 @@ else
 @code {
     [Inject]
     private ThemeService ThemeService { get; set; }
-    
+
     [Inject]
     private IOptions<CookieThemeServiceOptions> Options { get; set; }
-    
+
     private bool sidebarExpanded = true;
     private bool disposed = false;
     private bool isMobile = false;
@@ -490,6 +565,7 @@ else
 
     public void Dispose()
     {
+        AntiFreeze.DisposeAsync();
         NavigationManager.LocationChanged -= OnLocationChanged;
         disposed = true;
         mm.DisposeAsync();
@@ -570,6 +646,37 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
+    private async Task Sherlock()
+    {
+        string steam = string.Empty;
+
+         await DialogService.OpenAsync("Розыск человека", ds =>
+         @<RadzenStack Gap="1.5rem">
+            <RadzenTextBox @bind-Value=steam Placeholder="STEAMID" />
+            <RadzenButton Text="Найти" Click=@(() => { ds.Close(true); }) />
+         </RadzenStack>
+    , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
+
+        if (steam != default)
+        {
+            var request = await http.PostAsJsonAsync("/api/players/sherlock", new { SteamId = steam });
+
+            if (request.IsSuccessStatusCode)
+            {
+                var id = await request.Content.ReadAsStringAsync();
+
+                if (!string.IsNullOrEmpty(id))
+                {
+                    NavigationManager.NavigateTo($"/player/{id}");
+                }
+                else
+                {
+                    NotificationService.Notify(NotificationSeverity.Error, "Игрок не найден");
+                }
+            }
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -614,11 +721,13 @@ else
                 Console.WriteLine(ex.ToString());
             }
 
+            await AntiFreeze.StartAsync();
+
             ready = true;
 
             await InvokeAsync(StateHasChanged);
 
-            #pragma warning disable CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
+            #pragma warning disable CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пOKа вызов не будет завершен
             
             Task.Run(async () =>
             {
@@ -691,7 +800,7 @@ else
                             await DialogService.OpenAsync("Подключение уведомлений", ds =>
                                         @<RadzenStack Gap="1.5rem">
                                             <RadzenText>Сейчас откроется диалог, в котором сайт потребует разрешения на отправку уведомлений. Согласитесь, если Вам требуется, чтобы браузер или устройство отправляло уведомление о сообщениях или найденной игре.</RadzenText>
-                                            <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
+                                            <RadzenButton Text="OK" Click=@(() => { ds.Close(true); }) />
                                         </RadzenStack>
     , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
 
@@ -792,7 +901,7 @@ else
                                 await DialogService.OpenAsync("Система подбора матчей - ошибка", ds =>
                                         @<RadzenStack Gap="1.5rem">
                                             <RadzenText>Подключение к сервису подбора матчей было закрыто: @exception.Message</RadzenText>
-                                            <RadzenButton Text="Ок" Click=@(() => { ds.Close(true); }) />
+                                            <RadzenButton Text="OK" Click=@(() => { ds.Close(true); }) />
                                         </RadzenStack>
                             , options: new DialogOptions() { ShowClose = true, CloseDialogOnEsc = true, CloseDialogOnOverlayClick = true });
 
@@ -838,7 +947,7 @@ else
                                     break;
                                 }
                                 case GameHubConnectResult.IsBanned: {
-                                    NotificationService.Notify(NotificationSeverity.Error, "Вы были заблокированы, поэтому Вы не можете начать поиск игры!");
+                                    NotificationService.Notify(NotificationSeverity.Error, "Вы были заблOKированы, поэтому Вы не можете начать поиск игры!");
                                     break;
                                 }
                                 case GameHubConnectResult.MixesDisabled: {
@@ -902,7 +1011,7 @@ else
                 }
             });
             
-            #pragma warning restore CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пока вызов не будет завершен
+            #pragma warning restore CS4014 // Так как этот вызов не ожидается, выполнение существующего метода продолжается до тех пор, пOKа вызов не будет завершен
         }
     }
 

@@ -10,14 +10,20 @@
 {
     @if (player.Feedback.Count == 0)
     {
-        @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
-        {
-            <RadzenText>Отзывы об игроке не найдены. Будьте первым, кто оставит отзыв!</RadzenText>
-        }
-        else
-        {
-            <RadzenText>О Вас пока никто не оставлял отзывы!</RadzenText>
-        }
+        <CascadingAuthenticationState>
+            <AuthorizeView>
+                <Authorized>
+                    @if (AuthProvider.CurrentUser.Id != player.MainInfo.Id)
+                    {
+                        <RadzenText>Отзывы об игроке не найдены. Будьте первым, кто оставит отзыв!</RadzenText>
+                    }
+                    else
+                    {
+                        <RadzenText>О Вас пока никто не оставлял отзывы!</RadzenText>
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </CascadingAuthenticationState>
     }
     else
     {

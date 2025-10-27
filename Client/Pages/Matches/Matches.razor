@@ -21,13 +21,13 @@
                 <Template Context="match">
                     <a href="@(string.Concat("/match/", match.Id))">
                         <div style="@($"display: flex; flex-direction: column;height: 100%;align-items: center;justify-content: space-evenly;")">
-                            @if (match.MatchDate == "LIVE")
+                            @if (match.MatchDate == DateTime.MinValue)
                             {
-                                <div class="rz-text-h4" style="color: red;width:100%;text-align:center">@match.MatchDate</div>
+                                <div class="rz-text-h4" style="color: red;width:100%;text-align:center">LIVE</div>
                             }
                             else
                             {
-                                <div class="rz-text-h4" style="width:100%;text-align:center">@(DateTime.Parse(match.MatchDate).ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
+                                <div class="rz-text-h4" style="width:100%;text-align:center">@(match.MatchDate.Value.ToLocalFromMoscow().ToString("dd.MM.yyyy HH:mm"))</div>
                             }
                             @if (!isMobile)
                             {

@@ -13,27 +13,41 @@ namespace kTVCSSBlazor.Client.Authorization
     public class UserService
     {
         private const string _storageKey = "kTVCSSComIdent092025";
-        private readonly IConfiguration _configuration;
-        private readonly ILocalStorageService _localStorage;
-        private HttpClient _http;
+        private readonly IServiceProvider _serviceProvider;
 
-        public UserService(IConfiguration configuration, ILocalStorageService localStorage, HttpClient http)
+        public UserService(IServiceProvider serviceProvider)
         {
-            _configuration = configuration;
-            _localStorage = localStorage;
-            _http = http;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<RegisterResult> Register(string username, string password)
         {
-            return await _http.GetFromJsonAsync<RegisterResult>($"/api/register?username={username}&password={password}");
+            return await GetHTTPClient().GetFromJsonAsync<RegisterResult>($"/api/register?username={username}&password={password}");
+        }
+
+        private ILocalStorageService GetLocalStorage()
+        {
+            return _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<ILocalStorageService>();
+        }
+
+        private HttpClient GetHTTPClient()
+        {
+
+#if DEBUG
+            return new HttpClient { BaseAddress = new Uri("http://localhost:3000"), Timeout = TimeSpan.FromMinutes(1) };
+#endif
+
+#if RELEASE
+            return new HttpClient { BaseAddress = new Uri("https://api.ktvcss.com"), Timeout = TimeSpan.FromMinutes(1) };
+#endif
+
         }
 
         private async Task<User?> Get(LoginArgs args)
         {
             try
             {
-                var response = await _http.PostAsJsonAsync($"/api/login", args);
+                var response = await GetHTTPClient().PostAsJsonAsync($"/api/login", args);
 
                 response.EnsureSuccessStatusCode();
 
@@ -63,14 +77,14 @@ namespace kTVCSSBlazor.Client.Authorization
         public async Task PersistUserToBrowserAsync(User user)
         {
             string userJson = JsonSerializer.Serialize(user);
-            _localStorage.SetItemAsStringAsync(_storageKey, userJson);
+            GetLocalStorage().SetItemAsStringAsync(_storageKey, userJson);
         }
 
         public async Task<User?> FetchUserFromBrowserAsync()
         {
             try
             {
-                var storedUserResult = await _localStorage.GetItemAsync<string>(_storageKey);
+                var storedUserResult = await GetLocalStorage().GetItemAsync<string>(_storageKey);
 
                 if (!string.IsNullOrEmpty(storedUserResult))
                 {
@@ -87,6 +101,6 @@ namespace kTVCSSBlazor.Client.Authorization
             return null;
         }
 
-        public async Task ClearBrowserUserDataAsync() => _localStorage.RemoveItemAsync(_storageKey);
+        public async Task ClearBrowserUserDataAsync() => GetLocalStorage().RemoveItemAsync(_storageKey);
     }
 }

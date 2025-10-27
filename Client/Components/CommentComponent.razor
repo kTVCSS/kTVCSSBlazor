@@ -1,0 +1,58 @@
+﻿@using kTVCSSBlazor.Client.Authorization
+@inject StateProvider AuthProvider
+
+<RadzenStack>
+    <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+        <RadzenStack Gap="0px" AlignItems="AlignItems.Center" Orientation="Orientation.Horizontal">
+            <img class="rz-mr-2" src="@AvatarUrl" style="width: 32px; height: 32px;border-radius:50%" />
+
+            <RadzenText>
+                <RadzenLink Path="@string.Concat("/player/", AuthorId)" class="rz-font-weight-bold"
+                            Text="@AuthorName" /> - @DateTime.Parse(DateTime.ToLocalFromMoscow().ToString()).ToShortDateString()
+                @DateTime.Parse(DateTime.ToLocalFromMoscow().ToString()).ToShortTimeString()
+            </RadzenText>
+
+            @if (UseDeletion)
+            {
+                <CascadingAuthenticationState>
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (AuthProvider.CurrentUser.Role >= kTVCSS.Models.Db.Models.Roles.RoleType.Moderator)
+                            {
+                                <RadzenButton class="rz-ml-2" Variant="Variant.Text"
+                                              Click="RemoveEvent" Text="Удалить" />
+                            }
+                        </Authorized>
+                    </AuthorizeView>
+                </CascadingAuthenticationState>
+            }
+        </RadzenStack>
+    </RadzenStack>
+
+    <div style="width: 100%;white-space: normal;overflow-wrap: break-word;">
+        <RadzenMarkdown Text="@Text" />
+    </div>
+</RadzenStack>
+
+@code {
+    [Parameter]
+    public string? AvatarUrl { get; set; }
+
+    [Parameter]
+    public string AuthorName { get; set; }
+
+    [Parameter]
+    public int? AuthorId { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public DateTime DateTime { get; set; }
+
+    [Parameter]
+    public bool UseDeletion { get; set; } = false;
+
+    [Parameter]
+    public EventCallback RemoveEvent { get; set; }
+}
